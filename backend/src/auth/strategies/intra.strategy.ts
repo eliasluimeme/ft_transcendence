@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { Strategy } from 'passport-42';
 import { PassportStrategy } from "@nestjs/passport";
 import { ConfigService } from "@nestjs/config";
@@ -26,8 +26,12 @@ export class IntraStrategy extends PassportStrategy(Strategy, '42') {
       ): Promise<void> {
         try {
           // console.log(profile);
-          const user = await this.authService.validateUser(profile); // Validate user using the profile data
-          done(null, user); // Provide the user object to the done callback
+          let user = await this.authService.validateUser(profile);
+
+          if (!user)
+            user = await this.authService.createUser(profile);
+
+          done(null, user); // Provide the user object to the req object
         } catch (error) {
           done(error, false); // Handle validation error
         }

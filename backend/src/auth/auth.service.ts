@@ -1,9 +1,58 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import * as argon from 'argon2';
+import { AuthDto } from './dto';
+import { Tokens } from './types';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
-    constructor(private prisma: PrismaService) {}
+    constructor(
+        private prisma: PrismaService, 
+        private jwt: JwtService, 
+        private config: ConfigService,
+    ) {}
+
+    async getTokens(userId: number, email: string): Promise<Tokens> {
+        const accessToken = await this.jwt.signAsync({ 
+            userId, 
+            email 
+        }, { 
+            secret: this.config.get('JWT_SECRET'), 
+            expiresIn: '15m',
+        });
+
+        const refreshToken = await this.jwt.signAsync({ 
+            userId, 
+            email 
+        }, { 
+            secret: this.config.get('JWT_REFRESH_SECRET'), 
+            expiresIn: '7d', 
+        });
+        
+        return { accessToken: accessToken, refreshToken: refreshToken };
+    }
+
+    async signup(dto: AuthDto): Promise<Tokens> {
+        const hash = await argon.hash(dto.password);
+
+        const user = await this.prisma.user.create({
+            data: {
+                email: dto.email,
+                fullName: dto.fullName,
+                userName: dto.userName,
+                hash,
+            }
+        })
+
+        const tokens = await this.getTokens(user.id, user.email);
+        return tokens;
+    }
+
+    signin(dto: AuthDto) {
+
+    }
 
     async validateUser(profile: any): Promise<any> {
 
@@ -14,11 +63,9 @@ export class AuthService {
       });
 
       if (!user)
-        return this.createUser(profile);
-      else {
-        console.log('User found: ', user);
-        return user;
-      }
+        return null;
+
+      return { ...user, new: "false" };
     }
 
     async createUser(profile: any): Promise<any> {
@@ -27,15 +74,14 @@ export class AuthService {
             data: {
                 email: profile.emails[0].value,
                 userName: profile.username,
-                firstName: profile.name.givenName,
-                lastName: profile.name.familyName,
+                fullName: profile.displayName,
+                hash: 'hey',
                 photo: profile._json.image.link,
             }
         })
 
-        console.log('New user created: ', newUser);
         if (newUser)
-            return newUser;
+            return { user: newUser, new: "true"};
         else
             throw new Error('Cannot create user');
     }
