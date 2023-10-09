@@ -1,5 +1,6 @@
 // @ts-nocheck
 'use client'
+import '@/app/(dashboard)/(routes)/dashboard/style.css'
 import React from 'react';
 import Image from 'next/image';
 import { CSSProperties, useState } from 'react';

@@ -1,6 +1,8 @@
 import './globals.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import NavBar from '@/components/ui/NavBar'
+// import { useRouter } from 'next/router'
 // import { ClerkProvider }  from '@clerk/nextjs'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -17,7 +19,12 @@ export default function RootLayout({
 }) {
   return (
       <html lang="en">
-        <body className={inter.className}>{children}</body>
+        <body className={inter.className}>
+          <div className='fixed top-[3rem] left-[1.94rem]'>
+            <NavBar />
+          </div>
+          {children}
+        </body>
       </html>
   )
 }

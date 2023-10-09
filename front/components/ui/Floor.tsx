@@ -1,11 +1,19 @@
 interface FloorProps {
-    With: string;
-    Hight: string;
+  Width: string;
+  Height: string;
 }
 
-export default function Floor({ With, Hight }: FloorProps) {
-    const className = `border border-white border-opacity-40 bg-white shadow-lg shadow-black-[0.03] backdrop-blur-[0.5rem] rounded-lg ${With} ${Hight}`;
-    return (
-      <div className={className}></div>
-    )
-}
+const Floor: React.FC<FloorProps> = ({ Width, Height }) => {
+  const containerStyle: React.CSSProperties = {
+    background: 'linear-gradient(90deg, rgba(126, 130, 135, 0.44) 2.64%, rgba(66, 69, 73, 0.00) 102.5%)',
+    width: Width,
+    height: Height,
+  };
+
+  return (
+    <div style={containerStyle}>
+    </div>
+  );
+};
+
+export default Floor;
