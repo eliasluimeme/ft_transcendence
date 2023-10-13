@@ -1,74 +1,39 @@
-// @ts-nocheck
-'use client'
-import '@/components/ui/CSS/style.css'
-import React from 'react';
-import Image from 'next/image';
-import { CSSProperties, useState } from 'react';
+import "@/components/ui/CSS/style.css";
+import Image from "next/image";
+import Link from "next/link";
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function NavBar() {
-  const [selectedIcon, setSelectedIcon] = useState(null);
-  const [hoveredIcon, setHoveredIcon] = useState(null);
-
-  const containerStyle: CSSProperties = {
-    width: '2.75rem',
-    height: '40.125rem',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  };
-
-  const buttonStyle: CSSProperties = {
-    padding: '10px',
-    border: 'none',
-    background: 'none',
-    cursor: 'pointer',
-    outline: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    opacity: 0.5, // Initial opacity
-    transition: 'opacity 0.2s', // Add a transition for smoother hover effect
-  };
-
-  const handleIconClick = (iconName) => {
-    setSelectedIcon(iconName);
-  };
-
-  const handleIconMouseEnter = (iconName) => {
-    setHoveredIcon(iconName);
-  };
-
-  const handleIconMouseLeave = () => {
-    setHoveredIcon(null);
-  };
-
-  const renderIconButton = (iconName, imageSrc, altText) => {
-    return (
-      <button
-        style={{
-          ...buttonStyle,
-          opacity: selectedIcon === iconName || hoveredIcon === iconName ? 1 : 0.5,
-        }}
-        onClick={() => handleIconClick(iconName)}
-        onMouseEnter={() => handleIconMouseEnter(iconName)}
-        onMouseLeave={handleIconMouseLeave}
-      >
-        <Image
-          src={imageSrc}
-          alt={altText}
-          width={24}
-          height={21}
-        />
-      </button>
-    );
-  };
-
+  const links = [
+    {
+      icon: "/home.svg",
+      path: "/",
+    },
+    {
+      icon: "/🦆 icon _medical cross_.svg",
+      path: "/game",
+    },
+    {
+      icon: "/🦆 icon _chat_.svg",
+      path: "/chat",
+    },
+    {
+      icon: "/🦆 icon _cog_.svg",
+      path: "/settings",
+    },
+  ];
   return (
-    <div className="style rounded-full" style={containerStyle}>
-      {renderIconButton('home', 'home.svg', 'home')}
-      {renderIconButton('game', '🦆 icon _medical cross_.svg', 'game')}
-      {renderIconButton('chat', '🦆 icon _chat_.svg', 'chat')}
-      {renderIconButton('settings', '🦆 icon _cog_.svg', 'settings')}
+    <div className="rounded-full bg-[#36393E] flex items-center flex-col justify-around w-14">
+      {links.map((link) => (
+        <Link className="" href={link.path}>
+          <Image src={link.icon} alt="" width={24} height={21} />
+        </Link>
+      ))}
+      <Avatar>
+        <AvatarImage src="https://cdn.intra.42.fr/users/9373f1cfc045b4628c01920b3000a836/ael-kouc.jpg" />
+        <AvatarFallback>CN</AvatarFallback>
+      </Avatar>
     </div>
   );
 }
