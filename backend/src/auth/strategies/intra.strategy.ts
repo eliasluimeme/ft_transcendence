@@ -18,22 +18,15 @@ export class IntraStrategy extends PassportStrategy(Strategy, '42') {
         });
     }
 
-    async validate(
-        _accessToken: string,
-        _refreshToken: string,
-        profile: any,
-        done: (error: any, user?: any, info?: any) => void,
-      ): Promise<void> {
+    async validate( _accessToken: string, _refreshToken: string, profile: any, done: (error: any, user?: any, info?: any) => void ): Promise<void> {
         try {
-          // console.log(profile);
-          let user = await this.authService.validateUser(profile);
+          const user = await this.authService.validateIntraUser(profile);
 
-          if (!user)
-            user = await this.authService.createUser(profile);
-
-          done(null, user); // Provide the user object to the req object
+          // return user;
+          done(null, user);
         } catch (error) {
-          done(error, false); // Handle validation error
+          // return error;
+          done(error, false);
         }
       }
 }
