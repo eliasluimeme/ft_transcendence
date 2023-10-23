@@ -30,10 +30,12 @@ export default function NavBar() {
           <Image src={link.icon} alt="" width={24} height={21} />
         </Link>
       ))}
-      <Avatar>
-        <AvatarImage src="https://cdn.intra.42.fr/users/9373f1cfc045b4628c01920b3000a836/ael-kouc.jpg" />
-        <AvatarFallback>CN</AvatarFallback>
-      </Avatar>
+      <Link href="/profile">
+        <Avatar>
+          <AvatarImage src="https://cdn.intra.42.fr/users/9373f1cfc045b4628c01920b3000a836/ael-kouc.jpg" />
+          <AvatarFallback>CN</AvatarFallback>
+        </Avatar>
+      </Link>
     </div>
   );
 }

@@ -1,0 +1,40 @@
+<svg width="74" height="99" viewBox="0 0 74 99" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Gold Medal" filter="url(#filter0_d_3_3524)">
+<path id="Rectangle 2" d="M27.0361 54.4615L34.8049 58.9469L19.0289 86.2716L14.5009 76.1731L27.0361 54.4615Z" fill="#CE4444"/>
+<path id="Rectangle 3" d="M27.0361 54.4615L19.2673 49.9762L3.49131 77.301L14.5009 76.1731L27.0361 54.4615Z" fill="#983535"/>
+<path id="Rectangle 6" d="M38.1194 54.4615L30.3506 58.9469L46.1266 86.2716L50.6546 76.1731L38.1194 54.4615Z" fill="#983535"/>
+<path id="Rectangle 7" d="M38.1194 54.4615L45.8883 49.9762L61.6642 77.301L50.6546 76.1731L38.1194 54.4615Z" fill="#CE4444"/>
+<circle id="Ellipse 1" cx="32.3395" cy="35.6473" r="27.2465" fill="url(#paint0_linear_3_3524)" stroke="#765C00"/>
+<circle id="Ellipse 2" cx="32.3395" cy="35.6473" r="20.878" fill="#A88300"/>
+<g id="Mask Group">
+<mask id="mask0_3_3524" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="12" y="16" width="43" height="43">
+<circle id="Ellipse 4" cx="33.4539" cy="37.8762" r="20.9266" fill="#C28B37"/>
+</mask>
+<g mask="url(#mask0_3_3524)">
+<circle id="Ellipse 3" cx="32.3394" cy="35.6474" r="20.9266" fill="#C09525"/>
+</g>
+</g>
+<path id="Vector" d="M32.4523 21.0891L36.9665 30.1175L45.9948 31.246L39.7954 38.1978L41.4807 48.1742L32.4523 43.66L23.424 48.1742L25.1243 38.1978L18.9098 31.246L27.9381 30.1175L32.4523 21.0891Z" fill="url(#paint1_linear_3_3524)"/>
+<path id="Vector_2" d="M6.47778 19.4334L9.42112 12.9556L6.47778 6.47779L12.9556 9.42114L19.4334 6.47779L16.49 12.9556L19.4334 19.4334L12.9556 16.49L6.47778 19.4334Z" fill="white"/>
+</g>
+<defs>
+<filter id="filter0_d_3_3524" x="2.70784" y="5.69429" width="70.7088" height="92.3298" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dx="5.48449" dy="5.48449"/>
+<feGaussianBlur stdDeviation="3.13399"/>
+<feComposite in2="hardAlpha" operator="out"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.3 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_3_3524"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_3_3524" result="shape"/>
+</filter>
+<linearGradient id="paint0_linear_3_3524" x1="32.3395" y1="8.90084" x2="32.3395" y2="62.3938" gradientUnits="userSpaceOnUse">
+<stop stop-color="#FFC600"/>
+<stop offset="1" stop-color="#FFDE69"/>
+</linearGradient>
+<linearGradient id="paint1_linear_3_3524" x1="32.4523" y1="21.0891" x2="32.4523" y2="48.1742" gradientUnits="userSpaceOnUse">
+<stop stop-color="#FFFCDD"/>
+<stop offset="1" stop-color="#FFE896"/>
+</linearGradient>
+</defs>
+</svg>

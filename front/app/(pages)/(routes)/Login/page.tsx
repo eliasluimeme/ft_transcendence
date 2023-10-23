@@ -5,13 +5,9 @@ import { Button } from '@/components/ui/button';
 const LandingPage = () => {
   return (
     <div className="flex justify-center items-center h-screen">
-      <div className="login box-border h-96 w-96 flex flex-col justify-center items-center rounded-lg bg-opacity-50">
-        <div className="text-white text-2xl font-bold mb-9">Login</div>
-        <div className="text-white text-lg mb-9">Login With intra</div>
-        <div className='flex'>
-            <Button variant="nik" className="font-bold mr-2">Sign up</Button>
-            <Button variant="nik" className='font-bold'>Sign in</Button>
-        </div>
+      <div className="bg-white box-border h-96 w-96 flex flex-col justify-center items-center rounded-lg text-[#1E2124]">
+        <div className=" text-2xl font-bold mb-9">Login</div>
+        <Button variant="default" className='font-bold opacity-[50%] hover:opacity-[100%]'>Login With Intra</Button>
       </div>
     </div>
   );
