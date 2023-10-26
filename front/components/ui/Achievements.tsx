@@ -22,7 +22,7 @@ export default function Achievements() {
           />
           <div className="">
             <div className="mb-[2%] text-[#7289DA]">Untouchable :</div>
-            <div className="mb-[3%]">
+            <div className="mb-[3%] lg:text-lg md:text-[15px] text-[10px]">
               Win 10 consecutive matches without losing a single game, asserting
               your position as the unbeatable ping pong champion.
             </div>
@@ -47,7 +47,7 @@ export default function Achievements() {
           />
           <div className="">
             <div className="mb-[2%] text-[#7289DA]">Masterful Blocker:</div>
-            <div className="mb-[3%]">
+            <div className="mb-[3%] lg:text-lg md:text-[15px] text-[10px]">
               Successfully block 20 smashes from your opponent, demonstrating
               impeccable defensive skills and lightning-fast reflexes.
             </div>
@@ -72,7 +72,7 @@ export default function Achievements() {
           />
           <div className="">
             <div className="mb-[2%] text-[#7289DA]">Ping Pong Marathoner :</div>
-            <div className="mb-[3%]">
+            <div className="mb-[3%] lg:text-lg md:text-[15px] text-[10px]">
               Play for a total of 1 hours in a single gaming session, proving
               your dedication and stamina to the sport.
             </div>
@@ -97,7 +97,7 @@ export default function Achievements() {
           />
           <div className="">
             <div className="mb-[2%] text-[#7289DA]">Quick Learner :</div>
-            <div className="mb-[3%]">
+            <div className="mb-[3%] lg:text-lg md:text-[15px] text-[10px]">
               Score your first point within the first 10 minutes of playing the
               game, demonstrating your fast adaptation to the gameplay
               mechanics.{" "}
@@ -123,7 +123,7 @@ export default function Achievements() {
           />
           <div className="">
             <div className="mb-[2%] text-[#7289DA]">Swift Swiper</div>
-            <div className="mb-[3%]">
+            <div className="mb-[3%] lg:text-lg md:text-[15px] text-[10px]">
               Win a game with a score of 11-0, showcasing dominance and quick
               reflexes that leave your opponent stunned.
             </div>
@@ -143,6 +143,7 @@ export default function Achievements() {
   };
 
   return (
+    
     <div>
       <div className="flex  items-center justify-around mt-[10%]">
         {Achiv.map((achievement, index) => (

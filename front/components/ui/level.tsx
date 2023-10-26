@@ -14,11 +14,11 @@ const Level: React.FC<SwitchlevelProps> = ({
   className,
 }) => {
   const buttonClasses: string = active
-    ? "text-white"
+    ? "text-[#7289DA]"
     : "text-[#ADB7BE]";
   return (
     <button onClick={selectTab} className={className}>
-      <p className={`hover:text-white ${buttonClasses}`}>{children}</p>
+      <p className={`hover:text-white  ${buttonClasses}`}>{children}</p>
     </button>
   );
 };
