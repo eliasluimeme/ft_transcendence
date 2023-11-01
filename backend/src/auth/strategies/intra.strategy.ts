@@ -20,6 +20,7 @@ export class IntraStrategy extends PassportStrategy(Strategy, '42') {
 
     async validate( _accessToken: string, _refreshToken: string, profile: any, done: (error: any, user?: any, info?: any) => void ): Promise<void> {
         try {
+          // console.log(profile);
           const user = await this.authService.validateIntraUser(profile);
 
           // return user;

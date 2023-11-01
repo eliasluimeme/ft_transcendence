@@ -20,15 +20,19 @@ export class AuthController {
     @ApiOperation({ summary: '42 Auth' })
     @ApiResponse({ status: 200, description: 'Successfuly authenticated' })
     @UseGuards(IntraAuthGuard)
-    authLogin() {}
+    authLogin() {
+        console.log('login')
+    }
     
     @Get('auth/login/callback')
     @UseGuards(IntraAuthGuard)
     async authCallBack(@Req() req, @Res({ passthrough: true }) res) {
         const token = await this.authService.getToken( req.user.id, req.user.email );
         res.header('Authorization', `Bearer ${token}`);
-        // return res.redirect('/home');
-        return { success: true, user: req.user, token: token };
+        // if (2FA)
+        // console.log("authenticated");
+        res.redirect('/home');
+        // return { success: true, user: req.user, token: token };
     }
 
     @Post('signup')
@@ -55,7 +59,7 @@ export class AuthController {
 	}
 
     @Get('home')
-    @UseGuards(JwtAuthGuard)
+    // @UseGuards(JwtAuthGuard)
     getHello (@Request() req) {
         return "Hello world!!!";
     }

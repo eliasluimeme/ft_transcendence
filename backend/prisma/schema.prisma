@@ -12,8 +12,6 @@ datasource db {
 
 model User {
   id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
   email  String @unique
   hash   String?
@@ -21,5 +19,12 @@ model User {
   fullName String?
   userName  String @unique
 
+  accessToken String
+
+
+
   photo String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
