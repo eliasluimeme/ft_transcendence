@@ -3,6 +3,7 @@ import { useTransition, useState } from "react";
 import Level from "./level";
 import Achievements from "./Achievements";
 import Laader from "./Laader";
+import "@/components/ui/CSS/font.css"
 const Levels = () => {
   const [tab, setTab] = useState<string>("Achievements");
   const [isPending, startTransition] = useTransition();

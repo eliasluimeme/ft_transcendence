@@ -1,3 +1,21 @@
 .style{
     background-color: #36393E;
 }
+.custom-max-height {
+    max-height: 11rem; /* Equivalent to max-h-44 in Tailwind */
+    overflow-y: scroll; /* Enable vertical scrolling */
+  }
+::-webkit-scrollbar {
+    width: 0;
+    background: transparent;
+  }
+  
+  /* Handle (thumb) */
+  ::-webkit-scrollbar-thumb {
+    background: transparent;
+  }
+  
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }

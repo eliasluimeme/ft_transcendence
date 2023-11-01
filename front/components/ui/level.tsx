@@ -1,4 +1,5 @@
 import React, { ReactNode } from "react";
+import "@/components/ui/CSS/font.css"
 
 interface SwitchlevelProps {
   active: boolean;
@@ -14,7 +15,7 @@ const Level: React.FC<SwitchlevelProps> = ({
   className,
 }) => {
   const buttonClasses: string = active
-    ? "text-[#7289DA]"
+    ? "blue_font"
     : "text-[#ADB7BE]";
   return (
     <button onClick={selectTab} className={className}>

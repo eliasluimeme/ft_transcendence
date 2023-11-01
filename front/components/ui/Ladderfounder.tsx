@@ -1,8 +1,9 @@
 import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
+import "@/components/ui/CSS/style.css";
 
-const Ladderfounder = () => {
+const Ladderfounder: React.FC = () => {
   const LEADER_DATA = [
     {
       name: "achraf",
@@ -29,19 +30,48 @@ const Ladderfounder = () => {
         "https://cdn.intra.42.fr/users/9373f1cfc045b4628c01920b3000a836/ael-kouc.jpg",
     },
     {
-      name: "chi we7da",
+      name: "chi we7daaaaaaaaaa",
       rank: "5",
       image:
         "https://cdn.intra.42.fr/users/9373f1cfc045b4628c01920b3000a836/ael-kouc.jpg",
     },
+    {
+      name: "chi we7da",
+      rank: "6",
+      image:
+        "https://cdn.intra.42.fr/users/9373f1cfc045b4628c01920b3000a836/ael-kouc.jpg",
+    },
+    {
+      name: "chi we7da",
+      rank: "7",
+      image:
+        "https://cdn.intra.42.fr/users/9373f1cfc045b4628c01920b3000a836/ael-kouc.jpg",
+    },
+    {
+      name: "chi we7da",
+      rank: "8",
+      image:
+        "https://cdn.intra.42.fr/users/9373f1cfc045b4628c01920b3000a836/ael-kouc.jpg",
+    },
+    {
+      name: "chi we7da",
+      rank: "9",
+      image:
+        "https://cdn.intra.42.fr/users/9373f1cfc045b4628c01920b3000a836/ael-kouc.jpg",
+    },
+    {
+      name: "chi we7da",
+      rank: "10",
+      image:
+        "https://cdn.intra.42.fr/users/9373f1cfc045b4628c01920b3000a836/ael-kouc.jpg",
+    },
   ];
-
   const rankOneleader = LEADER_DATA.find((nami) => nami.rank === "1");
   const rankTooleader = LEADER_DATA.find((nami) => nami.rank === "2");
   const rankTreeleader = LEADER_DATA.find((nami) => nami.rank === "3");
   return (
-    <div className="p-5">
-      <div className="flex items-center justify-around">
+    <div className="flex flex-col text-[13px]">
+      <div className="flex items-center justify-around bg-[#424549] shadow-md mx-[10%] my-[5%] rounded-xl">
         <div className="flex pt-10 items-center justify-center">
           {rankTooleader ? (
             <>
@@ -95,6 +125,19 @@ const Ladderfounder = () => {
           )}
         </div>
       </div>
+      <div className="flex flex-col items-center justify-around  overflow-y-scroll custom-max-height  scroll-smooth mr-[20%]">
+        {LEADER_DATA.slice(3).map((data, index) => (
+          <div key={index} className="flex mb-[3%] space-x-2">
+            <Avatar className="border">
+              <AvatarImage src={data.image} />
+              <AvatarFallback>Rank {data.rank}</AvatarFallback>
+            </Avatar>
+            <div>{data.name}</div>
+            <div>#{data.rank}</div>
+          </div>
+        ))}
+      </div>
+      <div className="flex itemes-center justify-center mt-[3%]">YOUR RANK : #50</div>
     </div>
   );
 };
