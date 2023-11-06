@@ -18,10 +18,12 @@ model User {
 
   fullName String?
   userName  String @unique
+  country String?
+  number Int?
 
-  accessToken String
-
-
+  accessToken String?
+  twoFactorAuthSecret String?
+  isTwoFactorAuthEnabled Boolean @default(false)
 
   photo String?
 

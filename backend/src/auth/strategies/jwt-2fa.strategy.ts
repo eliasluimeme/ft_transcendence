@@ -6,7 +6,7 @@ import { UserService } from 'src/user/user.service';
 import { Request } from 'express';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
+export class Jwt2faStrategy extends PassportStrategy(Strategy, 'jwt-2fa') {
   constructor(
     private userService: UserService,
     private configService: ConfigService,
@@ -30,6 +30,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (!user)
       throw new UnauthorizedException();
 
-    return user;
+    if (!user.isTwoFactorAuthEnabled || payload.payload.isTwoFactorAuthenticated)
+      return user;
   }
 }
