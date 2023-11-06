@@ -13,35 +13,36 @@ export class UserService {
                     email: profile.emails[0].value,
                     userName: profile.username,
                     fullName: profile.displayName,
-                    hash: '',
                     photo: profile._json.image.link,
                 }
             });
-            return user;
+            if (user)
+                return user;
         } catch (error) {
             console.error('Error creating user: ', error);
         }
     }
 
-    async createLocalUser(dto: AuthDto) {
-        try {
-            const user = await this.prisma.user.create({
-                data: {
-                    email: dto.email,
-                    userName: dto.userName,
-                    fullName: dto.fullName,
-                    hash: dto.password,
-                    photo: '',
-                }
-            });
-            return user;
-        } catch (error) {
-            throw error;
-        }
-    }
+    // async createLocalUser(dto: AuthDto) {
+    //     try {
+    //         const user = await this.prisma.user.create({
+    //             data: {
+    //                 email: dto.email,
+    //                 userName: dto.userName,
+    //                 fullName: dto.fullName,
+    //                 hash: dto.password,
+    //                 photo: '',
+    //             }
+    //         });
+    //         delete user.hash;
+    //         return user;
+    //     } catch (error) {
+    //         throw error;
+    //     }
+    // }
 
-    async updateUser(id: number, newData: { email: string, userName: string, fullName: string }) {
-        // check if credentials are valid and doesnt exist
+    async updateUser(id: number, newData: any) {
+        // check if credentials are valid and not in use
         try {
             const user = await this.prisma.user.update({
                 where: {
@@ -61,6 +62,7 @@ export class UserService {
                     id: userId,
                 }
             });
+            delete user.hash;
             return user;
         } catch (error) {
             console.error('Error finding user: ', error);
@@ -75,6 +77,7 @@ export class UserService {
                     email: email,
                 }
             });
+            delete user.hash;
             return user;
         } catch (error) {
             console.error('Error finding user: ', error);
@@ -93,4 +96,5 @@ export class UserService {
             console.error('Error deleting user: ', error);
         }
     }
+
 }

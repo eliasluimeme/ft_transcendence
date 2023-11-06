@@ -22,10 +22,8 @@ export class IntraStrategy extends PassportStrategy(Strategy, '42') {
         try {
           const user = await this.authService.validateIntraUser(profile);
 
-          // return user;
           done(null, user);
         } catch (error) {
-          // return error;
           done(error, false);
         }
       }
