@@ -43,6 +43,7 @@ export class UserService {
 
     async updateUser(id: number, newData: any) {
         // check if credentials are valid and not in use
+        // console.log(newData)
         try {
             const user = await this.prisma.user.update({
                 where: {

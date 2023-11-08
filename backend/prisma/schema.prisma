@@ -17,15 +17,59 @@ model User {
   hash   String?
 
   fullName String?
-  userName  String @unique
+  userName  String
   country String?
-  number Int?
+  number String?
 
   accessToken String?
   twoFactorAuthSecret String?
   isTwoFactorAuthEnabled Boolean @default(false)
 
   photo String?
+
+  achievements Boolean[] @default([false, false, false, false, false])
+  wins Int @default(0)
+  losses Int @default(0)
+
+  sentRequests Friends[] @relation("sentRequests")
+  receivedRequests Friends[] @relation("receivedRequests")
+
+  blocking Blocks[] @relation("blocking")
+  blockedBy Blocks[] @relation("blockedBy")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum REQUEST {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
+model Friends {
+  id        Int      @id @default(autoincrement())
+
+  sender User @relation("sentRequests", fields: [senderId], references: [id])
+  senderId Int
+
+  receiver User @relation("receivedRequests", fields: [receiverId], references: [id])
+  receiverId Int
+
+  status REQUEST 
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Blocks {
+  id        Int      @id @default(autoincrement())
+
+  blocking User @relation("blocking", fields: [blockingId], references: [id])
+  blockingId Int
+
+  blockedBy User @relation("blockedBy", fields: [blockedById], references: [id])
+  blockedById Int
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

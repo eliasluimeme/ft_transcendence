@@ -1,15 +1,21 @@
 "use client";
 import React, { useState } from "react";
+import axios from "axios";
+
 
 const FillSet: React.FC = () => {
   const [inputValues, setInputValues] = useState({
-    fullName: "el kouch achraf",
-    nickname: "ael-kouc",
-    country: "morocco",
-    phoneNumber: "0702763761",
+    fullName: "",
+    userName: "",
+    country: "",
+    number: "",
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const getData = async () => {
+      const result = await axios.get("http://localhost:3001/settings");
+      console.log(result);
+    }
     const { name, value } = e.target;
     setInputValues((prevInputValues) => ({
       ...prevInputValues,
@@ -17,9 +23,27 @@ const FillSet: React.FC = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
+    try {
+      const response = await axios.post("http://localhost:3001/settings/update", inputValues, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.status === 200) {
+        console.log("Data sent successfully!");
+      } else {
+        console.error("Failed to send data.");
+      }
+    } catch (error) {
+      console.error("An error occurred while sending data:", error);
+    }
   };
+
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-[#1E2124] text-gray-300"> {/* Change the background and text color */}
@@ -43,12 +67,12 @@ const FillSet: React.FC = () => {
             <label
               htmlFor="inline-nickname"
               className="block text-gray-100 text-sm  mb-1">
-              Nickname
+              User name
             </label>
             <input
               type="text"
-              name="nickname"
-              value={inputValues.nickname}
+              name="userName"
+              value={inputValues.userName}
               onChange={handleInputChange}
               className="w-full py-2 px-3 border border-gray-300 rounded-lg focus:outline-none focus:border-gray-900"
             />
@@ -76,15 +100,15 @@ const FillSet: React.FC = () => {
             <input
               type="text"
               name="phoneNumber"
-              value={inputValues.phoneNumber}
+              value={inputValues.number}
               onChange={handleInputChange}
               className="w-full py-2 px-3 border border-gray-300 rounded-lg focus:outline-none focus:border-gray-900"
             />
           </div>
-          <button
+          <button onClick={handleSubmit}
             type="submit"
             className="w-full py-2 bg-[#1E2124] text-gray-100  rounded-lg hover:bg-gray-600 focus:outline-none"> 
-            Submit
+            Save
           </button>
         </form>
       </div>

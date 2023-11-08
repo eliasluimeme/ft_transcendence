@@ -1,16 +1,25 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { Jwt2faAuthGuard } from 'src/auth/guards/jwt-2fa.guard';
+import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 
-@Controller('user')
+
+@Controller()
 export class UserController {
     constructor(
         private userService: UserService,
     ) {}
 
+    @Get('settings')
+    @UseGuards(Jwt2faAuthGuard)
+    async getSettingsData(@Req() req): Promise<any> {
+        return await this.userService.findUserById(req.user.id);
+    }
+
     @Post('settings/update') 
     @UseGuards(Jwt2faAuthGuard)
     async updateProfile(@Req() req, @Body() body) {
-        return await this.userService.updateUser(req.user.id, body.data);
+        console.log(body);
+        return await this.userService.updateUser(req.user.id, body);
     }
 }

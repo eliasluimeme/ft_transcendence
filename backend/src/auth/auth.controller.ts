@@ -38,7 +38,7 @@ export class AuthController {
 
     @Post('auth/2fa/login')
     @HttpCode(200)
-    @UseGuards(JwtAuthGuard)
+    // @UseGuards(JwtAuthGuard)
     async auth2FA(@Req() req, @Body() body, @Res({ passthrough: true }) res) {
         const is2FACodeValid = this.authService.is2FACodeValid(
             body.twoFactorAuthenticationCode,
