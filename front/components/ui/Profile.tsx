@@ -7,8 +7,8 @@ const Pic = () => {
     "https://cdn.intra.42.fr/users/9373f1cfc045b4628c01920b3000a836/ael-kouc.jpg";
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen  text-gray-300">
-      <Avatar className="w-40 h-40 border-4 ">
+    <div className="flex flex-col items-center justify-center min-h-screen text-gray-300 bg-[#1E2124] bg-opacity-50 bg-no-repeat bg-cover bg-center background-image">
+      <Avatar className="w-40 h-40 border-4">
         <AvatarImage src={image} />
         <AvatarFallback>Done</AvatarFallback>
       </Avatar>

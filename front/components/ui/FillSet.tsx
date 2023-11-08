@@ -17,18 +17,17 @@ const FillSet: React.FC = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-
-  };
+  const handleSubmit = (e: React.FormEvent) => {};
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-[#1E2124] text-gray-300"> {/* Change the background and text color */}
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[#1E2124] text-gray-300">
       <div className="w-96 p-6 bg-[#36393E] shadow-lg rounded-lg">
         <form onSubmit={handleSubmit}>
           <div className="mb-6">
             <label
               htmlFor="inline-full-name"
-              className="block text-gray-100 text-sm  mb-1">
+              className="block text-gray-100 text-sm  mb-1"
+            >
               Full Name
             </label>
             <input
@@ -42,7 +41,8 @@ const FillSet: React.FC = () => {
           <div className="mb-6">
             <label
               htmlFor="inline-nickname"
-              className="block text-gray-100 text-sm  mb-1">
+              className="block text-gray-100 text-sm  mb-1"
+            >
               Nickname
             </label>
             <input
@@ -56,7 +56,8 @@ const FillSet: React.FC = () => {
           <div className="mb-6">
             <label
               htmlFor="inline-country"
-              className="block text-gray-100 text-sm  mb-1">
+              className="block text-gray-100 text-sm  mb-1"
+            >
               Country
             </label>
             <input
@@ -70,7 +71,8 @@ const FillSet: React.FC = () => {
           <div className="mb-6">
             <label
               htmlFor="inline-phone-number"
-              className="block text-gray-100 text-sm  mb-1">
+              className="block text-gray-100 text-sm  mb-1"
+            >
               Phone Number
             </label>
             <input
@@ -83,8 +85,9 @@ const FillSet: React.FC = () => {
           </div>
           <button
             type="submit"
-            className="w-full py-2 bg-[#1E2124] text-gray-100  rounded-lg hover:bg-gray-600 focus:outline-none"> 
-            Submit
+            className="w-full py-2 bg-[#1E2124] text-gray-100  rounded-lg hover:bg-gray-600 focus:outline-none"
+          >
+            Save
           </button>
         </form>
       </div>
