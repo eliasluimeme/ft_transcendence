@@ -10,7 +10,7 @@ const LandingPage = () => {
       <div className="bg-white box-border h-96 w-96 flex flex-col justify-center items-center rounded-lg text-[#1E2124]">
         <div className=" text-2xl font-bold mb-9">Login</div>
         <Button variant="default" className='font-bold opacity-[50%] hover:opacity-[100%]'>
-          <Link href="http://locallhost/3000/auth/login/42">Login With Intra</Link>
+          <Link href="http://localhost:3001/auth/42/login">Login With Intra</Link>
         </Button>
       </div>
     </div>
