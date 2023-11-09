@@ -52,7 +52,7 @@ export class AuthService {
 
     async generateQrCode( user: any ) {
         const otp = await this.generate2FASecret(user);
-        return toDataURL(otp.otpauthUrl);
+        return { qr : toDataURL(otp.otpauthUrl)};
     }
 
     async set2FASecret(userId: number, secret: string) {

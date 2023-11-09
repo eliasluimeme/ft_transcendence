@@ -64,6 +64,7 @@ export class UserService {
                 }
             });
             delete user.hash;
+            console.log(user);
             return user;
         } catch (error) {
             console.error('Error finding user: ', error);
