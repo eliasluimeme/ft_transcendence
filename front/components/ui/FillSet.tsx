@@ -12,10 +12,6 @@ const FillSet: React.FC = () => {
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const getData = async () => {
-      const result = await axios.get("http://localhost:3001/settings");
-      console.log(result);
-    }
     const { name, value } = e.target;
     setInputValues((prevInputValues) => ({
       ...prevInputValues,
@@ -99,7 +95,7 @@ const FillSet: React.FC = () => {
             </label>
             <input
               type="text"
-              name="phoneNumber"
+              name="number"
               value={inputValues.number}
               onChange={handleInputChange}
               className="w-full py-2 px-3 border border-gray-300 rounded-lg focus:outline-none focus:border-gray-900"
