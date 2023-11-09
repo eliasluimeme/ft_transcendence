@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { AuthDto } from 'src/auth/dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 
@@ -41,11 +41,27 @@ export class UserService {
     //     }
     // }
 
-    async updateUser(id: number, newData: any) {
+    async checkExistingData( data: any ): Promise<boolean> {
+        const ifExists = await this.prisma.user.findFirst({
+            where: {
+                userName: data.userName,
+                fullName: data.fullName,
+                number: data.number,
+            },
+        });
+
+        if (!ifExists)
+            return false;
+        return true;
+    }
+
+    async updateUser(id: number, newData: any ) {
         // check if credentials are valid and not in use
-        // console.log(newData)
+        const existingCredentials = await this.checkExistingData(newData);
+        if (existingCredentials)
+            throw new ForbiddenException('Credentials already in use');
         try {
-            const user = await this.prisma.user.update({
+            await this.prisma.user.update({
                 where: {
                     id: id,
                 },

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 
@@ -10,6 +10,30 @@ const FillSet: React.FC = () => {
     country: "",
     number: "",
   });
+
+  const fetchData = async () => {
+    try {
+      const response = await axios.get("http://localhost:3001/settings", {
+        withCredentials: true,
+      });
+      if (response.status === 200) {
+        setInputValues({
+          fullName: response.data.fullName,
+          userName: response.data.userName,
+          country: response.data.country,
+          number: response.data.number,
+        });
+      } else {
+        console.error("Failed to fetch user data.");
+      }
+    } catch (error) {
+      console.error("An error occurred while fetching user data:", error);
+    }
+  };
+  
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -30,7 +54,7 @@ const FillSet: React.FC = () => {
         },
       });
 
-      if (response.status === 200) {
+      if (response.status === 201) {
         console.log("Data sent successfully!");
       } else {
         console.error("Failed to send data.");
@@ -42,13 +66,14 @@ const FillSet: React.FC = () => {
 
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-[#1E2124] text-gray-300"> {/* Change the background and text color */}
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[#1E2124] text-gray-300">
       <div className="w-96 p-6 bg-[#36393E] shadow-lg rounded-lg">
         <form onSubmit={handleSubmit}>
           <div className="mb-6">
             <label
               htmlFor="inline-full-name"
-              className="block text-gray-100 text-sm  mb-1">
+              className="block text-gray-100 text-sm  mb-1"
+            >
               Full Name
             </label>
             <input
@@ -76,7 +101,8 @@ const FillSet: React.FC = () => {
           <div className="mb-6">
             <label
               htmlFor="inline-country"
-              className="block text-gray-100 text-sm  mb-1">
+              className="block text-gray-100 text-sm  mb-1"
+            >
               Country
             </label>
             <input
@@ -90,7 +116,8 @@ const FillSet: React.FC = () => {
           <div className="mb-6">
             <label
               htmlFor="inline-phone-number"
-              className="block text-gray-100 text-sm  mb-1">
+              className="block text-gray-100 text-sm  mb-1"
+            >
               Phone Number
             </label>
             <input
