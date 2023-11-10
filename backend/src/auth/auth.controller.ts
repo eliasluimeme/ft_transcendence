@@ -32,8 +32,10 @@ export class AuthController {
 
     @Get('auth/2fa/generate')
     @UseGuards(JwtAuthGuard)
-    async generate2FAQrCode(@Req() req) {
-        return await this.authService.generateQrCode(req.user);
+    async generate2FAQrCode(@Req() req, @Res() res) {
+        const qr = await this.authService.generateQrCode(req.user);
+        res.set('Content-Type', 'image/png');
+        return res.send(qr);
     }
 
     @Post('auth/2fa/login')
