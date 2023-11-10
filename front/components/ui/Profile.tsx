@@ -75,7 +75,6 @@ const Pic = () => {
       if (response.status === 200) {
         setInputValuesQR({ImageQR : response.data.qr,});
         console.log(inputValuesQR.ImageQR)
-        console.log(response.data);
       } else {
         console.log("failed to fetchdata");
       }
