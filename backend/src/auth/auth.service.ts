@@ -52,9 +52,10 @@ export class AuthService {
 
     async generateQrCode( user: any ) {
         const otp = await this.generate2FASecret(user);
-        const base64 = toDataURL(otp.otpauthUrl);
-        const base64Data = (await base64).replace(/^data:image\/\w+;base64,/, '');
-        return Buffer.from(base64Data, 'base64');
+        return await toDataURL(otp.otpauthUrl);
+        // console.log(base64);
+        // const base64Data = (base64).replace(/^data:image\/\w+;base64,/, '');
+        // return Buffer.from(base64Data, 'base64');
     }
 
     async set2FASecret(userId: number, secret: string) {

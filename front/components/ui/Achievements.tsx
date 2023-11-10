@@ -149,7 +149,7 @@ export default function Achievements() {
         {Achiv.map((achievement, index) => (
           <Level
             className="opacity-60 hover:opacity-[100%] transition-opacity"
-            key={achievement.name}
+            key={index}
             selectTab={() => handleTapChange(achievement.name)}
             active={tab === achievement.name}
           >

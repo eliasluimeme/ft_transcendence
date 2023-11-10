@@ -35,7 +35,7 @@ export class AuthController {
     async generate2FAQrCode(@Req() req, @Res() res) {
         const qr = await this.authService.generateQrCode(req.user);
         res.set('Content-Type', 'image/png');
-        return res.send(qr);
+        return res.send({qr: qr});
     }
 
     @Post('auth/2fa/login')

@@ -17,8 +17,8 @@ const Info = () => {
       transform: "translate(-50%, -50%)",
       background: "#36393E",
       border: "none",
-      width: "28%", // Set the desired width
-      height: "75%", // Set the desired height, // Set a max height if needed
+      width: "28%",
+      height: "75%",
     },
   };
   const data = {
