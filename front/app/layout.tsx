@@ -8,7 +8,7 @@ import axios from "axios";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "ana ghadi l dar",
+  title: "TRENDENDEN",
   description: "Plateform",
 };
 

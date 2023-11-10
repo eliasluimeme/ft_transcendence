@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "@mantine/hooks": "^7.1.7",
-    "axios": "^1.5.1"
-  }
-}

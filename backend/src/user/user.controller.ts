@@ -18,7 +18,6 @@ export class UserController {
     @Post('settings/update') 
     @UseGuards(Jwt2faAuthGuard)
     async updateProfile(@Req() req, @Body() body): Promise<any> {
-        console.log(body);
-        return await this.userService.updateUser(req.user.id, body);
+        return await this.userService.updateProfile(req.user.id, body);
     }
 }

@@ -40,6 +40,14 @@ export class AuthService {
         return this.getToken(payload);
     }
 
+    async set2FASecret(userId: number, secret: string) {
+        try {
+            await this.userService.updateUser(userId, { twoFactorAuthSecret: secret });
+        } catch (error) {
+            console.error('Error setting 2FA secret: ', error);
+        }
+    }
+
     async generate2FASecret(user: any) {
         const secret = authenticator.generateSecret();
 
@@ -53,39 +61,11 @@ export class AuthService {
     async generateQrCode( user: any ) {
         const otp = await this.generate2FASecret(user);
         return await toDataURL(otp.otpauthUrl);
-        // console.log(base64);
-        // const base64Data = (base64).replace(/^data:image\/\w+;base64,/, '');
-        // return Buffer.from(base64Data, 'base64');
-    }
-
-    async set2FASecret(userId: number, secret: string) {
-        try {
-            await this.userService.updateUser(userId, { twoFactorAuthSecret: secret });
-            // const user = await this.prisma.user.update({
-            //     where: {
-            //         id: userId,
-            //     },
-            //     data: {
-            //         twoFactorAuthSecret: secret,
-            //     }
-            // });
-        } catch (error) {
-            console.error('Error setting 2FA secret: ', error);
-        }
     }
 
     async activate2FA(userId: number) {
         try {
-            await this.userService.updateUser(userId, { isTwoFactorAuthEnabled: true, });
-        //     const user = await this.prisma.user.update({
-        //         where: {
-        //             id: userId,
-        //         },
-        //         data: {
-        //             isTwoFactorAuthEnabled: true,
-        //         }
-        //     });
-        console.log(await this.userService.findUserById(userId));
+            await this.userService.updateUser(userId, { isTwoFactorAuthEnabled: true });
         } catch (error) {
             console.error('Error enabling 2FA: ', error);
         }
@@ -94,21 +74,13 @@ export class AuthService {
     async desactivate2FA(userId: number) {
         try {
             await this.userService.updateUser(userId, { isTwoFactorAuthEnabled: false });
-            // const user = await this.prisma.user.update({
-            //     where: {
-            //         id: userId,
-            //     },
-            //     data: {
-            //         isTwoFactorAuthEnabled: false,
-            //     }
-            // });
         } catch (error) {
             console.error('Error disabling 2FA: ', error);
         }
     }
 
     is2FACodeValid(code: string, secret: string): boolean {
-        return authenticator.verify({ token: code, secret });
+        return authenticator.verify({ token: code, secret: secret });
     }
 
     // async login2FA(user: any) {

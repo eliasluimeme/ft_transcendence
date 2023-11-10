@@ -69,27 +69,46 @@ const Pic = () => {
   const [inputValuesQR, setInputValuesQR] = useState({
     ImageQR: "",
   });
-  const fetchDataQR = async () => {
+  const handleEnable2FA = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:3001/auth/2fa/generate",
-        {
-          withCredentials: true,
-        }
-      );
+      // Fetch QR code data when the user clicks on "Enable 2FA"
+      const response = await axios.get("http://localhost:3001/auth/2fa/generate", {
+        withCredentials: true,
+      });
+
       if (response.status === 200) {
         setInputValuesQR({ ImageQR: response.data.qr });
-        console.log(inputValuesQR.ImageQR);
+        setIsOpen(true); // Open the modal after fetching QR code
       } else {
-        console.log("failed to fetchdata");
+        console.log("Unexpected response status:", response.status);
       }
     } catch (error) {
-      console.error("An error occurred while fetching user data:", error);
+      console.error("An error occurred while fetching QR code:", error);
     }
   };
-  useEffect(() => {
-    fetchDataQR();
-  }, []);
+  const handleDisable2FA = async () => {
+    try {
+      // Fetch QR code data when the user clicks on "Enable 2FA"
+      const response = await axios.get("http://localhost:3001/auth/2fa/turn-off", {
+        withCredentials: true,
+      });
+
+      if (response.status === 200) {
+      } else {
+        console.log("Unexpected response status:", response.status);
+      }
+    } catch (error) {
+      console.error("An error occurred while fetching QR code:", error);
+    }
+  };
+
+  const check = ()  => {
+    if (inputValues.toFAStatu) {
+      handleDisable2FA();
+    } else {
+      handleEnable2FA();
+    }
+  }
   ///send data
   const [code, setCodeValue] = useState({
     code: "",
@@ -107,7 +126,7 @@ const Pic = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:3001/settings/update",
+        "http://localhost:3001/auth/2fa/turn-on",
         code,
         {
           withCredentials: true,
@@ -142,7 +161,7 @@ const Pic = () => {
       </Button>
       <Button
         className="mt-4 w-40 bg-[#1E2124] hover:bg-gray-600 text-gray-100"
-        onClick={() => setIsOpen(true)}
+        onClick={check}
       >
         {inputValues.toFAStatu ? "Disable 2FA" : "Enable 2FA"}
       </Button>
@@ -179,7 +198,6 @@ const Pic = () => {
             />
             <button
               onClick={handleSubmit}
-              type="submit"
               className="w-full py-2 bg-[#1E2124] text-gray-100  rounded-lg hover:bg-gray-600 focus:outline-none"
             >
               send

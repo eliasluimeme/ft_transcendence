@@ -1,7 +1,6 @@
 import { Body, Controller, Get, HttpCode, Post, Req, Request, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { IntraAuthGuard } from './guards/intra.guard';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from './guards/jwt.guard';
 import { Jwt2faAuthGuard } from './guards/jwt-2fa.guard';
 import { ConfigService } from '@nestjs/config';
@@ -22,11 +21,10 @@ export class AuthController {
     @Get('auth/42/callback')
     @UseGuards(IntraAuthGuard)
     async authCallBack(@Req() req, @Res({ passthrough: true }) res) {
-        // if (req.user.isTwoFactorAuthEnabled)
-        //     return res.redirect('auth/2fa');
-
         const token = await this.authService.login(req.user, false);
         res.cookie( 'access_token', `${token}` , {httpOnly: true, maxAge: 60 * 60 * 24 * 1000});
+        if (req.user.isTwoFactorAuthEnabled)
+            return res.redirect(this.configService.get('FRONTEND_URL') + '/Login/2fa');
         return res.redirect(this.configService.get('FRONTEND_URL'));
     }
 
@@ -39,26 +37,29 @@ export class AuthController {
     }
 
     @Post('auth/2fa/login')
-    @HttpCode(200)
-    // @UseGuards(JwtAuthGuard)
+    // @HttpCode(200)
+    @UseGuards(JwtAuthGuard)
     async auth2FA(@Req() req, @Body() body, @Res({ passthrough: true }) res) {
+        console.log(body);
+        console.log(req.user.twoFactorAuthSecret);
         const is2FACodeValid = this.authService.is2FACodeValid(
-            body.twoFactorAuthenticationCode,
-            req.user.twoFactorAuthSecret
+            body.number,
+            req.user.twoFactorAuthSecret,
         );
-
+        console.log(is2FACodeValid);
         if (!is2FACodeValid)
             throw new UnauthorizedException('Invalid 2FA code');
 
         const token = await this.authService.login(req.user, true);
-        return res.cookie( token , {httpOnly: true, maxAge: 60 * 60 * 24 * 1000});
+        res.cookie( 'access_token', `${token}` , {httpOnly: true, maxAge: 60 * 60 * 24 * 1000} );
+        return { success: true };
     }
     
     @Post('auth/2fa/turn-on')
 	@UseGuards(JwtAuthGuard)
     async turnOn2FA(@Req() req, @Body() body) {
         const is2FACodeValid = this.authService.is2FACodeValid(
-            body.twoFactorAuthenticationCode,
+            body.number,
             req.user.twoFactorAuthSecret
         );
 
@@ -68,7 +69,7 @@ export class AuthController {
         return await this.authService.activate2FA(req.user.id);
     }
     
-    @Post('auth/2fa/turn-off')
+    @Get('auth/2fa/turn-off')
 	@UseGuards(JwtAuthGuard)
     async turnOff2FA(@Req() req, @Body() body) {
         return await this.authService.desactivate2FA(req.user.id);
