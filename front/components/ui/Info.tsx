@@ -1,14 +1,13 @@
-// Info.tsx
+"use client"
 import React, { useState } from "react";
 import Modal from "react-modal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
+import { useEffect } from "react";
 
-import GameHistory from "./GameHistory"; // Import the GameHistory component
 
 const Info: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-
   const customStyles = {
     overlay: {
       backgroundColor: "rgba(0, 0, 0, 0.6)",
@@ -46,26 +45,26 @@ const Info: React.FC = () => {
     TrophyCupStatu: true,
     match1: {
       image:
-      "https://cdn.intra.42.fr/users/9373f1cfc045b4628c01920b3000a836/ael-kouc.jpg",
+        "https://cdn.intra.42.fr/users/9373f1cfc045b4628c01920b3000a836/ael-kouc.jpg",
       result: "11 - 0",
     },
     match2: {
       image:
-      "https://cdn.intra.42.fr/users/9373f1cfc045b4628c01920b3000a836/ael-kouc.jpg",
+        "https://cdn.intra.42.fr/users/9373f1cfc045b4628c01920b3000a836/ael-kouc.jpg",
       result: "11 - 3",
     },
     match3: {
       image:
-      "https://cdn.intra.42.fr/users/9373f1cfc045b4628c01920b3000a836/ael-kouc.jpg",
+        "https://cdn.intra.42.fr/users/9373f1cfc045b4628c01920b3000a836/ael-kouc.jpg",
       result: "11 - 0",
     },
     match4: {
       image:
-      "https://cdn.intra.42.fr/users/9373f1cfc045b4628c01920b3000a836/ael-kouc.jpg",
+        "https://cdn.intra.42.fr/users/9373f1cfc045b4628c01920b3000a836/ael-kouc.jpg",
       result: "11 - 0",
     },
   };
-
+  const freind = true
   return (
     <div className="">
       <button onClick={() => setIsOpen(true)}>
@@ -83,6 +82,9 @@ const Info: React.FC = () => {
         contentLabel="User Info Modal"
       >
         <div className="">
+          <button className="mb-[1%] opacity-[50%] hover:opacity-[100%]">
+            {freind ? "+ Add Freind" : ""}
+          </button>
           <Avatar className="border-4 border-[#F4F4F4] lg:w-32 lg:h-32 md:w-25 md:h-25 sm:w-20 sm:h-20 w-12 h-12 mx-auto mb-4">
             <AvatarImage src={data.image} />
             <AvatarFallback>rank 2</AvatarFallback>
