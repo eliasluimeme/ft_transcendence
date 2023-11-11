@@ -69,27 +69,23 @@ const Pic = () => {
   const [inputValuesQR, setInputValuesQR] = useState({
     ImageQR: "",
   });
-  const fetchDataQR = async () => {
+  const handleEnable2FA = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:3001/auth/2fa/generate",
-        {
-          withCredentials: true,
-        }
-      );
+      // Fetch QR code data when the user clicks on "Enable 2FA"
+      const response = await axios.get("http://localhost:3001/auth/2fa/generate", {
+        withCredentials: true,
+      });
+
       if (response.status === 200) {
         setInputValuesQR({ ImageQR: response.data.qr });
-        console.log(inputValuesQR.ImageQR);
+        setIsOpen(true); // Open the modal after fetching QR code
       } else {
-        console.log("failed to fetchdata");
+        console.log("Unexpected response status:", response.status);
       }
     } catch (error) {
-      console.error("An error occurred while fetching user data:", error);
+      console.error("An error occurred while fetching QR code:", error);
     }
   };
-  useEffect(() => {
-    fetchDataQR();
-  }, []);
   ///send data
   const [code, setCodeValue] = useState({
     code: "",
@@ -142,7 +138,7 @@ const Pic = () => {
       </Button>
       <Button
         className="mt-4 w-40 bg-[#1E2124] hover:bg-gray-600 text-gray-100"
-        onClick={() => setIsOpen(true)}
+        onClick={handleEnable2FA}
       >
         {inputValues.toFAStatu ? "Disable 2FA" : "Enable 2FA"}
       </Button>

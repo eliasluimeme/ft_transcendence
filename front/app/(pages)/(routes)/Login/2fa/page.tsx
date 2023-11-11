@@ -23,7 +23,7 @@ const page = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:3001/settings/update",
+        "http://localhost:3001/auth/2fa/turn-on",
         code,
         {
           withCredentials: true,
@@ -73,12 +73,6 @@ const page = () => {
   return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="w-[50%] h-[50%] flex flex-col items-center justify-center text-center">
-        <Image
-          src={inputValuesQR.ImageQR as string}
-          alt="QR Code"
-          width={200}
-          height={200}
-        />
         <div className="mb-6">
           <label
             htmlFor="inline-phone-number"
