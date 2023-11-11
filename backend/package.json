@@ -39,6 +39,7 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
     "cookie-parser": "^1.4.6",
+    "fs.promises": "^0.1.2",
     "js-cookie": "^3.0.5",
     "mysql": "^2.18.1",
     "otplib": "^12.0.1",

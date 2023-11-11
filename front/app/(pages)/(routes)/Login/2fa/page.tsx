@@ -4,6 +4,8 @@ import { useState } from "react";
 import Image from "next/image";
 import { useEffect } from "react";
 import axios from "axios";
+import { useRouter } from 'next/navigation'
+
 
 const page = () => {
   ///////////////////////////////send data///////////////////
@@ -17,13 +19,14 @@ const page = () => {
       [name]: value,
     }));
   };
+  const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
       const response = await axios.post(
-        "http://localhost:3001/auth/2fa/turn-on",
+        "http://localhost:3001/auth/2fa/login",
         code,
         {
           withCredentials: true,
@@ -34,7 +37,9 @@ const page = () => {
       );
 
       if (response.status === 201) {
+
         console.log(code);
+        router.push("/");
         console.log("Data sent successfully!");
       } else {
         console.error("Failed to send data.");
@@ -43,32 +48,7 @@ const page = () => {
       console.error("An error occurred while sending data:", error);
     }
   };
-  /////////////////////////////////////////////////////////////////////////
-  ////////////////////////fetch data to get the QR code //////////////////
-  const [inputValuesQR, setInputValuesQR] = useState({
-    ImageQR: "",
-  });
-  const fetchDataQR = async () => {
-    try {
-      const response = await axios.get(
-        "http://localhost:3001/auth/2fa/generate",
-        {
-          withCredentials: true,
-        }
-      );
-      if (response.status === 200) {
-        setInputValuesQR({ ImageQR: response.data.qr });
-        console.log(inputValuesQR.ImageQR);
-      } else {
-        console.log("failed to fetchdata");
-      }
-    } catch (error) {
-      console.error("An error occurred while fetching user data:", error);
-    }
-  };
-  useEffect(() => {
-    fetchDataQR();
-  }, []);
+
   /////////////////////////////////////////////////////////////////////
   return (
     <div className="flex items-center justify-center min-h-screen">

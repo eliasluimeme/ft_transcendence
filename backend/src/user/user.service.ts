@@ -41,25 +41,54 @@ export class UserService {
     //     }
     // }
 
-    async checkExistingData( data: any ): Promise<boolean> {
-        const ifExists = await this.prisma.user.findFirst({
+    async checkExistingData( id: number, data: { fullName: string, userName: string, country: string, number: string } ) {
+        const existingUserName = await this.prisma.user.findUnique({
             where: {
                 userName: data.userName,
+            },
+        });
+
+        if (existingUserName && existingUserName.id !== id)
+            throw new ForbiddenException('User name already in use');
+
+        const existingFullName = await this.prisma.user.findUnique({
+            where: {
                 fullName: data.fullName,
+            },
+        });
+
+        if (existingFullName && existingFullName.id !== id)
+            throw new ForbiddenException('Full name already in use');
+
+        const existingNumber = await this.prisma.user.findUnique({
+            where: {
                 number: data.number,
             },
         });
 
-        if (!ifExists)
-            return false;
-        return true;
+        if (existingNumber && existingNumber.id !== id)
+            throw new ForbiddenException('Number already in use');
+    }
+
+    async updateProfile(id: number, newData: { fullName: string, userName: string, country: string, number: string } ) {
+        try {
+            // await this.checkExistingData(id, newData);
+
+            const user = await this.prisma.user.update({
+                where: {
+                    id: id,
+                },
+                data: newData,
+            });
+
+            return user;
+        } catch (error) {
+            console.error('Error updating user: ', error);
+            throw error;
+        }
     }
 
     async updateUser(id: number, newData: any ) {
-        // check if credentials are valid and not in use
-        // const existingCredentials = await this.checkExistingData(newData);
-        // if (existingCredentials)
-        //     throw new ForbiddenException('Credentials already in use');
         try {
             await this.prisma.user.update({
                 where: {
@@ -80,7 +109,6 @@ export class UserService {
                 }
             });
             delete user.hash;
-            console.log(user);
             return user;
         } catch (error) {
             console.error('Error finding user: ', error);

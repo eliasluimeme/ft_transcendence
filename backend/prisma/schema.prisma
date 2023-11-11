@@ -16,10 +16,10 @@ model User {
   email  String @unique
   hash   String?
 
-  fullName String?
-  userName  String
+  fullName String @unique
+  userName  String @unique
   country String?
-  number String?
+  number String? @unique
 
   accessToken String?
   twoFactorAuthSecret String?

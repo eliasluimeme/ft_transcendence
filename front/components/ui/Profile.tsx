@@ -10,7 +10,7 @@ import Image from "next/image";
 
 const Pic = () => {
   const [inputValues, setInputValues] = useState({
-    profilImage: "",
+    photo: "",
     toFAStatu: false,
   });
 
@@ -48,7 +48,7 @@ const Pic = () => {
       });
       if (response.status === 200) {
         setInputValues({
-          profilImage: response.data.photo,
+          photo: response.data.photo,
           toFAStatu: response.data.isTwoFactorAuthEnabled,
         });
       } else {
@@ -72,9 +72,12 @@ const Pic = () => {
   const handleEnable2FA = async () => {
     try {
       // Fetch QR code data when the user clicks on "Enable 2FA"
-      const response = await axios.get("http://localhost:3001/auth/2fa/generate", {
-        withCredentials: true,
-      });
+      const response = await axios.get(
+        "http://localhost:3001/auth/2fa/generate",
+        {
+          withCredentials: true,
+        }
+      );
 
       if (response.status === 200) {
         setInputValuesQR({ ImageQR: response.data.qr });
@@ -84,6 +87,32 @@ const Pic = () => {
       }
     } catch (error) {
       console.error("An error occurred while fetching QR code:", error);
+    }
+  };
+  const handleDisable2FA = async () => {
+    try {
+      // Fetch QR code data when the user clicks on "Enable 2FA"
+      const response = await axios.get(
+        "http://localhost:3001/auth/2fa/turn-off",
+        {
+          withCredentials: true,
+        }
+      );
+
+      if (response.status === 200) {
+      } else {
+        console.log("Unexpected response status:", response.status);
+      }
+    } catch (error) {
+      console.error("An error occurred while fetching QR code:", error);
+    }
+  };
+
+  const check = () => {
+    if (inputValues.toFAStatu) {
+      handleDisable2FA();
+    } else {
+      handleEnable2FA();
     }
   };
   ///send data
@@ -103,7 +132,7 @@ const Pic = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:3001/settings/update",
+        "http://localhost:3001/auth/2fa/turn-on",
         code,
         {
           withCredentials: true,
@@ -124,27 +153,79 @@ const Pic = () => {
     }
   };
 
+  ///upload image//////////////////
+  const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+    }
+  };
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const handleImageUpload = async () => {
+    if (selectedFile) {
+      const formData = new FormData();
+      formData.append("image", selectedFile);
+      try {
+        const response = await axios.post(
+          "http://localhost:3001/settings/update",
+          formData,
+          {
+            withCredentials: true,
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        if (response.status === 201) {
+          setInputValues({
+            ...inputValues,
+            photo: response.data.imageUrl,
+          });
+        } else {
+          console.log("Unexpected response status:", response.status);
+        }
+      } catch (error) {
+        console.error("An error occurred while uploading the image:", error);
+      }
+    }
+  };
+  ///////////////////////////////////////////////////////////////////
   return (
     <div className="flex flex-col items-center justify-center min-h-screen text-gray-300 bg-[#1E2124] bg-opacity-50 bg-no-repeat bg-cover bg-center background-image">
       <Avatar className="w-40 h-40 border-4">
-        <AvatarImage src={inputValues.profilImage} />
+        <AvatarImage src={inputValues.photo} />
         <AvatarFallback>Done</AvatarFallback>
       </Avatar>
+      {/* ///////////////////////////////////////////////////////////////
+      /////////chose avatar/////////////////////////////////////////
+      /////////////////////////////////////////////////////////////// */}
       <Button className="mt-4 w-40 bg-[#1E2124] hover:bg-gray-600 text-gray-100">
         Choose Avatar
       </Button>
-      <Button className="mt-4 w-40 bg-[#1E2124] hover:bg-gray-600 text-gray-100">
+      {/* ///////////////////////////////////////////////////////////////
+      /////////upload image/////////////////////////////////////////
+      /////////////////////////////////////////////////////////////// */}
+      <Button
+        onClick={() => setUploadModalOpen(true)}
+        className="mt-4 w-40 bg-[#1E2124] hover:bg-gray-600 text-gray-100"
+      >
         Upload Image
       </Button>
+      {/* ///////////////////////////////////////////////////////////////
+      /////////2FA///////////////////////////////////////////////////
+      /////////////////////////////////////////////////////////////// */}
       <Button
         className="mt-4 w-40 bg-[#1E2124] hover:bg-gray-600 text-gray-100"
-        onClick={handleEnable2FA}
+        onClick={check}
       >
         {inputValues.toFAStatu ? "Disable 2FA" : "Enable 2FA"}
       </Button>
-      <Button variant="destructive" className="mt-4 w-40">
-        Delete Account
-      </Button>
+
+      {/* ///////////////////////////////////////////////////////////////
+      /////////pop up of 2FA/////////////////////////////////////////
+      /////////////////////////////////////////////////////////////// */}
       {!inputValues.toFAStatu && (
         <Modal
           className="flex flex-col items-center p-4 rounded-lg "
@@ -175,7 +256,6 @@ const Pic = () => {
             />
             <button
               onClick={handleSubmit}
-              type="submit"
               className="w-full py-2 bg-[#1E2124] text-gray-100  rounded-lg hover:bg-gray-600 focus:outline-none"
             >
               send
@@ -187,6 +267,33 @@ const Pic = () => {
           ></button>
         </Modal>
       )}
+      {/* ///////////////////////////////////////////////////////////////
+      ////////////////////////////// popup of upload image///////////
+      /////////////////////////////////////////////////////////////// */}
+      {!isOpen && (
+        <Modal
+          className="flex flex-col items-center p-4 rounded-lg "
+          style={Style}
+          isOpen={uploadModalOpen}
+          onRequestClose={() => setUploadModalOpen(false)}
+          contentLabel="User Info Modal"
+        >
+          <input
+            className="font-alfa-slab mt-4 p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-gray-900"
+            type="file"
+            onChange={handleFileChange}
+          />
+          <Button className="mt-[10%]" onClick={handleImageUpload}>
+            {" "}
+            save{" "}
+          </Button>
+          <button
+            className="text-black"
+            onClick={() => setIsOpen(false)}
+          ></button>
+        </Modal>
+      )}
+      {/* /////////////////////////////////////////////////////////////// */}
     </div>
   );
 };
