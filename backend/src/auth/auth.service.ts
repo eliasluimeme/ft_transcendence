@@ -49,11 +49,14 @@ export class AuthService {
     }
 
     async generate2FASecret(user: any) {
-        const secret = authenticator.generateSecret();
+        let secret: any;
+
+        if (!user.twoFactorAuthSecret) {
+           secret = authenticator.generateSecret();
+           await this.set2FASecret(user.id, secret);
+        } else secret = user.twoFactorAuthSecret;
 
         const otpauthUrl = authenticator.keyuri(user.email, 'TRENDENDEN', secret);
-
-        await this.set2FASecret(user.id, secret);
 
         return { secret, otpauthUrl };
     }

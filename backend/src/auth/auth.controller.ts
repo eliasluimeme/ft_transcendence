@@ -5,12 +5,14 @@ import { JwtAuthGuard } from './guards/jwt.guard';
 import { Jwt2faAuthGuard } from './guards/jwt-2fa.guard';
 import { ConfigService } from '@nestjs/config';
 import { LocalAuthGuard } from './guards/local.guard';
+import { UserService } from 'src/user/user.service';
 
 
 @Controller()
 export class AuthController {
     constructor(
         private authService: AuthService,
+        private userService: UserService,
         private configService: ConfigService,
     ) {}
 
@@ -22,6 +24,7 @@ export class AuthController {
     @UseGuards(IntraAuthGuard)
     async authCallBack(@Req() req, @Res({ passthrough: true }) res) {
         const token = await this.authService.login(req.user, false);
+        this.userService.updateUser(req.user.id, { accessToken: token });
         res.cookie( 'access_token', `${token}` , {httpOnly: true, maxAge: 60 * 60 * 24 * 1000});
         if (req.user.isTwoFactorAuthEnabled)
             return res.redirect(this.configService.get('FRONTEND_URL') + '/Login/2fa');
@@ -37,16 +40,13 @@ export class AuthController {
     }
 
     @Post('auth/2fa/login')
-    // @HttpCode(200)
     @UseGuards(JwtAuthGuard)
     async auth2FA(@Req() req, @Body() body, @Res({ passthrough: true }) res) {
-        console.log(body);
-        console.log(req.user.twoFactorAuthSecret);
         const is2FACodeValid = this.authService.is2FACodeValid(
             body.number,
             req.user.twoFactorAuthSecret,
         );
-        console.log(is2FACodeValid);
+
         if (!is2FACodeValid)
             throw new UnauthorizedException('Invalid 2FA code');
 
@@ -57,7 +57,7 @@ export class AuthController {
     
     @Post('auth/2fa/turn-on')
 	@UseGuards(JwtAuthGuard)
-    async turnOn2FA(@Req() req, @Body() body) {
+    async turnOn2FA(@Req() req: any, @Res({ passthrough: true }) res: any, @Body() body: any) {
         const is2FACodeValid = this.authService.is2FACodeValid(
             body.number,
             req.user.twoFactorAuthSecret
@@ -66,17 +66,19 @@ export class AuthController {
         if (!is2FACodeValid)
             throw new UnauthorizedException('Invalid 2FA code');
 
+        const token = await this.authService.login(req.user, true);
+        res.cookie( 'access_token', `${token}` , { httpOnly: true, maxAge: 60 * 60 * 24 * 1000 });
         return await this.authService.activate2FA(req.user.id);
     }
     
     @Get('auth/2fa/turn-off')
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(Jwt2faAuthGuard)
     async turnOff2FA(@Req() req, @Body() body) {
         return await this.authService.desactivate2FA(req.user.id);
     }
 
     @Get('logout')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(Jwt2faAuthGuard)
     getLogoutPage(@Res({ passthrough: true }) res) {
         res.clearCookie('access_token');
         return res.redirect(this.configService.get('FRONTEND_URL') + 'Login');
