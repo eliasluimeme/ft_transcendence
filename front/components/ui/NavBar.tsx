@@ -1,10 +1,10 @@
-"use client"
+"use client";
 import "@/components/ui/CSS/style.css";
 import Image from "next/image";
 import Link from "next/link";
 import Info from "./Info";
 import axios from "axios";
-import { useRouter } from 'next/navigation'
+import { useRouter } from "next/navigation";
 export default function NavBar() {
   const links = [
     {
@@ -25,6 +25,17 @@ export default function NavBar() {
     },
   ];
 
+  const logout = async () => {
+    try {
+      // Make a request to the logout endpoint
+      await axios.get("http://localhost:3001/logout");
+
+      // Redirect to the login page after successful logout
+    } catch (error) {
+      console.error("Error during logout:", error);
+      // Handle error, e.g., show an error message
+    }
+  };
   const image =
     "https://cdn.intra.42.fr/users/9373f1cfc045b4628c01920b3000a836/ael-kouc.jpg";
   return (
@@ -35,6 +46,9 @@ export default function NavBar() {
         </Link>
       ))}
       <Info />
+      <button onClick={logout}>
+        <Image src="/logout.svg" alt="" width={24} height={21} />
+      </button>
     </div>
   );
 }
