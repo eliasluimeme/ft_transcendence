@@ -91,7 +91,6 @@ const Pic = () => {
   };
   const handleDisable2FA = async () => {
     try {
-      // Fetch QR code data when the user clicks on "Enable 2FA"
       const response = await axios.get(
         "http://localhost:3001/auth/2fa/turn-off",
         {
@@ -192,6 +191,51 @@ const Pic = () => {
     }
   };
   ///////////////////////////////////////////////////////////////////
+  //////////////////////////chose avatar ////////////////////////////
+  ///////////////////////////////////////////////////////////////////
+  const [uploadModalAvatarOpen, setUploadModalAvatarOpen] = useState(false);
+  const [avatarOptions, setAvatarOptions] = useState([
+    "https://media.istockphoto.com/id/517188688/photo/mountain-landscape.jpg?s=612x612&w=0&k=20&c=A63koPKaCyIwQWOTFBRWXj_PwCrR4cEoOw2S9Q7yVl8=",
+    "https://img.freepik.com/free-photo/digital-painting-mountain-with-colorful-tree-foreground_1340-25699.jpg",
+  ]);
+
+  // Update this function to handle the selection of the avatar
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const handleAvatarSelection = (selectedAvatar: string) => {
+    setSelectedImage(selectedAvatar);
+  };
+
+  const handleSaveAvatar = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:3001/settings/update",
+        { imageUrl: selectedImage },
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.status === 201) {
+        console.log("zebi");
+        setInputValues({
+          ...inputValues,
+          photo: response.data.imageUrl,
+        });
+        console.log("Image URL sent successfully!");
+        setUploadModalAvatarOpen(false); // Close the modal if needed
+      } else {
+        // Handle failure (e.g., show error message)
+        console.error("Failed to send image URL.");
+      }
+    } catch (error) {
+      // Handle the error
+      console.error("An error occurred while sending image URL:", error);
+    }
+  };
+  ///////////////////////////////////////////////////////////////////
   return (
     <div className="flex flex-col items-center justify-center min-h-screen text-gray-300 bg-[#1E2124] bg-opacity-50 bg-no-repeat bg-cover bg-center background-image">
       <Avatar className="w-40 h-40 border-4">
@@ -201,7 +245,10 @@ const Pic = () => {
       {/* ///////////////////////////////////////////////////////////////
       /////////chose avatar/////////////////////////////////////////
       /////////////////////////////////////////////////////////////// */}
-      <Button className="mt-4 w-40 bg-[#1E2124] hover:bg-gray-600 text-gray-100">
+      <Button
+        onClick={() => setUploadModalAvatarOpen(true)}
+        className="mt-4 w-40 bg-[#1E2124] hover:bg-gray-600 text-gray-100"
+      >
         Choose Avatar
       </Button>
       {/* ///////////////////////////////////////////////////////////////
@@ -294,6 +341,39 @@ const Pic = () => {
         </Modal>
       )}
       {/* /////////////////////////////////////////////////////////////// */}
+      {/* ///////////////////////////////////////////////////////////////
+      ////////////////////////////// popup of chose avatar///////////////
+      /////////////////////////////////////////////////////////////////// */}
+
+      {!isOpen && (
+        <Modal
+          className="flex flex-col items-center p-4 rounded-lg "
+          style={Style}
+          isOpen={uploadModalAvatarOpen}
+          onRequestClose={() => setUploadModalAvatarOpen(false)}
+          contentLabel="User Info Modal"
+        >
+          <div className="flex items-center space-x-4 mt-4 justify-center">
+            {avatarOptions.map((avatar, index) => (
+              <img
+                key={index}
+                src={avatar}
+                alt={`Avatar ${index + 1}`}
+                className={`w-[20%] border cursor-pointer ${
+                  selectedImage === avatar ? "border-2 border-blue-500" : ""
+                }`}
+                onClick={() => handleAvatarSelection(avatar)}
+              />
+            ))}
+          </div>
+          <Button
+            onClick={handleSaveAvatar}
+            className="mt-4 w-40 bg-[#1E2124] hover:bg-gray-600 text-gray-100"
+          >
+            Save
+          </Button>
+        </Modal>
+      )}
     </div>
   );
 };
