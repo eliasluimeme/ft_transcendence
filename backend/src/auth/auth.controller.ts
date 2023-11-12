@@ -6,6 +6,7 @@ import { Jwt2faAuthGuard } from './guards/jwt-2fa.guard';
 import { ConfigService } from '@nestjs/config';
 import { LocalAuthGuard } from './guards/local.guard';
 import { UserService } from 'src/user/user.service';
+import { Response } from 'express';
 
 
 @Controller()
@@ -27,7 +28,7 @@ export class AuthController {
         this.userService.updateUser(req.user.id, { accessToken: token });
         res.cookie( 'access_token', `${token}` , {httpOnly: true, maxAge: 60 * 60 * 24 * 1000});
         if (req.user.isTwoFactorAuthEnabled)
-            return res.redirect(this.configService.get('FRONTEND_URL') + '/Login/2fa');
+            return res.redirect(this.configService.get('FRONTEND_URL') + 'Login/2fa');
         return res.redirect(this.configService.get('FRONTEND_URL'));
     }
 
@@ -78,10 +79,10 @@ export class AuthController {
     }
 
     @Get('logout')
-    @UseGuards(Jwt2faAuthGuard)
-    getLogoutPage(@Res({ passthrough: true }) res) {
-        res.clearCookie('access_token');
-        return res.redirect(this.configService.get('FRONTEND_URL') + 'Login');
+    // @UseGuards(JwtAuthGuard)
+    logout(@Res() res) {
+        res.clearCookie('access_token', { httpOnly: true, maxAge: 60 * 60 * 24 * 1000 });
+        return res.redirect(this.configService.get('FRONTEND_URL'));
     }
 
     // @Post('signup')
@@ -101,7 +102,7 @@ export class AuthController {
     // }
 
     @Get('home')
-    @UseGuards(Jwt2faAuthGuard)
+    // @UseGuards(Jwt2faAuthGuard)
     getHello (@Request() req) {
         return "Hello world!!!";
     }

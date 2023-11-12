@@ -19,30 +19,28 @@ export class UserController {
 
     @Get('photo')
     @UseGuards(Jwt2faAuthGuard)
-    async getPhoto(@Req() req: any, @Res({ passthrough: true }) res: Response, @Body() body: fileParams): Promise<any> {
+    async getPhoto(@Req() req: any, @Body() body: fileParams): Promise<any> {
         const user = await this.userService.findUserById(req.user.id);
-        // const photo = await fs.readFile(`./uploads/${user.photo}`);
-        res.writeHead(200, { 'Content-Type': 'image/png' });
-        // res.end(photo, 'binary');
-        return res.sendFile(path.join(__dirname, '../uploads/' + user.photo))
+        return user.photo;
     }
 
     @Post('photo/upload')
     @UseGuards(Jwt2faAuthGuard)
     @UseInterceptors(
-        FileInterceptor('file', {
+        FileInterceptor('photo', {
           storage: diskStorage({
             destination: './uploads',
-            filename: (req, file, cb) => {
-              cb(null, `${file.originalname}`);
+            filename: (req, photo, cb) => {
+              cb(null, `${photo.originalname}`);
             },
           }),
         }),
       )
-    async uploadPhoto(@UploadedFile() file: Express.Multer.File, @Req() req: any) {
-        const user = await this.userService.updateUser(req.user.id, { photo: file.filename });
+    async uploadPhoto(@UploadedFile() photo: Express.Multer.File, @Req() req: any) {
+        // CHECK IMAGE SIZE AND TYPE
+        const user = await this.userService.updateUser(req.user.id, { photo: 'http://localhost:3001/' + photo.filename });
 
-        return { message: 'File uploaded successfully' };
+        return { photo: user.photo };
     }
 
     @Get('settings')

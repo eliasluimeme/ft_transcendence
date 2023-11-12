@@ -90,12 +90,13 @@ export class UserService {
 
     async updateUser(id: number, newData: any ) {
         try {
-            await this.prisma.user.update({
+            const user = await this.prisma.user.update({
                 where: {
                     id: id,
                 },
                 data: newData,
             });
+            return user;
         } catch (error) {
             console.error('Error updating user: ', error);
         }

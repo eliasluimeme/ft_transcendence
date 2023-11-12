@@ -64,7 +64,7 @@ const Info: React.FC = () => {
       result: "11 - 0",
     },
   };
-  const freind = false
+  const freind = true
   return (
     <div className="">
       <button onClick={() => setIsOpen(true)}>

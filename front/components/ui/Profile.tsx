@@ -164,10 +164,10 @@ const Pic = () => {
   const handleImageUpload = async () => {
     if (selectedFile) {
       const formData = new FormData();
-      formData.append("image", selectedFile);
+      formData.append("photo", selectedFile);
       try {
         const response = await axios.post(
-          "http://localhost:3001/settings/update",
+          "http://localhost:3001/photo/upload",
           formData,
           {
             withCredentials: true,
@@ -178,9 +178,10 @@ const Pic = () => {
         );
 
         if (response.status === 201) {
+          console.log(response.data)
           setInputValues({
             ...inputValues,
-            photo: response.data.imageUrl,
+            photo: response.data.photo,
           });
         } else {
           console.log("Unexpected response status:", response.status);
@@ -209,7 +210,7 @@ const Pic = () => {
     try {
       const response = await axios.post(
         "http://localhost:3001/settings/update",
-        { imageUrl: selectedImage },
+        { photo: selectedImage },
         {
           withCredentials: true,
           headers: {
@@ -222,7 +223,7 @@ const Pic = () => {
         console.log("zebi");
         setInputValues({
           ...inputValues,
-          photo: response.data.imageUrl,
+          photo: response.data.photo,
         });
         console.log("Image URL sent successfully!");
         setUploadModalAvatarOpen(false); // Close the modal if needed

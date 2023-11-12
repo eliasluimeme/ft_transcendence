@@ -13,7 +13,7 @@ import { join } from 'path';
 @Module({
   imports: [AuthModule, UserModule, PrismaModule, MulterModule,
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '../uploads'),
+      rootPath: '/Users/elias/Documents/GitHub/ft_transcendence/backend/uploads/',
     }),
     ConfigModule.forRoot({
       isGlobal: true,
