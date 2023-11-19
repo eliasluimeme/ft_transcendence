@@ -49,7 +49,7 @@ const Page: FC = () => {
   const [searchInput, setSearchInput] = useState("");
 
 
-  const handleKeyPress = (e) => {
+  const handleKeyPress = (e : any) => {
     if (e.key === 'Enter') {
       console.log('Search:', searchInput);
       setSearchInput('');
