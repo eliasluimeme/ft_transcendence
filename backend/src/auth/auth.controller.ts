@@ -7,6 +7,8 @@ import { ConfigService } from '@nestjs/config';
 import { LocalAuthGuard } from './guards/local.guard';
 import { UserService } from 'src/user/user.service';
 import { Response } from 'express';
+import * as Cookies from 'js-cookie';
+
 
 
 @Controller()
@@ -74,15 +76,18 @@ export class AuthController {
     
     @Get('auth/2fa/turn-off')
 	@UseGuards(Jwt2faAuthGuard)
-    async turnOff2FA(@Req() req, @Body() body) {
+    async turnOff2FA(@Req() req, @Res() res) {
+        const token = await this.authService.login(req.user, false);
+        // generate another token without 2fa 
+        res.cookie( 'access_token', `${token}` , { httpOnly: true, maxAge: 60 * 60 * 24 * 1000 });
         return await this.authService.desactivate2FA(req.user.id);
     }
 
     @Get('logout')
-    // @UseGuards(JwtAuthGuard)
-    logout(@Res() res) {
-        res.clearCookie('access_token', { httpOnly: true, maxAge: 60 * 60 * 24 * 1000 });
-        return res.redirect(this.configService.get('FRONTEND_URL'));
+    @UseGuards(Jwt2faAuthGuard)
+    logout(@Res() res: Response, @Req() req: any) {
+        res.clearCookie('access_token');
+        return res.status(200).json({ success : true });
     }
 
     // @Post('signup')

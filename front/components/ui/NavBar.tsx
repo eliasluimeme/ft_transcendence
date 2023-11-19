@@ -24,13 +24,14 @@ export default function NavBar() {
       path: "/settings",
     },
   ];
-
+  const router = useRouter();
   const logout = async () => {
     try {
-      // Make a request to the logout endpoint
-      await axios.get("http://localhost:3001/logout");
+      // Make a request to your backend logout endpoint
+      const response = await axios.get('http://localhost:3001/logout', { withCredentials: true });
 
-      // Redirect to the login page after successful logout
+      if (response.status === 200 && response.data.success === true) 
+        router.push('http://localhost:3000/Login');
     } catch (error) {
       console.error("Error during logout:", error);
       // Handle error, e.g., show an error message

@@ -1,6 +1,7 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
-import { AuthDto } from 'src/auth/dto';
+import { BadGatewayException, BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import * as fs from 'fs';
+import { Observable, of } from 'rxjs';
 
 @Injectable()
 export class UserService {
@@ -142,6 +143,39 @@ export class UserService {
         } catch (error) {
             console.error('Error deleting user: ', error);
         }
+    }
+
+    async searchUsers( userName: string ) {
+        try {
+            const users = await this.prisma.user.findMany({
+                where: {
+                    userName: userName,
+                }
+            })
+            return users;
+        } catch(error) {
+            console.log('error finding users: ', error)
+        }
+    }
+
+    validateFile(file: Express.Multer.File): Observable<boolean> {
+        const fileSize = 10 * 1024 * 1024;
+        const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+
+        if (!file)
+            throw new BadGatewayException('No file provided');
+
+        const sizeInBytes = fs.statSync(file.path).size;
+        if (sizeInBytes > fileSize)
+            throw new BadGatewayException('File size too large');
+
+        const fileExtension = file.originalname.split('.').pop().toLowerCase();
+        if (!allowedExtensions.includes(fileExtension))
+            throw new BadGatewayException('File size too large');
+
+        const isValid = true;
+        const isValidObservable$ = of(isValid);
+        return isValidObservable$;
     }
 
 }

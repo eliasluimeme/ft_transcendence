@@ -18,6 +18,8 @@ export class AuthService {
         private config: ConfigService,
     ) {}
 
+    private blacklistToken: string[] = [];
+
     getToken( payload: any ) {
         const accessToken = this.jwt.sign({ 
             payload,
@@ -164,5 +166,9 @@ export class AuthService {
             return null;
 
         return user;
+    }
+
+    async logout(token: string) {
+        this.blacklistToken.push(token);
     }
 }
