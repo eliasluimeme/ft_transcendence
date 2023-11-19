@@ -3,8 +3,6 @@ import React, { useState } from "react";
 import Modal from "react-modal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
-import { useEffect } from "react";
-
 
 const Info: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -92,8 +90,8 @@ const Info: React.FC = () => {
           <div className="text-lg font-bold mb-2 text-[#BBBCBD]">
             {data.nickname}
           </div>
-          <div className="text-gray-500 mb-2 text-[#BBBCBD]">{data.status}</div>
-          <div className="text-gray-500 mb-4 text-[#BBBCBD]">{data.rank}</div>
+          <div className="text-gray-500 mb-2">{data.status}</div>
+          <div className="text-gray-500 mb-4">{data.rank}</div>
           <div className="flex space-x-[2%] justify-center">
             <Image
               className={`w-[11%] ${data.GoldMedalStatu ? "" : "opacity-50"}`}
