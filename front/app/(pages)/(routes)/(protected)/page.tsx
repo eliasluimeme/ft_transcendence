@@ -4,7 +4,8 @@ import GameHistory from "@/components/ui/GameHistory";
 import { useRef, FC } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 const Page: FC = () => {
   const data = {
@@ -47,14 +48,39 @@ const Page: FC = () => {
   };
   const freind = true;
   const [searchInput, setSearchInput] = useState("");
-
+  const [profile, profilechange] = useState ({
+    image : "",
+  })
 
   const handleKeyPress = (e : any) => {
     if (e.key === 'Enter') {
       console.log('Search:', searchInput);
-      setSearchInput('');
+      fetchData();
+      // setSearchInput('');
     }
   };
+  const fetchData = async () => {
+    try {
+      const response = await axios.post("http://localhost:3001/search",
+      {search: searchInput}, {
+        withCredentials: true,
+      });
+      if (response.status === 201) {
+        console.log(response.data[0])
+        console.log(" hhhhh :", response.data[0].photo)
+        profilechange({
+          image : response.data[0].photo
+        })
+      } else {
+        console.log("failed to fetchdata");
+      }
+    } catch (error) {
+      console.error("An error occurred while fetching user data:", error);
+    }
+  };
+  // useEffect(() => {
+  //   fetchData();
+  // }, []);
   return (
     <div className="font-alfa-slab h-full grid grid-cols-3 gap-3">
       <div className="bg-[#36393E] col-span-2 rounded-lg">
@@ -94,7 +120,7 @@ const Page: FC = () => {
                   {freind ? "+ Add Freind" : ""}
                 </button>
                 <Avatar className="border-4 border-[#F4F4F4] lg:w-32 lg:h-32 md:w-25 md:h-25 sm:w-20 sm:h-20 w-12 h-12 mx-auto mb-4">
-                  <AvatarImage src={data.image} />
+                  <AvatarImage src={profile.image} />
                   <AvatarFallback>rank 2</AvatarFallback>
                 </Avatar>
                 <div className="text-lg font-bold mb-2 text-[#BBBCBD]">

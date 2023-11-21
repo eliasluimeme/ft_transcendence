@@ -59,7 +59,7 @@ const FillSet: React.FC = () => {
         }
       );
 
-      if (response.status === 201) {
+      if (response.status === 200) {
         console.log("Data sent successfully!");
       } else {
         console.error("Failed to send data.");

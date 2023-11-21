@@ -64,8 +64,9 @@ export class UserController {
     }
 
     @Post('search')
-    @UseGuards(Jwt2faAuthGuard)
+    // @UseGuards(Jwt2faAuthGuard)
     async search(@Body() body: any) {
+      console.log(body.search)
         return await this.userService.searchUsers(body.search);
     }
 
