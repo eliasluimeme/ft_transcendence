@@ -48,29 +48,32 @@ const Page: FC = () => {
   };
   const freind = true;
   const [searchInput, setSearchInput] = useState("");
-  const [profile, profilechange] = useState ({
-    image : "",
-  })
+  const [profile, profilechange] = useState({
+    image: "",
+  });
 
-  const handleKeyPress = (e : any) => {
-    if (e.key === 'Enter') {
-      console.log('Search:', searchInput);
+  const handleKeyPress = (e: any) => {
+    if (e.key === "Enter") {
+      console.log("Search:", searchInput);
       fetchData();
       // setSearchInput('');
     }
   };
   const fetchData = async () => {
     try {
-      const response = await axios.post("http://localhost:3001/search",
-      {search: searchInput}, {
-        withCredentials: true,
-      });
+      const response = await axios.post(
+        "http://localhost:3001/search",
+        { search: searchInput },
+        {
+          withCredentials: true,
+        }
+      );
       if (response.status === 201) {
-        console.log(response.data[0])
-        console.log(" hhhhh :", response.data[0].photo)
+        console.log(response.data[0]);
+        console.log(" hhhhh :", response.data[0].photo);
         profilechange({
-          image : response.data[0].photo
-        })
+          image: response.data[0].photo,
+        });
       } else {
         console.log("failed to fetchdata");
       }
@@ -98,9 +101,9 @@ const Page: FC = () => {
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              fill-rule="evenodd"
+              fillRule="evenodd"
               d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-              clip-rule="evenodd"
+              clipRule="evenodd"
             ></path>
           </svg>
           <input

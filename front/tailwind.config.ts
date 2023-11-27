@@ -16,6 +16,9 @@ module.exports = {
       },
     },
     extend: {
+      backgroundImage: {
+        'game-background' : 'url(/public/game/game.png)'
+      },
       fontFamily: {
         'alfa-slab': ['Alfa Slab One', 'sans'],
       },
