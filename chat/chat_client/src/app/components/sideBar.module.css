@@ -1,0 +1,140 @@
+/* .userList {
+    userList: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .userList li {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .userList li img {
+    width: 50px;
+    height: 50px;
+    float: left;
+    margin-right: 10px;
+  }
+  
+  .userList li a {
+    color: #000;
+    text-decoration: none;
+  }
+  
+  .userList li a:hover {
+    text-decoration: underline;
+  }
+  
+  /* Media Query for Small Screens */
+  /* @media (max-width: 600px) {
+    .userList li img {
+      width: 30px;
+      height: 30px;
+    }
+  } */ 
+
+
+
+  /* .sidebar {
+    width: 220px;
+    height: 642px;
+    top: 39px;
+    left: 90px;
+    position: fixed; /* Make the sidebar fixed to the viewport */
+    /* background: linear-gradient(90.27deg, rgba(126, 130, 135, 0.44) 2.64%,
+                 rgba(66, 69, 73, 0) 102.5%);
+  } */
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 325px;
+    height: 100vh;
+    background: linear-gradient(90.27deg, rgba(126, 130, 135, 0.44) 2.64%, rgba(66, 69, 73, 0) 102.5%);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .header {
+    /* display: flex; */
+    margin-top: 40px;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  
+ 
+  .h2 {
+    margin-left: 16px;
+    font-size: 18px;
+  }
+  
+  .list {
+    padding: 16px;
+  }
+  
+  .list a {
+    color: black;
+    text-decoration: none;
+    font-size: 16px;
+    /* padding: 8px 0; */
+    /* display: block; */
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  
+  .list a:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+
+
+
+
+  
+  
+  
+
+/* .img {
+  --s: 100px; image size
+  --b: 6px; border thickness
+  --c: #ae3ec9; border color
+  --cb: #e9ecef; background color */
+  /* --f: 1; initial scale */
+  
+  /* width: var(--s); */
+  /* aspect-ratio: 1; */
+  /* padding-top: calc(var(--s)/5);
+  cursor: pointer;
+  border-radius: 0 0 999px 999px;
+  --_g: 50%/calc(100%/var(--f)) 100% no-repeat content-box;
+  --_o: calc((1/var(--f) - 1)*var(--s)/2 - var(--b));
+  outline: var(--b) solid var(--c);
+  outline-offset: var(--_o);
+  background: 
+    radial-gradient(
+      circle closest-side,
+      var(--cb) calc(99% - var(--b)),var(--c) calc(100% - var(--b)) 99%,#0000
+     ) var(--_g);
+  -webkit-mask:
+    linear-gradient(#000 0 0) no-repeat
+     50% calc(1px - var(--_o)) / calc(100%/var(--f) - 2*var(--b) - 2px) 50%,
+    radial-gradient(circle closest-side,#000 99%,#0000) var(--_g);
+  transform: scale(var(--f));
+  transition: .5s;
+} */
+/* .img:hover {
+  --f: 1.4; 
+  /* hover scale */
+/* }
+
+
+/* .body {
+  margin: 0;
+  min-height: 100vh;
+  display: grid;
+  place-content: center;
+  grid-auto-flow: column;
+  gap: 30px;
+  background: #E0E4CC;
+}
+ */

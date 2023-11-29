@@ -1,33 +1,26 @@
-
-// export default function Home() {
-//   return (
-//     <div className="text-red-500 font-bold underline">
-//       Hello world!
-//     </div>
-    
-//   )
-// }
 "use client"
 
-import React, { useState } from 'react';
-import ChatInput from '@/app/components/ChatInput'
-import ChatMessages from '@/app/components/ChatMessage';
+import React, { useState, useEffect } from 'react';
+import { io } from 'socket.io-client';
+import ChatMessage from './components/ChatInput';
+import ChatPage from './components/ChatInput';
+import ChatInput from './components/ChatInput';
+import SideBar from './components/sideBar';
+import Conversation from './components/conversation';
+import Layout from './components/Layaout';
+import Chat from './chat/page';
 
-const Home = () => {
-  const [messages, setMessages] = useState([]);
 
-  const handleSendMessage = (message) => {
-    console.log(messages);
-    setMessages([...messages, message]);
-  };
+export default function Home() {
 
-  return (
-    <div>
-      <h1>Chat App</h1>
-      {/* <ChatMessages messages={messages} /> */}
-      <ChatInput onSendMessage={handleSendMessage} />
-    </div>
-  );
-};
-
-export default Home;
+return (
+  <div>
+    {/* <h1>Chat App</h1> */}
+    {/* <Conversation /> */}
+    {/* <SideBar />
+    <ChatInput  /> */}
+    {/* <Layout /> */}
+    {/* <Chat /> */}
+  </div>
+);
+}
