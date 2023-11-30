@@ -10,35 +10,9 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        Int      @id @default(autoincrement())
-
-  email  String @unique
-  hash   String?
-
-  fullName String @unique
-  userName  String @unique
-  country String?
-  number String? @unique
-
-  accessToken String?
-  twoFactorAuthSecret String?
-  isTwoFactorAuthEnabled Boolean @default(false)
-
-  photo String?
-
-  achievements Boolean[] @default([false, false, false, false, false])
-  wins Int @default(0)
-  losses Int @default(0)
-
-  sentRequests Friends[] @relation("sentRequests")
-  receivedRequests Friends[] @relation("receivedRequests")
-
-  blocking Blocks[] @relation("blocking")
-  blockedBy Blocks[] @relation("blockedBy")
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+enum MODE {
+  AI
+  CLASSIC
 }
 
 enum REQUEST {
@@ -47,30 +21,83 @@ enum REQUEST {
   DECLINED
 }
 
-model Friends {
-  id        Int      @id @default(autoincrement())
+model User {
+  id Int @id @default(autoincrement())
 
-  sender User @relation("sentRequests", fields: [senderId], references: [id])
+  email String  @unique
+  hash  String?
+
+  fullName String  @unique
+  userName String  @unique
+  country  String?
+  number   String? @unique
+
+  twoFactorAuthSecret    String?
+  isTwoFactorAuthEnabled Boolean @default(false)
+
+  photo String?
+
+  wins   Int[] @default([0, 0])
+  losses Int[] @default([0, 0])
+
+  achievements Boolean[] @default([false, false, false, false, false])
+
+  sentRequests     Friends[] @relation("sentRequests")
+  receivedRequests Friends[] @relation("receivedRequests")
+
+  // friendship and block map 
+
+  blocking Blocks[] @relation("blocking")
+  blocked  Blocks[] @relation("blocked")
+
+  player1               MatchHistory[]  @relation("Player1")
+  player2             MatchHistory[]  @relation("Player2")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Friends {
+  id Int @id @default(autoincrement())
+
+  sender   User @relation("sentRequests", fields: [senderId], references: [id])
   senderId Int
 
-  receiver User @relation("receivedRequests", fields: [receiverId], references: [id])
+  receiver   User @relation("receivedRequests", fields: [receiverId], references: [id])
   receiverId Int
 
-  status REQUEST 
+  status REQUEST
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Blocks {
-  id        Int      @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
-  blocking User @relation("blocking", fields: [blockingId], references: [id])
+  blocking   User @relation("blocking", fields: [blockingId], references: [id])
   blockingId Int
 
-  blockedBy User @relation("blockedBy", fields: [blockedById], references: [id])
-  blockedById Int
+  blocked   User @relation("blocked", fields: [blockedId], references: [id])
+  blockedId Int
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model MatchHistory {
+  id Int @id @default(autoincrement())
+
+  player1   User     @relation("Player1", fields: [player1Id], references: [id])
+  player1Id Int
+
+  player2   User     @relation("Player2", fields: [player2Id], references: [id])
+  player2Id Int
+
+  score1 Int @default(0)
+  score2 Int @default(0)
+
+  mode MODE
+
+  date DateTime @default(now())
 }

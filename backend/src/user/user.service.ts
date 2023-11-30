@@ -72,9 +72,9 @@ export class UserService {
     }
 
     async updateProfile(id: number, newData: { fullName: string, userName: string, country: string, number: string } ) {
+        await this.checkExistingData(id, newData);
         try {
-            // await this.checkExistingData(id, newData);
-
+            console.log('Updated profile')
             const user = await this.prisma.user.update({
                 where: {
                     id: id,
@@ -85,7 +85,6 @@ export class UserService {
             return user;
         } catch (error) {
             console.error('Error updating user: ', error);
-            throw error;
         }
     }
 
@@ -158,24 +157,23 @@ export class UserService {
         }
     }
 
-    validateFile(file: Express.Multer.File): Observable<boolean> {
-        const fileSize = 10 * 1024 * 1024;
-        const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
-
-        if (!file)
-            throw new BadGatewayException('No file provided');
-
-        const sizeInBytes = fs.statSync(file.path).size;
-        if (sizeInBytes > fileSize)
-            throw new BadGatewayException('File size too large');
-
-        const fileExtension = file.originalname.split('.').pop().toLowerCase();
-        if (!allowedExtensions.includes(fileExtension))
-            throw new BadGatewayException('File size too large');
-
-        const isValid = true;
-        const isValidObservable$ = of(isValid);
-        return isValidObservable$;
+    async addFriend( userId: number, friendId: number ) {
+        try {
+            // const user = await this.prisma.user.update({
+            //     where: {
+            //         id: userId,
+            //     },
+            //     data: {
+            //         friends: {
+            //             connect: {
+            //                 id: friendId,
+            //             }
+            //         }
+            //     }
+            // });
+            // return user;
+        } catch(error) {
+            console.log('error adding friend: ', error)
+        }
     }
-    //// seaarch
 }

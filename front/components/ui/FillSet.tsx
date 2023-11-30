@@ -43,27 +43,32 @@ const FillSet: React.FC = () => {
       [name]: value,
     }));
   };
-
+  function checkEmpty(name : string , fullName : string) : Boolean{
+    if(name.length === 0 || fullName.length === 0)
+      return true
+    return false;
+  }
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     try {
+    if(!checkEmpty(inputValues.fullName, inputValues.userName)) {
       const response = await axios.post(
         "http://localhost:3001/settings/update",
-        inputValues,
-        {
-          withCredentials: true,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+          inputValues,
+          {
+            withCredentials: true,
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+          );
+          if (response.status === 201) {
+            console.log("Data sent successfully!");
+          } else {
+            console.error("Failed to send data.");
+          }
+    }
 
-      if (response.status === 201) {
-        console.log("Data sent successfully!");
-      } else {
-        console.error("Failed to send data.");
-      }
     } catch (error) {
       console.error("An error occurred while sending data:", error);
     }

@@ -7,8 +7,6 @@ import { ConfigService } from '@nestjs/config';
 import { LocalAuthGuard } from './guards/local.guard';
 import { UserService } from 'src/user/user.service';
 import { Response } from 'express';
-import * as Cookies from 'js-cookie';
-
 
 
 @Controller()
@@ -27,7 +25,6 @@ export class AuthController {
     @UseGuards(IntraAuthGuard)
     async authCallBack(@Req() req, @Res({ passthrough: true }) res) {
         const token = await this.authService.login(req.user, false);
-        this.userService.updateUser(req.user.id, { accessToken: token });
         res.cookie( 'access_token', `${token}` , {httpOnly: true, maxAge: 60 * 60 * 24 * 1000});
         if (req.user.isTwoFactorAuthEnabled)
             return res.redirect(this.configService.get('FRONTEND_URL') + 'Login/2fa');
@@ -39,7 +36,7 @@ export class AuthController {
     async generate2FAQrCode(@Req() req, @Res() res) {
         const qr = await this.authService.generateQrCode(req.user);
         res.set('Content-Type', 'image/png');
-        return res.send({qr: qr});
+        return res.send({ qr: qr });
     }
 
     @Post('auth/2fa/login')
@@ -79,6 +76,7 @@ export class AuthController {
     async turnOff2FA(@Req() req, @Res() res) {
         const token = await this.authService.login(req.user, false);
         // generate another token without 2fa 
+        res.clearCookie('access_token');
         res.cookie( 'access_token', `${token}` , { httpOnly: true, maxAge: 60 * 60 * 24 * 1000 });
         return await this.authService.desactivate2FA(req.user.id);
     }
@@ -105,10 +103,4 @@ export class AuthController {
     //     res.header('Authorization', `Bearer ${user.token}`);
     //     return res.status(HttpStatus.OK).json(user);
     // }
-
-    @Get('home')
-    // @UseGuards(Jwt2faAuthGuard)
-    getHello (@Request() req) {
-        return "Hello world!!!";
-    }
 }

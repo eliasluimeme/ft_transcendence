@@ -88,87 +88,76 @@ export class AuthService {
         return authenticator.verify({ token: code, secret: secret });
     }
 
-    // async login2FA(user: any) {
-    //     const payload = {
-    //         userId: user.id,
-    //         email: user.email,
-    //         isTwoFactorAuthEnabled: !!user.isTwoFactorAuthEnabled,
-    //         isTwoFactorAuthenticated: true,
-    //     };
-
-    //     return this.getToken(payload);
-    // }
-
     async updateProfile(userId: number, data: any) {
         return await this.userService.updateUser(userId, data);
     }
 
-    // async signup(dto: AuthDto) {
-    //     try {
-    //         dto.password = await argon.hash(dto.password);
-            
-    //         const user = await this.userService.createLocalUser(dto);
-
-    //         const {hash: _, ...newUser} = user;
-
-    //         const token = await this.getToken( newUser.id, newUser.email )
-
-    //         return { user: newUser, token: token };
-    //     } catch(error) {
-    //         if (error instanceof PrismaClientKnownRequestError) {
-    //             if (error.code === 'P2002')
-    //                 throw new UnauthorizedException("Email or username is already taken");
-    //         }
-    //         throw error;
-    //     }
-    // }
-
-    // async signin(dto: AuthDto) {
-    //     const user = await this.userService.findUserByEmail(dto.email);
-
-    //     if (!user)
-    //         throw new UnauthorizedException("Invalid credentials");
-        
-    //     const pwMatch = await argon.verify(user.hash, dto.password);
-    //     if (!pwMatch)
-    //         throw new UnauthorizedException("Invalid credentials");
     
-    //     delete user.hash;
-
-    //     const token = await this.getToken(user.id, user.email);
-    //     return { success: true, user: user, token: token };
-    // }
-
     async validateIntraUser(profile: any): Promise<any> {
         let user = await this.userService.findUserByEmail(profile.emails[0].value);
 
         if (!user)
             user = await this.userService.createIntraUser(profile);
-
+        
         if (user)
             return user;
         
         throw new Error('Cannot create user');
     }
-
+    
     async validateLocalUser(email: string, password: string) {
         const user = await this.prisma.user.findUnique({
             where: {
                 email: email
             }
         });
-
+        
         if (!user)
-            return null;
+        return null;
+    
+    const pwMatch = await argon.verify(user.hash, password);
+    if (!pwMatch)
+    return null;
 
-        const pwMatch = await argon.verify(user.hash, password);
-        if (!pwMatch)
-            return null;
+return user;
+}
 
-        return user;
-    }
+async logout(token: string) {
+    this.blacklistToken.push(token);
+}
+// async signup(dto: AuthDto) {
+//     try {
+//         dto.password = await argon.hash(dto.password);
+        
+//         const user = await this.userService.createLocalUser(dto);
 
-    async logout(token: string) {
-        this.blacklistToken.push(token);
-    }
+//         const {hash: _, ...newUser} = user;
+
+//         const token = await this.getToken( newUser.id, newUser.email )
+
+//         return { user: newUser, token: token };
+//     } catch(error) {
+//         if (error instanceof PrismaClientKnownRequestError) {
+//             if (error.code === 'P2002')
+//                 throw new UnauthorizedException("Email or username is already taken");
+//         }
+//         throw error;
+//     }
+// }
+
+// async signin(dto: AuthDto) {
+//     const user = await this.userService.findUserByEmail(dto.email);
+
+//     if (!user)
+//         throw new UnauthorizedException("Invalid credentials");
+    
+//     const pwMatch = await argon.verify(user.hash, dto.password);
+//     if (!pwMatch)
+//         throw new UnauthorizedException("Invalid credentials");
+
+//     delete user.hash;
+
+//     const token = await this.getToken(user.id, user.email);
+//     return { success: true, user: user, token: token };
+// }
 }
