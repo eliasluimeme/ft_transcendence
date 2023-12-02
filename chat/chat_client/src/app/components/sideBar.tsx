@@ -21,14 +21,22 @@ return (
     <>
         <div className='mt-20'>
             <div   className=" mx-6 mt-auto flex items-center" >
-                <button type="submit" onClick={handleSearch}>
+                <button type="submit" 
+                    // onClick={handleSearch}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey){
+                          
+                          handleSearch(e)  
+                        }
+                      }}
+                    >
                 <img alt='search' src='/icons/search.svg' />
                 </button>
                 <input 
-                className="border p-2 rounded-2xl w-full text-black" 
-                value={searchInput} 
-                onChange={(e) => setSearchInput(e.target.value)} 
-                placeholder="Search friends" />
+                    className=" bg-transparent p-2 rounded-2xl w-full text-gray-50" 
+                    value={searchInput} 
+                    onChange={(e) => setSearchInput(e.target.value)} 
+                    placeholder="Search Friends" />
             </div>
         </div>
         <h2 className=' blue_font  lg:text-[30px] md:text-[20px] sm:text-[10px] text-[10px]'>Friends</h2>
