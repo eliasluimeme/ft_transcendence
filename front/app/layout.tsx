@@ -27,11 +27,18 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" />
-        <link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&display=swap" rel="stylesheet" />
         <link
           href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&display=swap"
           rel="stylesheet"
         />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&display=swap"
+          rel="stylesheet"
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Goldman&display=swap"
+          rel="stylesheet"
+        ></link>
       </head>
       <body className={inter.className}>{children}</body>
     </html>

@@ -21,6 +21,7 @@ module.exports = {
       },
       fontFamily: {
         'alfa-slab': ['Alfa Slab One', 'sans'],
+        'Goldman' : ['Goldman', 'sans']
       },
       gradientColorStops: {
         'red-grad': '#FD6C74',
@@ -82,5 +83,8 @@ module.exports = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+    require('tailwind-scrollbar'),
+  ],
 }

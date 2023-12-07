@@ -12,7 +12,7 @@ const settings = () => {
           backgroundImage: `url(${image})`,
           backgroundSize: "cover",
           backgroundRepeat: "no-repeat",
-          backgroundBlendMode : "screen"
+          backgroundBlendMode: "screen",
         }}
       >
         <Pic />
