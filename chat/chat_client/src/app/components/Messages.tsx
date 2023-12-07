@@ -4,6 +4,7 @@ import { FC, useRef, useState } from 'react'
 import { cn } from '../lib/utils'
 import Image from 'next/image'
 import { format } from 'date-fns'
+import ChatInput from './ChatInput'
 
 interface MessagesProps {
     initialMessages : Message[]
@@ -80,6 +81,7 @@ const Messages: FC<MessagesProps> = ({initialMessages}) => {
                                     />
                                   </div>
                         </div>
+                        <ChatInput />
                     </div>
             )
         })}

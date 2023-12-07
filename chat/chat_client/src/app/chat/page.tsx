@@ -16,7 +16,7 @@ function Chat (){
       </div>
       <div className="w-[70%] rounded-xl m-5 flex-1 justify-between flex flex-col max-h-[calc(100vh-6rem)]"
       style={{
-        backgroundImage: "url('/icons/gif/giphy.gif')",
+        // backgroundImage: "url('/icons/gif/giphy.gif')",
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
@@ -25,9 +25,8 @@ function Chat (){
       >
         {/* <div>
         </div> */}
-        {/* <Conversation /> */}
-          {/* <Messages initialMessages={[]} />
-          <ChatInput/> */}
+          <Messages initialMessages={[]} />
+          {/* <ChatInput/> */}
       </div>
     </div>
   );

@@ -12,8 +12,8 @@ export class SearchService {
     return `This action returns all search`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} search`;
+  findOne(userName: number) {
+    return `This action returns a #${userName} search`;
   }
 
   update(id: number, updateSearchDto: UpdateSearchDto) {

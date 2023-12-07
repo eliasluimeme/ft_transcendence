@@ -14,8 +14,6 @@ export type SearchProps = {
 
 function SearchBar(props: SearchProps ){
 
-    // const prisma = new PrismaClient();
-
 
     const friends: String[] = ['Achraf','Ilyass','Youssef','Yjaadoun']; // Dattabase
 
@@ -23,12 +21,11 @@ function SearchBar(props: SearchProps ){
     const [ searchFriend, setsearchFriend] = useState('');
 
     const friendSearch = async () => {
-        const firendResults = await axios.get('/api/search', {
+        const firendResults = await axios.get('http://localhost:3001/api/search/findOne', {
           params: {
             searchFriend: searchFriend,
           },
         });
-        // Process search results
         console.log(firendResults);
       };
 
@@ -48,14 +45,12 @@ function SearchBar(props: SearchProps ){
     return (
         <div>
             <div className='mt-20'>
-                <form   className=" mx-6 mt-auto flex items-center" >
-                    <button onClick={(e) => handleSearch(e)}>
-                        <Image alt='search' src='/icons/search.svg' width={50} height={50} />
-                    </button>
+                <form className=" mx-6 mt-auto flex items-center">
+                    <Image alt='search' src='/icons/search.svg' width={50} height={50} />
                     <input 
-                        className=" bg-transparent p-2 rounded-2xl w-full text-gray-50" 
+                        className="bg-transparent p-2 rounded-2xl w-full text-gray-50" 
                         value={searchFriend} 
-                        onChange={(event) => handleSearch(event)}
+                        onChange={handleSearch}
                         onKeyDown={handleKeyDown}
                         placeholder="Search Friends... " />
                 </form>
