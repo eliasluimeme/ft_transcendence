@@ -41,7 +41,6 @@ function SearchBar(props: SearchProps ){
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'Enter') {
-            // console.log(searchFriend);
             onSearch(searchFriend);
         }
     };

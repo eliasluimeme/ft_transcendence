@@ -10,8 +10,3 @@ export class AppController {
     return this.appService.getHello();
   }
 }
-
-@Controller('search')
-export class searchController{
-  constructor(private readonly searchController: SearchController) {}
-}
