@@ -15,6 +15,9 @@ module.exports = {
         "2xl": "1400px",
       },
     },
+    boxShadow: {
+      shadoww: '4px 4px 10px 0px rgba(255, 255, 255, 0.25)',
+    },
     extend: {
       backgroundImage: {
         'game-background' : 'url(/public/game/game.png)'

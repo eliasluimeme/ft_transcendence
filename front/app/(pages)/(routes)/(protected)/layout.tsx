@@ -8,9 +8,9 @@ export default function StartLayout({
   return (
     <div className="flex h-full w-full p-3 gap-3 font-custom">
       <NavBar />
-      <div className="absolute w-[30%] flex space-x-2 right-[10%] top-[5%]">
+      <div className="absolute w-[30%] flex space-x-2 right-[10%] top-[3%]">
         <svg
-          className="w-5 h-5 text-gray-500"
+          className="w-5 h-5 "
           fill="currentColor"
           viewBox="0 0 20 20"
           xmlns="http://www.w3.org/2000/svg"
