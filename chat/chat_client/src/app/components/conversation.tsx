@@ -6,27 +6,92 @@ import ChatInput from './ChatInput';
 import Messages from './Messages';
 
 
-const Conversation = () => {
-  // implementation of the conversation component between two users using nextjs and tailwindcss
-  const [messages, setMessages] = useState([
-    {
-      sender: 'ael-kouc',
-      message: 'Donc vu que je suis trop fort j\'ai réussi à faire \
-      marcher la page de connexion et d\'inscription.',
-    },
-    {
-      sender: 'ael-kouc',
-      message: 'Sinon le html et le javascript sont ok je pense. Je l\'ai pas posté sur GitLab\
-      car j\'ai pas mon ordi portable sur moi mais je te le montrerais lundi.',
-    },
-    {
-      sender: 'ael-kouc',
-      message: 'Et toi, t\'as bientôt finis?',
-    },
-  ]);
-    <Messages initialMessages={[]} />
+
+
+interface Message {
+  content: string;
+}
+  
+  
+  
+  const Conversation = () => {
+    
+    const initialMessages = ["Hello World From Conversation 1 ..!","Hello World From Conversation 2 ..!","Hello World From Conversation 3 ..!","Hello World From Conversation 4 ..!","Hello World From Conversation 5 ..!","Hello World From Conversation 6..!","Hello World From Conversation  7 ..!","Hello World From Conversation  8 ..!","Hello World From Conversation 9 ..!","Hello World From Conversation 10 ..!",]
+
+    // const initialMessages = ["Hello World From Conversation 1 ..!","Hello World From Conversation 2 ..!","Hello World From Conversation 3 ..!","Hello World From Conversation 4 ..!","Hello World From Conversation 5 ..!","Hello World From Conversation 6..!","Hello World From Conversation  7 ..!","Hello World From Conversation  8 ..!","Hello World From Conversation 9 ..!","Hello World From Conversation 10 ..!",]
+    // const messages: Message[] = initialMessages.map((content) => ({ content }));
+    const session = {
+    user: {
+      image: 'user-image',
+      id: 'user-id'
+    }
+  };
+const ChatId  = '1';
+const chatPartner = 'ael-kouc';
+
+  return (
+    <div 
+      className='flex-1 justify-between border rounded-lg flex flex-col h-full max-h-[calc(100vh-6rem)]'
+      style={{
+        backgroundImage: "url('https://images.unsplash.com/photo-1531306728370-e2ebd9d7bb99?q=80&w=2487&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        backgroundBlendMode : "screen"
+      }}
+        >
+    {/* <Messages
+        chatId={ChatId}
+        chatPartner={chatPartner}
+        sessionImg={session.user.image}
+        sessionId={session.user.id}
+        initialMessages={initialMessages}
+      /> */}
+      <ChatInput  />
+
+
+    </div>
+  )
 }
 export default Conversation;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // return(
 //   // <div className="flex-1">

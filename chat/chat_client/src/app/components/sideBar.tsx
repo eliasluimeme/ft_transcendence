@@ -15,7 +15,8 @@ function SideBar( ){
     const handleChat = (friend: string) => {
         // Implementation to open a chat with the friend.
         console.log(`Opening chat with ${friend}`);
-        // Add your code here to open the chat with the friend
+        // render <Conversation /> component.
+        
     };
 
     const handleSearch = (value: string) => {

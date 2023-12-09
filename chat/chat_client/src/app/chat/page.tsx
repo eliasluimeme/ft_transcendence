@@ -25,8 +25,9 @@ function Chat (){
       >
         {/* <div>
         </div> */}
-          <Messages initialMessages={[]} />
-          {/* <ChatInput/> */}
+          <Messages initialMessages={[]} sessionId={""} chatId={""} sessionImg={undefined} chatPartner={''} />
+          <ChatInput />
+          {/* <Conversation /> */}
       </div>
     </div>
   );
