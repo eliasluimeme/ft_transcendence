@@ -9,9 +9,15 @@ export class ChatRoomsService {
     this.prisma = new PrismaClient();
   }
 
- 
-  identify(name: string, clientID: string) {
-    // TODO: Implement the identify method
+  clientToUser = new Map<string, string>();
+
+  identify(name: string, clientId: string) {
+    this.clientToUser.set(clientId, name);
+    return Object.values(this.clientToUser);
+  }
+
+  getClientName(clientId: string) {
+    return this.clientToUser.get(clientId);
   }
 
   findAll() {
@@ -25,9 +31,7 @@ export class ChatRoomsService {
     });
   }
 
-  typing(
-    @MessageBody('isTyping') isTyping: boolean,
-  message: string) {
+  typing(@MessageBody('isTyping') isTyping: boolean, message: string) {
     // TODO: Implement the typing method that will write '{userName} is typing ...' in chatRoom.
 
     throw new Error('Method not implemented.');

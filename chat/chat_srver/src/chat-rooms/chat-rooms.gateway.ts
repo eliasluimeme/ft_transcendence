@@ -3,10 +3,11 @@ import {
   SubscribeMessage,
   MessageBody,
   ConnectedSocket,
+  WebSocketServer,
 } from '@nestjs/websockets';
 import { ChatRoomsService } from './chat-rooms.service';
 import { CreateChatRoomDto } from './dto/create-chat-room.dto';
-import { Socket } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { userInfo } from 'os';
 
 @WebSocketGateway({
@@ -16,13 +17,15 @@ import { userInfo } from 'os';
 })
 export class ChatRoomsGateway {
   constructor(private readonly chatRoomsService: ChatRoomsService) {}
-  clientToUser = new Map<string, string>();
+
+  @WebSocketServer()
+  server: Server;
 
   @SubscribeMessage('createChatRoom')
   async create(@MessageBody() createChatRoomDto: CreateChatRoomDto) {
     const chatRoomMessage =
       await this.chatRoomsService.create(createChatRoomDto);
-    this.chatRoomsService.emit('chatRoomCreated', chatRoomMessage);
+    this.server.emit('newChatRoom', chatRoomMessage);
     return chatRoomMessage;
   }
 
@@ -40,7 +43,11 @@ export class ChatRoomsGateway {
   }
 
   @SubscribeMessage('Typing')
-  typing(@MessageBody() message: string) {
-    return this.chatRoomsService.typing(message);
+  async typing(
+    @MessageBody('isTyping') isTyping: boolean,
+    @ConnectedSocket() client: Socket,
+  ) {
+    const name = await this.chatRoomsService.getClientName(client.id);
+    client.broadcast.emit('typing', { name, isTyping });
   }
 }
