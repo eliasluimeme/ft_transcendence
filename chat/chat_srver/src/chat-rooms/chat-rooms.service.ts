@@ -31,34 +31,9 @@ export class ChatRoomsService {
     });
   }
 
-  typing(@MessageBody('isTyping') isTyping: boolean, message: string) {
-    // TODO: Implement the typing method that will write '{userName} is typing ...' in chatRoom.
+  // typing(@MessageBody('isTyping') isTyping: boolean, message: string) {
+  //   // TODO: Implement the typing method that will write '{userName} is typing ...' in chatRoom.
 
-    throw new Error('Method not implemented.');
-  }
+  //   throw new Error('Method not implemented.');
+  // }
 }
-
-// @Injectable()
-// export class ChatRoomsService {
-//   prisma = new PrismaClient();
-
-//   create(createChatRoomDto: CreateChatRoomDto) {
-//     return 'This action adds a new chatRoom';
-//   }
-
-//   findAll() {
-//     return this.prisma.chatRoom.findMany();
-//   }
-
-//   findOne(id: number) {
-//     return `This action returns a #${id} chatRoom`;
-//   }
-
-//   update(id: number, updateChatRoomDto: UpdateChatRoomDto) {
-//     return `This action updates a #${id} chatRoom`;
-//   }
-
-//   remove(id: number) {
-//     return `This action removes a #${id} chatRoom`;
-//   }
-// }

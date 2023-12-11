@@ -8,7 +8,6 @@ import {
 import { ChatRoomsService } from './chat-rooms.service';
 import { CreateChatRoomDto } from './dto/create-chat-room.dto';
 import { Server, Socket } from 'socket.io';
-import { userInfo } from 'os';
 
 @WebSocketGateway({
   cors: {
@@ -31,10 +30,10 @@ export class ChatRoomsGateway {
 
   @SubscribeMessage('joinChatRoom')
   joinRoom(
-    @MessageBody('chatRoomId') chatRoomId: number,
+    @MessageBody('name') name: string,
     @ConnectedSocket() client: Socket,
   ) {
-    return this.chatRoomsService.identify(userInfo.name, client.id);
+    return this.chatRoomsService.identify(name, client.id);
   }
 
   @SubscribeMessage('findAllChatRooms')

@@ -7,8 +7,12 @@ export class ChatDmsService {
   typing(id: number) {
     throw new Error('Method not implemented.');
   }
-  create(createChatDmDto: CreateChatDmDto) {
-    return 'This action adds a new chatDm';
+  create(createChatDmDto: CreateChatDmDto, clientId : string) {
+    const message = {
+      senderId: clientId,
+      createdAt: new Date(),
+    };
+    return message;
   }
 
   findAll() {

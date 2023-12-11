@@ -19,8 +19,30 @@ model User {
 }
 
 
+model Message {
+  msgId         Int      @id @default(autoincrement())
+  msgContent    String
+  userSenderId     Int
+  chatroomId Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chatroom   Chatroom @relation(fields: [chatroomId], references: [id], onDelete: Cascade)
+}
+
+model chatDms {
+  chatDmId         Int      @id @default(autoincrement())
+  msgContent    String
+  userSenderId     Int
+  userReceiverId     Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  Message  Message[] @relation(fields: [msgId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
 model Chatroom {
-  id            Int             @id @default(autoincrement())
+  roomId            Int             @id @default(autoincrement())
   name          String
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
@@ -29,24 +51,13 @@ model Chatroom {
   ChatroomUsers ChatroomUsers[]
 }
 
-model Message {
-  id         Int      @id @default(autoincrement())
-  content    String
-  userId     Int
-  chatroomId Int
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  // user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  // chatroom   Chatroom @relation(fields: [chatroomId], references: [id], onDelete: Cascade)
-}
-
 model ChatroomUsers {
   chatroomId Int
   userId     Int
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-  // user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  // chatroom   Chatroom @relation(fields: [chatroomId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chatroom   Chatroom @relation(fields: [chatroomId], references: [id], onDelete: Cascade)
 
   @@id([chatroomId, userId])
 }

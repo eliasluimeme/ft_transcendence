@@ -4,7 +4,6 @@ import Image from 'next/image'
 import { ChangeEvent, useState } from 'react';
 import  '@/app/components/ui/css/font.css'
 import axios from 'axios';
-import { PrismaClient } from '@prisma/client'
 
 
 export type SearchProps = {
@@ -21,7 +20,7 @@ function SearchBar(props: SearchProps ){
     const [ searchFriend, setsearchFriend] = useState('');
 
     const friendSearch = async () => {
-        const firendResults = await axios.get('http://localhost:3001/api/search/findOne', {
+        const firendResults = await axios.get('http://localhost:3001/api/search/findall', {
           params: {
             searchFriend: searchFriend,
           },

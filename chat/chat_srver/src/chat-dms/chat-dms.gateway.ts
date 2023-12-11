@@ -2,9 +2,11 @@ import {
   WebSocketGateway,
   SubscribeMessage,
   MessageBody,
+  WebSocketServer,
 } from '@nestjs/websockets';
 import { ChatDmsService } from './chat-dms.service';
 import { CreateChatDmDto } from './dto/create-chat-dm.dto';
+import { Server } from 'socket.io';
 
 @WebSocketGateway({
   cors: {
@@ -14,8 +16,13 @@ import { CreateChatDmDto } from './dto/create-chat-dm.dto';
 export class ChatDmsGateway {
   constructor(private readonly chatDmsService: ChatDmsService) {}
 
+  @WebSocketServer()
+  server: Server;
+
   @SubscribeMessage('createChatDm')
-  create(@MessageBody() createChatDmDto: CreateChatDmDto) {
+  async create(@MessageBody() createChatDmDto: CreateChatDmDto) {
+    const message = await this.chatDmsService.create(createChatDmDto);
+    this.server.emit('message', message);
     return this.chatDmsService.create(createChatDmDto);
   }
 

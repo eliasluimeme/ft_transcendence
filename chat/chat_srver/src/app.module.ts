@@ -6,9 +6,10 @@ import { MessagesModule } from './messages/messages.module';
 import { MessagesGateway } from './messages/messages.gateway';
 import { ChatDmsModule } from './chat-dms/chat-dms.module';
 import { ChatRoomsModule } from './chat-rooms/chat-rooms.module';
+import { ConversationModule } from './conversation/conversation.module';
 
 @Module({
-  imports: [SearchModule, MessagesModule, ChatDmsModule, ChatRoomsModule],
+  imports: [SearchModule, MessagesModule, ChatDmsModule, ChatRoomsModule, ConversationModule],
   controllers: [AppController],
   providers: [AppService, MessagesGateway],
 })
