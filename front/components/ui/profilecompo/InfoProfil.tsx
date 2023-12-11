@@ -6,6 +6,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
+import Link from "next/link";
 
 type Data = {
   image: string;
@@ -47,9 +48,12 @@ const Informations: React.FC<{ data: Data }> = ({ data }) => {
         <div>Rank:</div>
         <div className="text-[#F3E322]">{data.rank}</div>
       </div>
-      <button className="row-start-5 Leader w-[130px] h-[30px] rounded-full bg-[#FFA961] flex items-center justify-center text-gray-300 hover:text-white ease-in-out duration-300">
+      <Link
+        className="row-start-5 Leader w-[130px] h-[30px] rounded-full bg-[#FFA961] flex items-center justify-center text-gray-300 hover:text-white ease-in-out duration-300"
+        href="/profile/Leader"
+      >
         Leader
-      </button>
+      </Link>
     </div>
   );
 };
