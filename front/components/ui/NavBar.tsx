@@ -2,7 +2,6 @@
 import "@/components/ui/CSS/style.css";
 import Image from "next/image";
 import Link from "next/link";
-import Info from "./Info";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 export default function NavBar() {
@@ -44,7 +43,6 @@ export default function NavBar() {
           <Image src={link.icon} alt="" width={24} height={21} />
         </Link>
       ))}
-      <Info />
       <button onClick={logout}>
         <Image src="/logout.svg" alt="" width={24} height={21} />
       </button>
