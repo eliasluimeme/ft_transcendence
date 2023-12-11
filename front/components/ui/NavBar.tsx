@@ -27,18 +27,16 @@ export default function NavBar() {
   const router = useRouter();
   const logout = async () => {
     try {
-      // Make a request to your backend logout endpoint
-      const response = await axios.get('http://localhost:3001/logout', { withCredentials: true });
+      const response = await axios.get("http://localhost:3001/logout", {
+        withCredentials: true,
+      });
 
-      if (response.status === 200 && response.data.success === true) 
-        router.push('http://localhost:3000/Login');
+      if (response.status === 200)
+        router.push("http://localhost:3000/Login");
     } catch (error) {
       console.error("Error during logout:", error);
-      // Handle error, e.g., show an error message
     }
   };
-  const image =
-    "https://cdn.intra.42.fr/users/9373f1cfc045b4628c01920b3000a836/ael-kouc.jpg";
   return (
     <div className="rounded-full bg-[#36393E] flex items-center flex-col justify-around w-14">
       {links.map((link, index) => (

@@ -7,7 +7,8 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { MulterModule } from '@nestjs/platform-express';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
+import { HttpExceptionFilter, PrismaExceptionFilter } from './exception.filter';
+import { APP_FILTER } from '@nestjs/core';
 
 
 @Module({
@@ -19,6 +20,16 @@ import { join } from 'path';
       isGlobal: true,
   })],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [ AppService,
+    // {
+    //   provide: APP_FILTER,
+    //   useClass: HttpExceptionFilter,
+    // },
+    // {
+    //   provide: APP_FILTER,
+    //   useClass: PrismaExceptionFilter,
+    // }
+  ]
+
 })
 export class AppModule {}

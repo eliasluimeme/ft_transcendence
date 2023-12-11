@@ -25,12 +25,13 @@ export class Jwt2faStrategy extends PassportStrategy(Strategy, 'jwt-2fa') {
   }
 
   async validate(payload: any) {
-    const user = await this.userService.findUserById(payload.payload.userId);
-
+    const user = await this.userService.findUserByIntraId(payload.userId);
+    
     if (!user)
-      throw new UnauthorizedException();
-
-    if (!user.isTwoFactorAuthEnabled || payload.payload.isTwoFactorAuthenticated)
-      return user;
+    throw new UnauthorizedException('User not found');
+  
+    const { twoFactorAuthSecret, ...userWithoutSecret } = user
+    if (!user.isTwoFactorAuthEnabled || payload.isTwoFactorAuthenticated)
+      return userWithoutSecret;
   }
 }

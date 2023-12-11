@@ -20,7 +20,7 @@ export class AuthService {
 
     private blacklistToken: string[] = [];
 
-    getToken( payload: any ) {
+    async getToken( payload: any ) {
         const accessToken = this.jwt.sign({ 
             payload,
         }, { 
@@ -31,15 +31,16 @@ export class AuthService {
         return accessToken;
     }
 
-    async login( user: any, isAuthenticated: boolean ) {
-        const payload = {
-            userId: user.id,
+    async generateToken( user: any, is2FAAuthenticated: boolean ) {
+        return await this.jwt.signAsync({ 
+            userId: user.intraId,
             email: user.email,
             isTwoFactorAuthEnabled: !!user.isTwoFactorAuthEnabled,
-            isTwoFactorAuthenticated: isAuthenticated,
-        }
-
-        return this.getToken(payload);
+            isTwoFactorAuthenticated: is2FAAuthenticated,
+          }, { 
+            secret: this.config.get('JWT_SECRET'), 
+            expiresIn: '1d',
+        });
     }
 
     async set2FASecret(userId: number, secret: string) {
@@ -94,15 +95,16 @@ export class AuthService {
 
     
     async validateIntraUser(profile: any): Promise<any> {
-        let user = await this.userService.findUserByEmail(profile.emails[0].value);
+        try {
+            let user = await this.userService.findUserByIntraId(profile.id);
+    
+            if (!user)
+                user = await this.userService.createIntraUser(profile);
 
-        if (!user)
-            user = await this.userService.createIntraUser(profile);
-        
-        if (user)
             return user;
-        
-        throw new Error('Cannot create user');
+        } catch (err) {
+            throw err;
+        }
     }
     
     async validateLocalUser(email: string, password: string) {
@@ -113,18 +115,19 @@ export class AuthService {
         });
         
         if (!user)
-        return null;
+            return null;
     
-    const pwMatch = await argon.verify(user.hash, password);
-    if (!pwMatch)
-    return null;
+        const pwMatch = await argon.verify(user.hash, password);
+        if (!pwMatch)
+            return null;
 
-return user;
-}
+        return user;
+    }
 
-async logout(token: string) {
-    this.blacklistToken.push(token);
-}
+    async logout(token: string) {
+        this.blacklistToken.push(token);
+    }
+
 // async signup(dto: AuthDto) {
 //     try {
 //         dto.password = await argon.hash(dto.password);

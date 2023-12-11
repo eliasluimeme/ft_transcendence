@@ -14,8 +14,6 @@ const Pic = () => {
     toFAStatu: false,
   });
 
-  const image =
-    "https://cdn.intra.42.fr/users/9373f1cfc045b4628c01920b3000a836/ael-kouc.jpg";
   //////////////////////////////////// pop up styling///////////////////
   const Style = {
     overlay: {

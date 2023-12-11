@@ -14,6 +14,7 @@ const Info: React.FC = () => {
       left: 0,
       right: 0,
       bottom: 0,
+      zIndex: 20,
     },
     content: {
       position: "absolute",

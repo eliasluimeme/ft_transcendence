@@ -23,7 +23,8 @@ enum REQUEST {
 
 model User {
   id Int @id @default(autoincrement())
-
+  intraId String @unique 
+  
   email String  @unique
   hash  String?
 
@@ -37,20 +38,17 @@ model User {
 
   photo String?
 
-  wins   Int[] @default([0, 0])
-  losses Int[] @default([0, 0])
+  level LadderLevel?
 
   achievements Boolean[] @default([false, false, false, false, false])
 
   sentRequests     Friends[] @relation("sentRequests")
   receivedRequests Friends[] @relation("receivedRequests")
 
-  // friendship and block map 
-
   blocking Blocks[] @relation("blocking")
   blocked  Blocks[] @relation("blocked")
 
-  player1               MatchHistory[]  @relation("Player1")
+  player1             MatchHistory[]  @relation("Player1")
   player2             MatchHistory[]  @relation("Player2")
 
   createdAt DateTime @default(now())
@@ -100,4 +98,19 @@ model MatchHistory {
   mode MODE
 
   date DateTime @default(now())
+}
+
+model LadderLevel {
+  id Int @id @default(autoincrement())
+
+  user User @relation( fields: [userId], references: [id] )
+  userId Int @unique
+
+  wins   Int[] @default([0, 0])
+  losses Int[] @default([0, 0])
+  
+  level Float @default(0.0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

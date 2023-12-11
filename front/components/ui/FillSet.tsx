@@ -9,7 +9,6 @@ const FillSet: React.FC = () => {
     country: "",
     number: "",
   });
-  const router = useRouter()
   const fetchData = async () => {
     try {
       const response = await axios.get("http://localhost:3001/settings", {
@@ -27,7 +26,6 @@ const FillSet: React.FC = () => {
         console.log("failed to fetchdata")
       }
     } catch (error) {
-      router.push("/Login");
       console.error("An error occurred while fetching user data:", error);
     }
   };
