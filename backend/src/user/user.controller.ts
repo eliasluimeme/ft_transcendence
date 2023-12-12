@@ -27,15 +27,67 @@ export class UserController {
     @Get('profile')
     @UseGuards(Jwt2faAuthGuard)
     async getProfile(@Req() req, @Res() res) {
-      const profile = await this.userService.getProfile(req.user);
-      res.json(profile);
+      res.json( await this.userService.getProfile(req.user) );
     }
 
     @Get('ladderBoard')
     @UseGuards(Jwt2faAuthGuard)
     async getladderBoard(@Req() req, @Res() res) {
-      const ladderBoard = await this.userService.getLadderboard(10);
-      res.json(ladderBoard);
+      res.json( await this.userService.getLadderboard(4) );
+    }
+
+    @Get('ladderBoard/rank')
+    @UseGuards(Jwt2faAuthGuard)
+    async getRank(@Req() req, @Res() res) {
+      res.json( await this.userService.getRank(req.user.level.level) );
+    }
+
+    @Post('friends/add')
+    @UseGuards(Jwt2faAuthGuard)
+    async addFriend(@Body() body: any, @Req() req: any) {
+        return await this.userService.addFriend(req.user.id, parseInt(body.friend) );
+    }
+
+    @Post('friends/accept')
+    @UseGuards(Jwt2faAuthGuard)
+    async acceptFriend(@Body() body: any, @Req() req: any) {
+        return await this.userService.acceptFriend(req.user.id, parseInt(body.friend) );
+    }
+
+    @Post('friends/reject')
+    @UseGuards(Jwt2faAuthGuard)
+    async rejectFriend(@Body() body: any, @Req() req: any) {
+        return await this.userService.rejectFriend(req.body.userId, parseInt(body.friend));
+    }
+
+    @Post('users/search')
+    @UseGuards(Jwt2faAuthGuard)
+    async search(@Req() req: any, @Res() res) {
+      res.json( await this.userService.searchUsers(req.user.id, req.body.search) );
+    }
+
+    @Get('users/block')
+    @UseGuards(Jwt2faAuthGuard)
+    async blockUser(@Req() req, @Res() res) {
+      res.json( await this.userService.blockUser(req.user.id, req.body.userId) );
+    }
+
+    @Get('users/unblock')
+    @UseGuards(Jwt2faAuthGuard)
+    async unblockUser(@Req() req, @Res() res) {
+      
+    }
+
+    @Get('settings')
+    @UseGuards(Jwt2faAuthGuard)
+    async getSettingsData(@Req() req: any): Promise<any> {
+        return await this.userService.findUserByIntraId(req.user.intraId);
+    }
+
+    @Post('settings/update') 
+    @UseGuards(Jwt2faAuthGuard)
+    async updateProfile(@Req() req, @Body() body): Promise<any> {
+        return await this.userService.updateProfile(req.user.id, body);
     }
 
     @Get('photo')
@@ -69,62 +121,5 @@ export class UserController {
         } catch( error ) {
             throw error;
         }
-    }
-
-    @Post('search')
-    @UseGuards(Jwt2faAuthGuard)
-    async search(@Req() req: any, @Res() res) {
-      console.log(req.user)
-      const us = await this.userService.searchUsers(req.user.id, req.body.search)
-      console.log(us);
-      res.json(us);
-    }
-
-    @Post('friends/add')
-    @UseGuards(Jwt2faAuthGuard)
-    async addFriend(@Body() body: any, @Req() req: any) {
-        return await this.userService.addFriend(req.user.id, parseInt(body.friend));
-    }
-
-    @Post('friends/accept')
-    @UseGuards(Jwt2faAuthGuard)
-    async acceptFriend(@Body() body: any, @Req() req: any) {
-        return await this.userService.acceptFriend(req.user.id, parseInt(body.friend));
-    }
-
-    @Post('friends/reject')
-    @UseGuards(Jwt2faAuthGuard)
-    async rejectFriend(@Body() body: any, @Req() req: any) {
-        return await this.userService.rejectFriend(req.body.userId, parseInt(body.friend));
-    }
-
-    @Get('users/:userId')
-    @UseGuards(Jwt2faAuthGuard)
-    async getUser() {
-
-    }
-
-    @Get('users/:userId/block')
-    @UseGuards(Jwt2faAuthGuard)
-    async blockUser(@Req() req, @Res() res) {
-
-    }
-
-    @Get('users/:userId/unblock')
-    @UseGuards(Jwt2faAuthGuard)
-    async unblockUser(@Req() req, @Res() res) {
-      
-    }
-
-    @Get('settings')
-    @UseGuards(Jwt2faAuthGuard)
-    async getSettingsData(@Req() req: any): Promise<any> {
-        return await this.userService.findUserByIntraId(req.user.intraId);
-    }
-
-    @Post('settings/update') 
-    @UseGuards(Jwt2faAuthGuard)
-    async updateProfile(@Req() req, @Body() body): Promise<any> {
-        return await this.userService.updateProfile(req.user.id, body);
     }
 }

@@ -9,27 +9,21 @@ import { MulterModule } from '@nestjs/platform-express';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { HttpExceptionFilter, PrismaExceptionFilter } from './exception.filter';
 import { APP_FILTER } from '@nestjs/core';
+import { ChatService } from './chat/chat.service';
+import { ChatController } from './chat/chat.controller';
+import { ChatModule } from './chat/chat.module';
 
 
 @Module({
-  imports: [AuthModule, UserModule, PrismaModule, MulterModule,
+  imports: [AuthModule, UserModule, PrismaModule, MulterModule, ChatModule,
     ServeStaticModule.forRoot({
       rootPath: '/Users/elias/Documents/GitHub/ft_transcendence/backend/uploads/',
     }),
     ConfigModule.forRoot({
       isGlobal: true,
   })],
-  controllers: [AppController],
-  providers: [ AppService,
-    // {
-    //   provide: APP_FILTER,
-    //   useClass: HttpExceptionFilter,
-    // },
-    // {
-    //   provide: APP_FILTER,
-    //   useClass: PrismaExceptionFilter,
-    // }
-  ]
+  controllers: [AppController, ChatController],
+  providers: [ AppService, ChatService]
 
 })
 export class AppModule {}

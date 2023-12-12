@@ -96,10 +96,12 @@ export class AuthService {
     
     async validateIntraUser(profile: any): Promise<any> {
         try {
-            let user = await this.userService.findUserByIntraId(profile.id);
+            const user = await this.userService.findUserByIntraId(profile.id);
     
-            if (!user)
-                user = await this.userService.createIntraUser(profile);
+            if (!user) {
+                const newUser = await this.userService.createIntraUser(profile);
+                return newUser;
+            }
 
             return user;
         } catch (err) {

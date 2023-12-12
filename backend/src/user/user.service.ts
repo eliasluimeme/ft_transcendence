@@ -32,7 +32,7 @@ export class UserService {
         }
     }
 
-    async getUserRank(userLevel: any): Promise<number> {
+    async getUserRank(userLevel: number): Promise<number> {
         try {
             const higherLevels = await this.prisma.ladderLevel.count({
                 where: { level: { gt: userLevel } },
@@ -59,25 +59,59 @@ export class UserService {
         }
     }
 
+    async getMatchHistory(userId: number): Promise<any> {
+        try {
+            const matchHistory = await this.prisma.matchHistory.findMany({
+                where: {
+                    OR: [
+                        { player1Id: userId },
+                        { player2Id: userId },
+                    ]
+                },
+            });
+            return matchHistory;
+        } catch (error) {
+            console.log('Error getting match history: ', error);
+        }
+    }
+
     async getProfile(user: any) {
-        // const ladderLevel = await this.prisma.ladderLevel.update({
-        //     where: {
-        //         userId: user.id,
-        //     },
-        //     data: {
-        //         userId: user.id,
-        //         level: 3.3,
-        //     }
-        // });
         try {
             const userLevel = await this.getUserLevel(user.id);
-            if (!userLevel) throw new NotFoundException('User not found');
-
             const userRank = await this.getUserRank(userLevel);
-            if (!userRank) throw new NotFoundException('User not found');
+            const matchs = await this.getMatchHistory(user.id);
 
+            const matchHistory = await Promise.all(matchs.map( async match => {
+                if (match.player1Id === user.id) {
+                    const { id, userName, photo } = user;
+                    match.player1 = { id, userName, photo };
+                    match.player2 = await this.prisma.user.findUnique({ 
+                        where: { id: match.player2Id },
+                        select: {
+                            id: true,
+                            userName: true,
+                            photo: true,
+                        }
+                    })
+                } else {
+                    const { id, userName, photo } = user;
+                    match.player2 = { id, userName, photo };
+                    match.player1 = await this.prisma.user.findUnique({ 
+                        where: { id: match.player1Id },
+                        select: {
+                            id: true,
+                            userName: true,
+                            photo: true,
+                        }
+                    })
+                }
+                // create dm
+                const { player1, player2, score1, score2, mode } = match;
+                return { player1, player2, score1, score2, mode };
+            }))
+            console.log('matchHistory: ', matchHistory)
             const { photo, userName, fullName, achievements } = user;
-            return { userName, fullName, photo, rank: userRank, level: userLevel, achievements };
+            return { userName, fullName, photo, rank: userRank, level: userLevel, achievements, matchHistory };
         } catch(error) {
             console.log('error getting profile: ', error)
         }
@@ -92,13 +126,21 @@ export class UserService {
           });
 
           const topPlayers = await Promise.all(players.map( async user => {
-            const rank = await this.getUserRank(user.level);
+            const rank = await this.getUserRank(user.level.level);
             return { user: user.userName, photo: user.photo, level: user.level.level, rank: rank };
           }))
     
           return topPlayers;
         } catch (error) {
           console.log("Failed to get ladderboard: ", error);
+        }
+    }
+
+    async getRank(userlevel: number): Promise<number> {
+        try {
+            return await this.getUserRank(userlevel);
+        } catch (error) {
+            console.log('Failed to get rank: ', error);
         }
     }
 
@@ -167,6 +209,9 @@ export class UserService {
             const user = await this.prisma.user.findUnique({
                 where: {
                     intraId: userId,
+                },
+                include: {
+                    level: true,
                 }
             });
 
@@ -208,23 +253,16 @@ export class UserService {
     }
 
     isValidQuery(query: string): boolean {
-        const allowedPattern = /^[a-zA-Z0-9 ]+$/;
+        const allowedPattern = /^[a-zA-Z0-9  -]+$/;
         return allowedPattern.test(query);
     }
 
     async searchUsers( userId: number, query: string ) {
         if (this.isValidQuery(query)) {
             try {
-                const users = await this.prisma.user.findMany({
+                const user = await this.prisma.user.findUnique({
                     where: {
-                        OR: [{
-                            userName: {
-                                startsWith: query.toLowerCase(),
-                        }}, {
-                            fullName: {
-                                startsWith: `${query.charAt(0).toUpperCase()}${query.slice(1).toLowerCase()}`,
-                            }
-                        }]
+                        userName: query,
                     },
                     select: {
                         id: true,
@@ -237,14 +275,14 @@ export class UserService {
                             }
                         },
                         achievements: true,
-                        blocking: {
+                        blocker: {
                             where: {
                                 blockedId: userId,
                             }
                         },
                         blocked: {
                             where: {
-                                blockingId: userId,
+                                blockerId: userId,
                             }
                         },
                         sentRequests: {
@@ -260,41 +298,24 @@ export class UserService {
                     }
                 })
 
-                if (users[0]) {
-                    return Promise.all(users.map(async user => { // Check what to do about blocks in front to return appropiate data
-                        const rank = await this.getUserRank(user.level);
-    
-                        if (user.id === userId)
-                            return { id: user.id, userName: user.userName, fullName: user.fullName, photo: user.photo, level: user.level.level, rank: rank, self: true };
-                        else if (user.blocking.find(block => block.blockedId === userId))
-                            return { id: user.id, userName: user.userName, fullName: user.fullName, photo: user.photo, level: user.level.level, rank: rank, blocked: true };
-                        else if (user.blocked.find(block => block.blockingId === userId))
-                            return { id: user.id, userName: user.userName, fullName: user.fullName, photo: user.photo, level: user.level.level, rank: rank, blocking: true };
-    
-                        else if (user.sentRequests && user.sentRequests.find(request => request.receiverId === userId)) {
-                            switch (user.sentRequests[0].status) {
-                                case 'PENDING':
-                                    return { id: user.id, userName: user.userName, fullName: user.fullName, photo: user.photo, level: user.level.level, rank: rank, friend: user.sentRequests[0].status };
-                                case 'ACCEPTED':
-                                    return { id: user.id, userName: user.userName, fullName: user.fullName, photo: user.photo, level: user.level.level, rank: rank, friend: user.sentRequests[0].status };
-                                case 'DECLINED':
-                                    return { id: user.id, userName: user.userName, fullName: user.fullName, photo: user.photo, level: user.level.level, rank: rank, friend: user.sentRequests[0].status };
-                            }
-                        }
-                        
-                        else if (user.receivedRequests && user.receivedRequests.find(request => request.senderId === userId)) {
-                            switch (user.receivedRequests[0].status) {
-                                case 'PENDING':
-                                    return { id: user.id, userName: user.userName, fullName: user.fullName, photo: user.photo, level: user.level.level, rank: rank, friend: user.receivedRequests[0].status };
-                                case 'ACCEPTED':
-                                    return { id: user.id, userName: user.userName, fullName: user.fullName, photo: user.photo, level: user.level.level, rank: rank, friend: user.receivedRequests[0].status };
-                                case 'DECLINED':
-                                    return { id: user.id, userName: user.userName, fullName: user.fullName, photo: user.photo, level: user.level.level, rank: rank, friend: user.receivedRequests[0].status };
-                            }
-                        }
-                        else
-                            return { id: user.id, userName: user.userName, fullName: user.fullName, photo: user.photo, level: user.level.level, rank: rank, friend: "false" };
-                    }))
+                if (user) {
+                    const rank = await this.getUserRank(user.level.level);
+
+                    if (user.id === userId)
+                        return { id: user.id, userName: user.userName, fullName: user.fullName, photo: user.photo, level: user.level.level, rank: rank, self: true };
+                    
+                    else if (user.blocker.find(block => block.blockedId === userId))
+                        return { id: user.id, userName: user.userName, fullName: user.fullName, photo: user.photo, level: user.level.level, rank: rank, block: true };
+                    else if (user.blocked.find(block => block.blockerId === userId))
+                        return { id: user.id, userName: user.userName, fullName: user.fullName, photo: user.photo, level: user.level.level, rank: rank, block: true };
+
+                    else if (user.sentRequests && user.sentRequests.find(request => request.receiverId === userId))
+                        return { id: user.id, userName: user.userName, fullName: user.fullName, photo: user.photo, level: user.level.level, rank: rank, friend: user.sentRequests[0].status };
+                    else if (user.receivedRequests && user.receivedRequests.find(request => request.senderId === userId))
+                        return { id: user.id, userName: user.userName, fullName: user.fullName, photo: user.photo, level: user.level.level, rank: rank, friend: user.receivedRequests[0].status };
+                    
+                    else
+                        return { id: user.id, userName: user.userName, fullName: user.fullName, photo: user.photo, level: user.level.level, rank: rank, friend: "NONE" };
                 }
                 else throw new NotFoundException('User not found');
             } catch(error) {
@@ -334,6 +355,7 @@ export class UserService {
                 }
             })
             // send notification to receiver
+            // create chat room
             return friendShip;
         } catch(error) {
             console.log('error adding friend: ', error)
@@ -416,6 +438,38 @@ export class UserService {
             } else throw new BadRequestException('Bad request no friendShip found');
         } catch(error) {
             console.log('error accepting friend: ', error);
+            throw error;
+        }
+    }
+
+    async blockUser( userId: number, blockedId: number) {
+        if (userId === blockedId)
+            throw new BadRequestException('You cannot block yourself');
+        try {
+            const user = await this.prisma.blocks.findMany({
+                where: {
+                    OR: [{ 
+                            blockerId: userId, 
+                            blockedId: blockedId,
+                        }, { 
+                            blockerId: blockedId, 
+                            blockedId: userId, 
+                        },
+                    ]
+                }
+            })
+
+            if (user) {
+                const newBlock = await this.prisma.blocks.create({
+                    data: {
+                        blocker: { connect: { id: userId } },
+                        blocked: { connect: { id: blockedId } },
+                    }
+                })
+                return newBlock;
+            } else throw new BadRequestException('User already blocked');
+        } catch(error) {
+            console.log('error blocking user: ', error);
             throw error;
         }
     }

@@ -23,8 +23,9 @@ enum REQUEST {
 
 model User {
   id Int @id @default(autoincrement())
-  intraId String @unique 
-  
+
+  intraId String @unique
+
   email String  @unique
   hash  String?
 
@@ -38,18 +39,30 @@ model User {
 
   photo String?
 
+  // Ladder level
   level LadderLevel?
 
+  // Achievements
   achievements Boolean[] @default([false, false, false, false, false])
 
+  // Friendships
   sentRequests     Friends[] @relation("sentRequests")
   receivedRequests Friends[] @relation("receivedRequests")
 
-  blocking Blocks[] @relation("blocking")
-  blocked  Blocks[] @relation("blocked")
+  // Blocks
+  blocker Blocks[] @relation("blocker")
+  blocked Blocks[] @relation("blocked")
 
-  player1             MatchHistory[]  @relation("Player1")
-  player2             MatchHistory[]  @relation("Player2")
+  // Match history
+  player1 MatchHistory[] @relation("Player1")
+  player2 MatchHistory[] @relation("Player2")
+
+  // Chat
+  // dm       DM[]            @relation()
+
+  messages      Message[]
+  chatrooms     Chatroom[]      @relation("ChatroomUsers")
+  ChatroomUsers ChatroomUsers[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -73,8 +86,8 @@ model Friends {
 model Blocks {
   id Int @id @default(autoincrement())
 
-  blocking   User @relation("blocking", fields: [blockingId], references: [id])
-  blockingId Int
+  blocker   User @relation("blocker", fields: [blockerId], references: [id])
+  blockerId Int
 
   blocked   User @relation("blocked", fields: [blockedId], references: [id])
   blockedId Int
@@ -86,10 +99,10 @@ model Blocks {
 model MatchHistory {
   id Int @id @default(autoincrement())
 
-  player1   User     @relation("Player1", fields: [player1Id], references: [id])
+  player1   User @relation("Player1", fields: [player1Id], references: [id])
   player1Id Int
 
-  player2   User     @relation("Player2", fields: [player2Id], references: [id])
+  player2   User @relation("Player2", fields: [player2Id], references: [id])
   player2Id Int
 
   score1 Int @default(0)
@@ -103,14 +116,67 @@ model MatchHistory {
 model LadderLevel {
   id Int @id @default(autoincrement())
 
-  user User @relation( fields: [userId], references: [id] )
-  userId Int @unique
+  user   User @relation(fields: [userId], references: [id])
+  userId Int  @unique
 
   wins   Int[] @default([0, 0])
   losses Int[] @default([0, 0])
-  
+
   level Float @default(0.0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model DM {
+  id Int @id @default(autoincrement())
+
+  // user1   User @relation(fields: [user1Id], references: [id], onDelete: Cascade)
+  // user1Id Int
+
+  // user2   User @relation(fields: [user2Id], references: [id], onDelete: Cascade)
+  // user2Id Int
+
+  createdAt DateTime @default(now())
+}
+
+model Message {
+  id Int @id @default(autoincrement())
+
+  content String
+
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int
+
+  chatroom   Chatroom @relation(fields: [chatroomId], references: [id], onDelete: Cascade)
+  chatroomId Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Chatroom {
+  id Int @id @default(autoincrement())
+
+  name String
+
+  users         User[]          @relation("ChatroomUsers")
+  messages      Message[]
+  ChatroomUsers ChatroomUsers[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ChatroomUsers {
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int
+
+  chatroom   Chatroom @relation(fields: [chatroomId], references: [id], onDelete: Cascade)
+  chatroomId Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@id([chatroomId, userId])
 }
