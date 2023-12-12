@@ -10,6 +10,9 @@ const Bot = () => {
             className="relative rounded-lg"
             src="https://cdn.dribbble.com/users/1420892/screenshots/11361440/media/1006e2732e0e9ad1e10d2494f17f409a.png?resize=1000x750&vertical=center"
             alt=""
+            sizes="(max-width: 600px) 400px,
+                (max-width: 1200px) 800px,
+                1200px"
             fill
           ></Image>
         </div>

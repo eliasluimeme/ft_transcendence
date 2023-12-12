@@ -176,7 +176,7 @@ const Pic = () => {
         );
 
         if (response.status === 201) {
-          console.log(response.data)
+          console.log(response.data);
           setInputValues({
             ...inputValues,
             photo: response.data.photo,
@@ -236,7 +236,10 @@ const Pic = () => {
   };
   ///////////////////////////////////////////////////////////////////
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen text-gray-300 bg-[#1E2124] bg-opacity-50 bg-no-repeat bg-cover bg-center background-image">
+    <div
+      id="app"
+      className="flex flex-col items-center justify-center min-h-screen text-gray-300 bg-[#1E2124] bg-opacity-50 bg-no-repeat bg-cover bg-center background-image"
+    >
       <Avatar className="w-40 h-40 border-4">
         <AvatarImage src={inputValues.photo} />
         <AvatarFallback>Done</AvatarFallback>
@@ -279,6 +282,9 @@ const Pic = () => {
           isOpen={isOpen}
           onRequestClose={() => setIsOpen(false)}
           contentLabel="User Info Modal"
+          appElement={
+            typeof window !== "undefined" && document.getElementById("app")
+          }
         >
           <Image
             src={inputValuesQR.ImageQR as string}
@@ -323,6 +329,9 @@ const Pic = () => {
           isOpen={uploadModalOpen}
           onRequestClose={() => setUploadModalOpen(false)}
           contentLabel="User Info Modal"
+          appElement={
+            typeof window !== "undefined" && document.getElementById("app")
+          }
         >
           <input
             className="font-alfa-slab mt-4 p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-gray-900"
@@ -351,18 +360,27 @@ const Pic = () => {
           isOpen={uploadModalAvatarOpen}
           onRequestClose={() => setUploadModalAvatarOpen(false)}
           contentLabel="User Info Modal"
+          appElement={
+            typeof window !== "undefined" && document.getElementById("app")
+          }
         >
-          <div className="flex items-center space-x-4 mt-4 justify-center">
+          <div className="flex relative items-center space-x-4 mt-4 justify-center">
             {avatarOptions.map((avatar, index) => (
-              <img
-                key={index}
-                src={avatar}
-                alt={`Avatar ${index + 1}`}
-                className={`w-[20%] border cursor-pointer ${
-                  selectedImage === avatar ? "border-2 border-blue-500" : ""
-                }`}
-                onClick={() => handleAvatarSelection(avatar)}
-              />
+              <div key={index} className="relative border w-[150px] h-[100px]">
+                <Image
+                  key={index}
+                  src={avatar}
+                  alt={`Avatar ${index + 1}`}
+                  sizes="(max-width: 600px) 400px,
+                (max-width: 1200px) 800px,
+                1200px"
+                  fill
+                  className={`w-[20%] border cursor-pointer ${
+                    selectedImage === avatar ? "border-2 border-blue-500" : ""
+                  }`}
+                  onClick={() => handleAvatarSelection(avatar)}
+                />
+              </div>
             ))}
           </div>
           <Button
