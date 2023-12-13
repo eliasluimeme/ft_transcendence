@@ -27,13 +27,17 @@ function setAchivement(description: string, achived: boolean, image: string) {
     <div className="">
       <HoverCard>
         <HoverCardTrigger>
-          <Image
-            src={image}
-            style={{ opacity: achived ? 1 : 0.5 }}
-            alt=""
-            width={80}
-            height={80}
-          ></Image>
+          <div className="w-[80px] h-[80px] relative">
+            <Image
+              src={image}
+              style={{ opacity: achived ? 1 : 0.5 }}
+              alt=""
+              sizes="(max-width: 600px) 400px,
+                (max-width: 1200px) 800px,
+                1200px"
+              fill
+            ></Image>
+          </div>
         </HoverCardTrigger>
         <HoverCardContent className="w-[180px] h-[40px] flex items-center justify-center">
           {description}

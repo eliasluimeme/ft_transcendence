@@ -22,6 +22,9 @@ export default function Redirect(dataButton: DataButton) {
                 className={`col-start-1 col-span-1 ${dataButton.withImage} rounded-lg`}
                 src={dataButton.image}
                 alt=""
+                sizes="(max-width: 600px) 400px,
+                (max-width: 1200px) 800px,
+                1200px"
                 fill
               ></Image>
             </div>

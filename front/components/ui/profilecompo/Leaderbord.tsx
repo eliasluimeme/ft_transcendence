@@ -8,7 +8,7 @@ type Leader = {
   name: string;
 };
 
-const getLeader = () => {
+const GetLeader = () => {
   const [leader, setleader] = useState<Leader[]>([
     {
       rank: 1,
@@ -37,7 +37,7 @@ const getLeader = () => {
   ]);
   return leader;
 };
-const getRank = () => {
+const GetRank = () => {
   const [rank, getRank] = useState("40");
 
   return rank;
@@ -64,8 +64,8 @@ const displayData = (leader: Leader, className: string) => {
 };
 
 const Leaderbord = () => {
-  const leaders = getLeader();
-  const rank = getRank();
+  const leaders = GetLeader();
+  const rank = GetRank();
   return (
     <div className="w-full h-full grid grid-rows-5 font-Goldman">
       {leaders.map((leader, index) => (

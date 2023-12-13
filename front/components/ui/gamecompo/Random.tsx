@@ -17,6 +17,9 @@ const Random = () => {
             className="rounded-lg"
             src="https://cdn.dribbble.com/users/648290/screenshots/3944891/media/4c6b4e878544bbfbd55a4d200f061db7.gif"
             alt=""
+            sizes="(max-width: 600px) 400px,
+                (max-width: 1200px) 800px,
+                1200px"
             fill
           ></Image>
         </div>

@@ -4,10 +4,9 @@ import { useState } from "react";
 import Image from "next/image";
 import { useEffect } from "react";
 import axios from "axios";
-import { useRouter } from 'next/navigation'
+import { useRouter } from "next/navigation";
 
-
-const page = () => {
+const Page = () => {
   ///////////////////////////////send data///////////////////
   const [code, setCodeValue] = useState({
     code: "",
@@ -19,7 +18,7 @@ const page = () => {
       [name]: value,
     }));
   };
-  const router = useRouter()
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,7 +36,6 @@ const page = () => {
       );
 
       if (response.status === 201) {
-
         console.log(code);
         router.push("/");
         console.log("Data sent successfully!");
@@ -80,4 +78,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;
