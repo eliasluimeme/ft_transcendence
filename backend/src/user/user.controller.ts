@@ -60,10 +60,18 @@ export class UserController {
         return await this.userService.rejectFriend(req.body.userId, parseInt(body.friend));
     }
 
+    @Post('users')
+    @UseGuards(Jwt2faAuthGuard)
+    async checkUser(@Req() req, @Res() res) {
+      console.log('hnaa', req.body.search)
+      res.json( await this.userService.checkUser(req.user.id, req.body.search) );
+    }
+
     @Post('users/search')
     @UseGuards(Jwt2faAuthGuard)
-    async search(@Req() req: any, @Res() res) {
-      res.json( await this.userService.searchUsers(req.user.id, req.body.search) );
+    async getUsersearch(@Req() req: any, @Res() res) {
+      console.log('hnaaaaaa', req.body)
+      res.json( await this.userService.searchUsers(req.user, req.body.indice.id) );
     }
 
     @Get('users/block')

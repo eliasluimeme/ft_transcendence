@@ -1,10 +1,54 @@
+'use client'
+import axios from "axios";
 import NavBar from "@/components/ui/NavBar";
+import { useState } from "react";
 import Head from "next/head";
+import { useRouter } from "next/navigation";
+
+
+
 export default function StartLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const [inputValue, setInputValue] = useState('');
+  const router = useRouter();
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(event.target.value);
+    // console.log(inputValue);
+  };
+
+  const handleKeyUp = async (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      await sendDataToBackend();
+    }
+  };
+
+  const sendDataToBackend = async () => {
+    console.log(inputValue)
+    try {
+      console.log("input", inputValue)
+      const response = await axios.post('http://localhost:3001/users', 
+      {search: inputValue},
+      {
+        // console.log(response),
+        withCredentials: true,
+      });
+      console.log(response)
+      if (response.status === 201) {
+        console.log('tema')
+        router.push('/users?search=' + inputValue);
+      }
+
+      // console.log('Data sent to backend:', response.data);
+    } catch (error) {
+        console.log('temaaaaa')
+        router.push('/');
+      // console.error('Error sending data to backend:', error);
+    }
+  };
+
   return (
     <div className="flex h-full w-full p-3 gap-3 font-custom">
       <NavBar />
@@ -23,6 +67,9 @@ export default function StartLayout({
         </svg>
         <input
           type="text"
+          value={inputValue}
+          onChange={handleInputChange}
+          onKeyUp={handleKeyUp}
           className="w-[100%] h-[2%] border-color: rgb(255 255 255) bg-transparent border rounded-full text-[15px]  border-gray-500 text-gray-500"
         />
       </div>

@@ -257,10 +257,41 @@ export class UserService {
         return allowedPattern.test(query);
     }
 
-    async searchUsers( userId: number, query: string ) {
+    async checkUser( userId: number, query: string) {
+        try {
+            const user = await this.prisma.user.findUnique({
+                where: {
+                    userName: query,
+                },
+                select: {
+                    blocker: {
+                        where: {
+                            blockedId: userId,
+                        }
+                    },
+                    blocked: {
+                        where: {
+                            blockerId: userId,
+                        }
+                    },
+                }
+            });
+            console.log('user:', user);
+            if (!user) throw new NotFoundException('User not found');
+            else if (user.blocker.find(block => block.blockedId === userId))
+                throw new NotFoundException('User not found');
+            else return { block: false };
+        } catch(error) {
+            if (error instanceof NotFoundException)
+                throw error;
+            console.log(error);
+        }
+    }
+
+    async searchUsers( user: any, query: string ) {
         if (this.isValidQuery(query)) {
             try {
-                const user = await this.prisma.user.findUnique({
+                const foundUser = await this.prisma.user.findUnique({
                     where: {
                         userName: query,
                     },
@@ -275,47 +306,67 @@ export class UserService {
                             }
                         },
                         achievements: true,
+                        player1: true,
+                        player2: true,
                         blocker: {
                             where: {
-                                blockedId: userId,
+                                blockedId: user.id,
                             }
                         },
                         blocked: {
                             where: {
-                                blockerId: userId,
+                                blockerId: user.id,
                             }
                         },
                         sentRequests: {
                             where: {
-                                receiverId: userId,
+                                receiverId: user.id,
                             }
                         },
                         receivedRequests: {
                             where: {
-                                senderId: userId,
+                                senderId: user.id,
                             }
                         }
                     }
                 })
+                console.log('user:', user);
 
-                if (user) {
+                if (foundUser) {
                     const rank = await this.getUserRank(user.level.level);
+                    const matchs = await this.getMatchHistory(user.id);
 
-                    if (user.id === userId)
-                        return { id: user.id, userName: user.userName, fullName: user.fullName, photo: user.photo, level: user.level.level, rank: rank, self: true };
+                    const matchHistory = matchs.map( match => {
+                        if (match.player1Id === user.id) {
+                            const { id, userName, photo } = user;
+                            match.player1 = { id, userName, photo };
+                            match.player2 = { id: foundUser.id, userName: foundUser.userName, photo: foundUser.photo};
+                            match.score = match.score1.toString() + " - " + match.score2.toString();
+                        } else {
+                            const { id, userName, photo } = user;
+                            match.player2 = { id, userName, photo };
+                            match.player1 = { id: foundUser.id, userName: foundUser.userName, photo: foundUser.photo};
+                            match.score = match.score1.toString() + " - " + match.score2.toString();
+                        }
+                        const { player1, player2, score, mode } = match;
+                        return { player1, player2, score, mode };
+                    })
+
+                    if (foundUser.id === user.id)
+                        return { id: foundUser.id, userName: foundUser.userName, fullName: foundUser.fullName, photo: foundUser.photo, rank: rank, achievements: foundUser.achievements, matchs: matchHistory, self: true };
                     
-                    else if (user.blocker.find(block => block.blockedId === userId))
-                        return { id: user.id, userName: user.userName, fullName: user.fullName, photo: user.photo, level: user.level.level, rank: rank, block: true };
-                    else if (user.blocked.find(block => block.blockerId === userId))
-                        return { id: user.id, userName: user.userName, fullName: user.fullName, photo: user.photo, level: user.level.level, rank: rank, block: true };
+                    else if (foundUser.blocker.find(block => block.blockedId === foundUser.id))
+                        return { id: foundUser.id, userName: foundUser.userName, fullName: foundUser.fullName, photo: foundUser.photo, rank: rank, achievements: foundUser.achievements, matchs: matchHistory, block: true };
+                    else if (foundUser.blocked.find(block => block.blockerId === foundUser.id))
+                        return { id: foundUser.id, userName: foundUser.userName, fullName: foundUser.fullName, photo: foundUser.photo, rank: rank, achievements: foundUser.achievements, matchs: matchHistory, block: true };
 
-                    else if (user.sentRequests && user.sentRequests.find(request => request.receiverId === userId))
-                        return { id: user.id, userName: user.userName, fullName: user.fullName, photo: user.photo, level: user.level.level, rank: rank, friend: user.sentRequests[0].status };
-                    else if (user.receivedRequests && user.receivedRequests.find(request => request.senderId === userId))
-                        return { id: user.id, userName: user.userName, fullName: user.fullName, photo: user.photo, level: user.level.level, rank: rank, friend: user.receivedRequests[0].status };
+                    else if (foundUser.sentRequests && foundUser.sentRequests.find(request => request.receiverId === foundUser.id))
+                        return { id: foundUser.id, userName: foundUser.userName, fullName: foundUser.fullName, photo: foundUser.photo, rank: rank, achievements: foundUser.achievements, matchs: matchHistory, friend: foundUser.sentRequests[0].status };
+                    else if (foundUser.receivedRequests && foundUser.receivedRequests.find(request => request.senderId === foundUser.id))
+                        return { id: foundUser.id, userName: foundUser.userName, fullName: foundUser.fullName, photo: foundUser.photo, rank: rank, achievements: foundUser.achievements, matchs: matchHistory, friend: foundUser.receivedRequests[0].status };
                     
                     else
-                        return { id: user.id, userName: user.userName, fullName: user.fullName, photo: user.photo, level: user.level.level, rank: rank, friend: "NONE" };
+                        return { id: foundUser.id, userName: foundUser.userName, fullName: foundUser.fullName, photo: foundUser.photo, rank: rank, achievements: foundUser.achievements, matchs: matchHistory, friend: "NONE" };
                 }
                 else throw new NotFoundException('User not found');
             } catch(error) {

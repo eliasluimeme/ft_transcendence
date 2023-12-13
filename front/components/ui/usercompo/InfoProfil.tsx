@@ -17,7 +17,8 @@ type Data = {
   rank: string;
 };
 
-const getInitialData = (): Data => {
+const getInitialData = (indice : string): Data => {
+  console.log("indice : ====> ", indice);
   const [profileInfo, setProfileInfo] = useState<Data>({
       image:"",
       statu:"",
@@ -28,10 +29,13 @@ const getInitialData = (): Data => {
   )
   const fetchData = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/profile", {
+      const response = await axios.post("http://localhost:3001/users/search", 
+      { indice },
+      {
         withCredentials: true,
       });
-      if (response.status === 200) {
+      if (response.status === 201) {
+        console.log("testtes")
         setProfileInfo({
           image: response.data.photo,
           statu: response.data.status,
@@ -83,8 +87,9 @@ const Informations: React.FC<{ data: Data }> = ({ data }) => {
   );
 };
 
-const InfoProfil = () => {
-  const data = getInitialData();
+const InfoProfil = (id : any) => {
+  const indice : string = id;
+  const data = getInitialData(indice);
   const [friend, sendFriend] = useState(false);
 
   return (

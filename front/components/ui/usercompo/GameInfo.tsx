@@ -15,7 +15,7 @@ type Achievement = {
   description: string;
   achieved: boolean;
 };
-const getAchivment = () => {
+const getAchivment = (indice : string) => {
   const [achievements, setAchievements] = useState<Achievement[]>([
     { description: "", achieved: true },
     { description: "", achieved: false },
@@ -24,10 +24,12 @@ const getAchivment = () => {
   ]);
   const fetchData = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/profile", {
+      const response = await axios.post("http://localhost:3001/users/search", 
+      { indice },
+      {
         withCredentials: true,
       });
-      if (response.status === 200) {
+      if (response.status === 201) {
         const newAchievements: Achievement[] = [
           { description: "First achievement", achieved: response.data.achievements[0]},
           { description: "Second achievement", achieved: response.data.achievements[1]},
@@ -114,25 +116,61 @@ const Informations: React.FC<{ achievement: Achievement[] }> = ({
 ///////////////////////win and loses /////////////////////////
 //////////////////////////////////////////////////////////////
 type MatchHistory = {
-  opo: string;
-  statu: boolean;
+  opo1: string;
+  result: string;
+  opo2 : string;
+  opo1image : string
+  opo2image : string
 };
 
-const getMatchHistory = () => {
-  const matchHistory: MatchHistory[] = [
-    { opo: "ael-kouc", statu: true },
-    { opo: "ael-kouc", statu: false },
-    { opo: "ael-kouc", statu: true },
-    { opo: "ael-kouc", statu: true },
-    { opo: "ael-kouc", statu: true },
-    { opo: "ael-kouc", statu: true },
-  ];
+const getMatchHistory = (indice : string) : MatchHistory[] => {
+  const [matchHistory, setmatchHistory] = useState<MatchHistory[]>([
+    { opo1: "",opo2: "",opo2image: "",opo1image: "", result: ""},
+    { opo1: "",opo2: "",opo2image: "",opo1image: "", result: ""},
+    { opo1: "",opo2: "",opo2image: "",opo1image: "", result: ""},
+    { opo1: "",opo2: "",opo2image: "",opo1image: "", result: ""},
+    { opo1: "",opo2: "",opo2image: "",opo1image: "", result: ""},
+    { opo1: "",opo2: "",opo2image: "",opo1image: "", result: ""},
+  ]);
+  const fetchData = async () => {
+    try {
+      const response = await axios.post("http://localhost:3001/users/search", 
+      { indice },
+      {
+        withCredentials: true,
+      });console.log("zab");
+      if (response.status === 201) {
+        const newMatchHistory: MatchHistory[] = [
+          { opo1: response.data.matchs[0].player1.userName,opo2: response.data.matchs[0].player2.userName,opo2image: response.data.matchs[0].player1.photo,   opo1image: response.data.matchs[0].player2.photo, result:response.data.matchs[0].score},
+          { opo1: response.data.matchs[1].player1.userName,opo2: response.data.matchs[1].player2.userName,opo2image: response.data.matchs[1].player1.photo,   opo1image: response.data.matchs[1].player2.photo, result:response.data.matchs[1].score},
+          { opo1: response.data.matchs[2].player1.userName,opo2: response.data.matchs[2].player2.userName,opo2image: response.data.matchs[2].player1.photo,   opo1image: response.data.matchs[2].player2.photo, result:response.data.matchs[2].score},
+          { opo1: response.data.matchs[3].player1.userName,opo2: response.data.matchs[3].player2.userName,opo2image: response.data.matchs[3].player1.photo,   opo1image: response.data.matchs[3].player2.photo, result:response.data.matchs[3].score},
+          { opo1: response.data.matchs[4].player1.userName,opo2: response.data.matchs[4].player2.userName,opo2image: response.data.matchs[4].player1.photo,   opo1image: response.data.matchs[4].player2.photo, result:response.data.matchs[4].score},
+          { opo1: response.data.matchs[5].player1.userName,opo2: response.data.matchs[5].player2.userName,opo2image: response.data.matchs[5].player1.photo,   opo1image: response.data.matchs[5].player2.photo, result:response.data.matchs[5].score},
+        ];
+        
+        console.log("dkhol");
+        setmatchHistory(newMatchHistory);
+        console.log(matchHistory);
+      } else {
+        console.log("failed to fetchdata");
+      }
+    } catch (error) {
+      console.error("An error occurred while fetching user data:", error);
+    }
+  };
+  useEffect(() => {
+    fetchData();
+  }, []);
   return matchHistory;
 };
 
-const GameInfo: React.FC = () => {
-  const achievements = getAchivment();
-  const matchHistory = getMatchHistory();
+const GameInfo = (id : any) => {
+
+  console.log("l9laoui")
+  const indice : string = id;
+  const achievements = getAchivment(indice);
+  const matchHistory = getMatchHistory(indice);
   return (
     <div className="w-full h-full">
       <div className="w-full h-full grid grid-rows-3">
@@ -146,16 +184,16 @@ const GameInfo: React.FC = () => {
             <div className="row-start-1 row-span-6 col-start-1 w-full h-full flex items-center justify-center ">
               <div className="w-[2px] h-[80%] bg-[#445E86] rounded-full"></div>
             </div>
-            {matchHistory.map((historyItem, index) => (
-              <WinLose
-                key={index}
-                className={`w-full h-full row-start-${
-                  index + 1
-                } col-start-2 col-span-9`}
-                wl={historyItem.statu}
-                opo={historyItem.opo}
-              />
-            ))}
+            {/* {matchHistory.map((historyItem, index) => (
+               <WinLose
+                 key={index}
+                 className={`w-full h-full row-start-${
+                   index + 1
+                 } col-start-2 col-span-9`}
+                 wl={historyItem.statu}
+                 opo={historyItem.opo}
+               />
+            ))} */}
           </div>
         </div>
       </div>
