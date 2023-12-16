@@ -1,0 +1,12 @@
+.game-background{
+    background: #36393E;
+}
+
+.rotate_01{
+    /* display: block; */
+    -webkit-transition: -webkit-transform 1s;
+}
+
+.rotate_01:hover{
+    -webkit-transform: rotate(350deg) translateZ(0);
+}

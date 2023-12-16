@@ -1,0 +1,21 @@
+.win_font {
+    background: linear-gradient(90deg, #FFF 1.56%, #31B930 120%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.lose_font{
+    background: linear-gradient(90deg, #FFF 1.56%, #C44343 120%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.blue_font{
+    background: linear-gradient(90deg, #7289DA 0%, rgba(255, 255, 255, 0.82) 69.61%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+@import url('https://fonts.googleapis.com/css2?family=Goldman&display=swap');
