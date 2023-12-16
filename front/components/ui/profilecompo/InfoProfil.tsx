@@ -101,18 +101,6 @@ const InfoProfil = () => {
       <div className="w-full h-full col-start-12">
         <div className="w-full h-full grid grid-rows-6">
           <div className="w-full h-full row-start-2 flex items-center ">
-            {friend === false && (
-              <div className="w-[75%] h-[50%] rounded-full  flex items-center justify-center bg-[#FFA961] bg-opacity-[50%] text-opacity-[50%] hover:bg-opacity-[100%] ease-in-out duration-300">
-                <HoverCard>
-                  <HoverCardTrigger>
-                    <button onClick={() => sendFriend(true)}>+</button>
-                  </HoverCardTrigger>
-                  <HoverCardContent className="w-[180px] h-[40px] flex items-center justify-center">
-                    Add friend
-                  </HoverCardContent>
-                </HoverCard>
-              </div>
-            )}
           </div>
         </div>
       </div>

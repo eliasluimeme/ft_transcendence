@@ -1,7 +1,8 @@
 "use client";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 type Leader = {
   rank: number;
   image: string;
@@ -10,36 +11,53 @@ type Leader = {
 
 const GetLeader = () => {
   const [leader, setleader] = useState<Leader[]>([
-    {
-      rank: 1,
-      image:
-        "https://cdn.intra.42.fr/users/9373f1cfc045b4628c01920b3000a836/ael-kouc.jpg",
-      name: "ael-kouc",
-    },
-    {
-      rank: 2,
-      image:
-        "https://cdn.intra.42.fr/users/9373f1cfc045b4628c01920b3000a836/ael-kouc.jpg",
-      name: "ael-kouc",
-    },
-    {
-      rank: 3,
-      image:
-        "https://cdn.intra.42.fr/users/9373f1cfc045b4628c01920b3000a836/ael-kouc.jpg",
-      name: "ael-kouc",
-    },
-    {
-      rank: 4,
-      image:
-        "https://cdn.intra.42.fr/users/9373f1cfc045b4628c01920b3000a836/ael-kouc.jpg",
-      name: "ael-kouc",
-    },
   ]);
+  const takeleader = async () => {
+    try {
+      const response = await axios.get("http://localhost:3001/ladderboard", {
+        withCredentials: true,
+      });
+      if (response.status === 200) {
+        console.log("leadder board", response);
+        const newleader: Leader[] = response.data.map(
+          (l: any) => ({
+            rank: l.rank,
+            image : l.photo,
+            name : l.user
+          })
+          );
+          setleader(newleader)
+      } else {
+        console.log("Failed to fetch friendship data");
+      }
+    } catch (error) {
+      console.error("An error occurred while fetching friendship data:", error);
+    }
+  };
+  useEffect(() => {
+    takeleader();
+  }, []);
   return leader;
 };
 const GetRank = () => {
-  const [rank, getRank] = useState("40");
-
+  const [rank, getRank] = useState("");
+  const takerank = async () => {
+    try {
+      const response = await axios.get("http://localhost:3001/ladderboard/rank", {
+        withCredentials: true,
+      });
+      if (response.status === 200) {
+        getRank(response.data.rank)
+      } else {
+        console.log("Failed to fetch friendship data");
+      }
+    } catch (error) {
+      console.error("An error occurred while fetching friendship data:", error);
+    }
+  };
+  useEffect(() => {
+    takerank();
+  }, []);
   return rank;
 };
 const displayData = (leader: Leader, className: string) => {

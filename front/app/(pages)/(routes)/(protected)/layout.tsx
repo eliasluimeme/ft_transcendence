@@ -26,25 +26,23 @@ export default function StartLayout({
   };
 
   const sendDataToBackend = async () => {
-    console.log(inputValue)
     try {
       console.log("input", inputValue)
-      const response = await axios.post('http://localhost:3001/users', 
-      {search: inputValue},
-      {
-        // console.log(response),
+      const response = await axios.get('http://localhost:3001/users/search', {
         withCredentials: true,
+        params: {
+          user : inputValue,
+        }
       });
       console.log(response)
-      if (response.status === 201) {
-        console.log('tema')
+      if (response.status === 200) {
         router.push('/users?search=' + inputValue);
       }
 
       // console.log('Data sent to backend:', response.data);
     } catch (error) {
         console.log('temaaaaa')
-        router.push('/');
+        router.push('/users/notfound');
       // console.error('Error sending data to backend:', error);
     }
   };

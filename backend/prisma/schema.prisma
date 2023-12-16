@@ -16,6 +16,7 @@ enum MODE {
 }
 
 enum REQUEST {
+  NONE
   PENDING
   ACCEPTED
   DECLINED

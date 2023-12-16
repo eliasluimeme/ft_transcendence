@@ -1,4 +1,4 @@
-import { BadGatewayException, BadRequestException, Body, Controller, FileTypeValidator, Get, HttpException, HttpStatus, MaxFileSizeValidator, ParseFilePipe, Post, Req, Res, UnauthorizedException, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadGatewayException, BadRequestException, Body, Controller, FileTypeValidator, Get, HttpException, HttpStatus, MaxFileSizeValidator, Param, ParseFilePipe, Post, Query, Req, Res, UnauthorizedException, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { UserService } from './user.service';
 import { Jwt2faAuthGuard } from 'src/auth/guards/jwt-2fa.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -6,6 +6,7 @@ import { diskStorage } from 'multer';
 import { Express, Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { JwtSecretRequestType } from '@nestjs/jwt';
+import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 
 interface fileParams {
     fileName: string;
@@ -25,65 +26,104 @@ export class UserController {
     }
 
     @Get('profile')
-    @UseGuards(Jwt2faAuthGuard)
+    @UseGuards(JwtAuthGuard)
     async getProfile(@Req() req, @Res() res) {
       res.json( await this.userService.getProfile(req.user) );
     }
 
-    @Get('ladderBoard')
+    @Get('ladderboard')
     @UseGuards(Jwt2faAuthGuard)
     async getladderBoard(@Req() req, @Res() res) {
       res.json( await this.userService.getLadderboard(4) );
     }
 
-    @Get('ladderBoard/rank')
+    @Get('ladderboard/rank')
     @UseGuards(Jwt2faAuthGuard)
     async getRank(@Req() req, @Res() res) {
       res.json( await this.userService.getRank(req.user.level.level) );
     }
 
-    @Post('friends/add')
+    @Get('friends')
     @UseGuards(Jwt2faAuthGuard)
-    async addFriend(@Body() body: any, @Req() req: any) {
-        return await this.userService.addFriend(req.user.id, parseInt(body.friend) );
+    async getFriends(@Body() body: any, @Req() req: any) {
+        return await this.userService.getFriends( req.user.id );
     }
 
-    @Post('friends/accept')
+    @Get('friends/friendship')
     @UseGuards(Jwt2faAuthGuard)
-    async acceptFriend(@Body() body: any, @Req() req: any) {
-        return await this.userService.acceptFriend(req.user.id, parseInt(body.friend) );
+    async getFriendship(@Query() param: any, @Req() req: any) {
+      console.log("gggggggggg", param)
+        return await this.userService.getFriendship( req.user.id, parseInt(param.id) );
     }
 
-    @Post('friends/reject')
+    @Get('friends/add')
     @UseGuards(Jwt2faAuthGuard)
-    async rejectFriend(@Body() body: any, @Req() req: any) {
-        return await this.userService.rejectFriend(req.body.userId, parseInt(body.friend));
+    async addFriend(@Query() param: any, @Req() req: any) {
+      console.log('hnaaaaaa', param)
+        return await this.userService.addFriend(req.user.id, parseInt(param.id) );
     }
 
-    @Post('users')
+    @Get('friends/accept')
     @UseGuards(Jwt2faAuthGuard)
-    async checkUser(@Req() req, @Res() res) {
-      console.log('hnaa', req.body.search)
-      res.json( await this.userService.checkUser(req.user.id, req.body.search) );
+    async acceptFriend(@Query() param: any, @Req() req: any) {
+        return await this.userService.acceptFriend(req.user.id, parseInt(param.id) );
     }
 
-    @Post('users/search')
+    @Get('friends/reject')
     @UseGuards(Jwt2faAuthGuard)
-    async getUsersearch(@Req() req: any, @Res() res) {
-      console.log('hnaaaaaa', req.body)
-      res.json( await this.userService.searchUsers(req.user, req.body.indice.id) );
+    async rejectFriend(@Query() param: any, @Req() req: any) {
+        return await this.userService.rejectFriend(req.user.Id, parseInt(param.id));
+    }
+
+    @Get('friends/unfriend')
+    @UseGuards(Jwt2faAuthGuard)
+    async unfriend(@Query() param: any, @Req() req: any) {
+        return await this.userService.unfriend(req.user.Id, parseInt(param.id));
+    }
+
+    @Get('users/search')
+    @UseGuards(Jwt2faAuthGuard)
+    async checkUser(@Req() req, @Query() params: any, @Res() res) {
+      res.json( await this.userService.checkUser(req.user.id, params.user) );
+    }
+
+    @Get('users/profile')
+    @UseGuards(Jwt2faAuthGuard)
+    async getUserProfile(@Req() req: any, @Query() params: any,@Res() res) {
+      console.log('hnaaaa', params)
+      res.json( await this.userService.searchUsers(req.user, params.user) );
+    }
+
+    // @Post('users/achievement')
+    // @UseGuards(Jwt2faAuthGuard)
+    // async getUserAchievement(@Req() req: any, @Res() res) {
+    //   // console.log('hnaaaaaa', req.body)
+    //   res.json( await this.userService.searchUsers(req.user, req.body.indice.id) );
+    // }
+
+    // @Post('users/history')
+    // @UseGuards(Jwt2faAuthGuard)
+    // async getUserHistory(@Req() req: any, @Res() res) {
+    //   // console.log('hnaaaaaa', req.body)
+    //   res.json( await this.userService.searchUsers(req.user, req.body.indice.id) );
+    // }
+
+    @Get('users/blocks')
+    @UseGuards(Jwt2faAuthGuard)
+    async getBlocks(@Req() req, @Query() param: any, @Res() res) {
+      res.json( await this.userService.getBlockStatus(req.user.id, parseInt(param.id)) );
     }
 
     @Get('users/block')
     @UseGuards(Jwt2faAuthGuard)
-    async blockUser(@Req() req, @Res() res) {
-      res.json( await this.userService.blockUser(req.user.id, req.body.userId) );
+    async blockUser(@Req() req, @Query() param: any, @Res() res) {
+      res.json( await this.userService.blockUser(req.user.id, parseInt(param.id)) );
     }
 
     @Get('users/unblock')
     @UseGuards(Jwt2faAuthGuard)
-    async unblockUser(@Req() req, @Res() res) {
-      
+    async unblockUser(@Req() req, @Query() param: any, @Res() res) {
+      res.json( await this.userService.unblockUser(req.user.id, parseInt(param.id)) );
     }
 
     @Get('settings')

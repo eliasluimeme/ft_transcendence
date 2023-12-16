@@ -16,38 +16,51 @@ type Achievement = {
   achieved: boolean;
 };
 const getAchivment = (indice : string) => {
-  const [achievements, setAchievements] = useState<Achievement[]>([
+  console.log("indice achivements : ====> ", indice);
+  // const [achievements, setAchievements] = useState<Achievement[]>([
+  //   { description: "", achieved: true },
+  //   { description: "", achieved: false },
+  //   { description: "", achieved: true },
+  //   { description: "", achieved: true },
+  // ]);
+  const achievementsInitialState: Achievement[] = [
     { description: "", achieved: true },
     { description: "", achieved: false },
     { description: "", achieved: true },
     { description: "", achieved: true },
-  ]);
-  const fetchData = async () => {
-    try {
-      const response = await axios.post("http://localhost:3001/users/search", 
-      { indice },
-      {
-        withCredentials: true,
-      });
-      if (response.status === 201) {
-        const newAchievements: Achievement[] = [
-          { description: "First achievement", achieved: response.data.achievements[0]},
-          { description: "Second achievement", achieved: response.data.achievements[1]},
-          { description: "Third achievement", achieved: response.data.achievements[2] },
-          { description: "Fourth achievement", achieved: response.data.achievements[3]},
-        ];
-        console.log(newAchievements);
-        setAchievements(newAchievements);
-      } else {
-        console.log("failed to fetchdata");
-      }
-    } catch (error) {
-      console.error("An error occurred while fetching user data:", error);
-    }
-  };
+  ];
+  const [achievements, setAchievements] = useState<Achievement[]>(achievementsInitialState);
+  // Fetch data using useEffect only once when the component mounts
   useEffect(() => {
-    fetchData();
-  }, []);
+    const fetchData = async () => {
+      console.log("Fetching data...");
+      try {
+        const response = await axios.get("http://localhost:3001/users/profile", {
+          withCredentials: true,
+          params: {
+            user: indice,
+          },
+        });
+        if (response.status === 200) {
+          const newAchievements: Achievement[] = [
+            { description: "First achievement", achieved: response.data.achievements[0] },
+            { description: "Second achievement", achieved: response.data.achievements[1] },
+            { description: "Third achievement", achieved: response.data.achievements[2] },
+            { description: "Fourth achievement", achieved: response.data.achievements[3] },
+          ];
+          console.log(newAchievements);
+          setAchievements(newAchievements);
+        } else {
+          console.log("failed to fetch data");
+        }
+      } catch (error) {
+        console.error("An error occurred while fetching user data:", error);
+      }
+    };
+
+    fetchData(); // Call fetchData only once when the component mounts
+  }, [indice]); // Ensure that fetchData runs when indice changes (if needed)
+
   return achievements;
 };
 function setAchivement(description: string, achived: boolean, image: string) {
@@ -123,52 +136,53 @@ type MatchHistory = {
   opo2image : string
 };
 
-const getMatchHistory = (indice : string) : MatchHistory[] => {
-  const [matchHistory, setmatchHistory] = useState<MatchHistory[]>([
-    { opo1: "",opo2: "",opo2image: "",opo1image: "", result: ""},
-    { opo1: "",opo2: "",opo2image: "",opo1image: "", result: ""},
-    { opo1: "",opo2: "",opo2image: "",opo1image: "", result: ""},
-    { opo1: "",opo2: "",opo2image: "",opo1image: "", result: ""},
-    { opo1: "",opo2: "",opo2image: "",opo1image: "", result: ""},
-    { opo1: "",opo2: "",opo2image: "",opo1image: "", result: ""},
+const getMatchHistory = (indice: string): MatchHistory[] => {
+  const [matchHistory, setMatchHistory] = useState<MatchHistory[]>([
+    // Your initial state remains the same
   ]);
+
   const fetchData = async () => {
     try {
-      const response = await axios.post("http://localhost:3001/users/search", 
-      { indice },
-      {
+      const response = await axios.get("http://localhost:3001/users/profile", {
         withCredentials: true,
-      });console.log("zab");
-      if (response.status === 201) {
-        const newMatchHistory: MatchHistory[] = [
-          { opo1: response.data.matchs[0].player1.userName,opo2: response.data.matchs[0].player2.userName,opo2image: response.data.matchs[0].player1.photo,   opo1image: response.data.matchs[0].player2.photo, result:response.data.matchs[0].score},
-          { opo1: response.data.matchs[1].player1.userName,opo2: response.data.matchs[1].player2.userName,opo2image: response.data.matchs[1].player1.photo,   opo1image: response.data.matchs[1].player2.photo, result:response.data.matchs[1].score},
-          { opo1: response.data.matchs[2].player1.userName,opo2: response.data.matchs[2].player2.userName,opo2image: response.data.matchs[2].player1.photo,   opo1image: response.data.matchs[2].player2.photo, result:response.data.matchs[2].score},
-          { opo1: response.data.matchs[3].player1.userName,opo2: response.data.matchs[3].player2.userName,opo2image: response.data.matchs[3].player1.photo,   opo1image: response.data.matchs[3].player2.photo, result:response.data.matchs[3].score},
-          { opo1: response.data.matchs[4].player1.userName,opo2: response.data.matchs[4].player2.userName,opo2image: response.data.matchs[4].player1.photo,   opo1image: response.data.matchs[4].player2.photo, result:response.data.matchs[4].score},
-          { opo1: response.data.matchs[5].player1.userName,opo2: response.data.matchs[5].player2.userName,opo2image: response.data.matchs[5].player1.photo,   opo1image: response.data.matchs[5].player2.photo, result:response.data.matchs[5].score},
-        ];
-        
-        console.log("dkhol");
-        setmatchHistory(newMatchHistory);
-        console.log(matchHistory);
+        params: {
+          user: indice,
+        },
+      });
+
+      if (response.status === 200) {
+        const newMatchHistory: MatchHistory[] = response.data.matchs.map(
+          (match: any) => ({
+            opo1: match.player1.userName,
+            opo2: match.player2.userName,
+            opo2image: match.player1.photo,
+            opo1image: match.player2.photo,
+            result: match.score,
+          })
+        );
+
+        setMatchHistory(newMatchHistory);
       } else {
-        console.log("failed to fetchdata");
+        console.log("Failed to fetch data");
       }
     } catch (error) {
       console.error("An error occurred while fetching user data:", error);
     }
   };
+
   useEffect(() => {
     fetchData();
   }, []);
+  console.log(matchHistory)
+
   return matchHistory;
 };
 
 const GameInfo = (id : any) => {
 
-  console.log("l9laoui")
-  const indice : string = id;
+  // console.log("l9laoui")
+  const indice : string = id.id;
+  // console.log("test allah allah",indice);
   const achievements = getAchivment(indice);
   const matchHistory = getMatchHistory(indice);
   return (
@@ -184,16 +198,16 @@ const GameInfo = (id : any) => {
             <div className="row-start-1 row-span-6 col-start-1 w-full h-full flex items-center justify-center ">
               <div className="w-[2px] h-[80%] bg-[#445E86] rounded-full"></div>
             </div>
-            {/* {matchHistory.map((historyItem, index) => (
+            {matchHistory.map((historyItem, index) => (
                <WinLose
                  key={index}
                  className={`w-full h-full row-start-${
                    index + 1
                  } col-start-2 col-span-9`}
-                 wl={historyItem.statu}
-                 opo={historyItem.opo}
+                 wl={historyItem.result}
+                 opo={historyItem.opo1}
                />
-            ))} */}
+            ))}
           </div>
         </div>
       </div>

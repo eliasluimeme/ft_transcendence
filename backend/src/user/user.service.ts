@@ -2,6 +2,7 @@ import { BadGatewayException, BadRequestException, ForbiddenException, Injectabl
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as fs from 'fs';
 import { Observable, of } from 'rxjs';
+import { CLIENT_RENEG_LIMIT } from 'tls';
 
 @Injectable()
 export class UserService {
@@ -105,13 +106,12 @@ export class UserService {
                         }
                     })
                 }
-                // create dm
                 const { player1, player2, score1, score2, mode } = match;
-                return { player1, player2, score1, score2, mode };
+                return { player1, player2, result: score1.toString() + " - " + score2.toString(), mode };
             }))
             console.log('matchHistory: ', matchHistory)
             const { photo, userName, fullName, achievements } = user;
-            return { userName, fullName, photo, rank: userRank, level: userLevel, achievements, matchHistory };
+            return { userName, fullName, photo, rank: userRank, level: userLevel, achievements, match: matchHistory };
         } catch(error) {
             console.log('error getting profile: ', error)
         }
@@ -136,9 +136,10 @@ export class UserService {
         }
     }
 
-    async getRank(userlevel: number): Promise<number> {
+    async getRank(userlevel: number) {
         try {
-            return await this.getUserRank(userlevel);
+            const rank = await this.getUserRank(userlevel);
+            return { rank: rank };
         } catch (error) {
             console.log('Failed to get rank: ', error);
         }
@@ -259,6 +260,7 @@ export class UserService {
 
     async checkUser( userId: number, query: string) {
         try {
+            // check query
             const user = await this.prisma.user.findUnique({
                 where: {
                     userName: query,
@@ -269,24 +271,56 @@ export class UserService {
                             blockedId: userId,
                         }
                     },
-                    blocked: {
-                        where: {
-                            blockerId: userId,
-                        }
-                    },
                 }
             });
-            console.log('user:', user);
-            if (!user) throw new NotFoundException('User not found');
+
+            if (!user) 
+                throw new NotFoundException('User not found');
             else if (user.blocker.find(block => block.blockedId === userId))
                 throw new NotFoundException('User not found');
-            else return { block: false };
+
+            else return { user: query };
         } catch(error) {
             if (error instanceof NotFoundException)
                 throw error;
             console.log(error);
         }
     }
+
+    // async getUserProfile( user: any, query: string ) {
+    //     try {
+    //         const userProfile = await this.prisma.user.findUnique({
+    //             where: {
+    //                 userName: query,
+    //             },
+    //             select: {
+    //                 id: true,
+    //                 userName: true,
+    //                 fullName: true,
+    //                 photo: true,
+    //                 level: {
+    //                     select: {
+    //                         level: true,
+    //                     }
+    //                 },
+    //                 sentRequests: {
+    //                     where: {
+    //                         receiverId: user.id,
+    //                     }
+    //                 },
+    //                 receivedRequests: {
+    //                     where: {
+    //                         senderId: user.id,
+    //                     }
+    //                 },
+    //             },
+    //         })
+
+
+    //     } catch(error) {
+    //         console.log(error);
+    //     }
+    // }
 
     async searchUsers( user: any, query: string ) {
         if (this.isValidQuery(query)) {
@@ -360,9 +394,9 @@ export class UserService {
                     else if (foundUser.blocked.find(block => block.blockerId === foundUser.id))
                         return { id: foundUser.id, userName: foundUser.userName, fullName: foundUser.fullName, photo: foundUser.photo, rank: rank, achievements: foundUser.achievements, matchs: matchHistory, block: true };
 
-                    else if (foundUser.sentRequests && foundUser.sentRequests.find(request => request.receiverId === foundUser.id))
+                    else if (foundUser.sentRequests && foundUser.sentRequests.find(request => request.receiverId === user.id))
                         return { id: foundUser.id, userName: foundUser.userName, fullName: foundUser.fullName, photo: foundUser.photo, rank: rank, achievements: foundUser.achievements, matchs: matchHistory, friend: foundUser.sentRequests[0].status };
-                    else if (foundUser.receivedRequests && foundUser.receivedRequests.find(request => request.senderId === foundUser.id))
+                    else if (foundUser.receivedRequests && foundUser.receivedRequests.find(request => request.senderId === user.id))
                         return { id: foundUser.id, userName: foundUser.userName, fullName: foundUser.fullName, photo: foundUser.photo, rank: rank, achievements: foundUser.achievements, matchs: matchHistory, friend: foundUser.receivedRequests[0].status };
                     
                     else
@@ -376,14 +410,84 @@ export class UserService {
             }
         } else throw new BadRequestException('Invalid input');
     }
+
+    async getFriends( userId: number ) {
+        try {
+            const friendShip = await this.prisma.friends.findMany({
+                where: {
+                    OR: [
+                        { senderId: userId, },
+                        { receiverId: userId, },
+                    ]
+                },
+            });
+            const friends = await Promise.all( friendShip.map( async friend => {
+                let user: any;
+                if (friend.senderId === userId) {
+                    user = await this.prisma.user.findUnique({
+                        where: {
+                            id: friend.receiverId
+                        },
+                        select: {
+                            userName: true,
+                            photo: true,
+                        }
+                    })
+                }
+                else if (friend.receiverId === userId) {
+                    user = await this.prisma.user.findUnique({
+                        where: {
+                            id: friend.senderId
+                        },
+                        select: {
+                            userName: true,
+                            photo: true,
+                        }
+                    })
+                }
+                return { userName: user.userName, photo: user.photo}
+            }))
+            return friends;
+        } catch(error) {
+            console.log('error getting friends: ', error)
+        }
+    }
+
+    async getFriendship( userId: number, friendId: number) {
+        try { // search in friends table
+            const friendship = await this.prisma.user.findUnique({
+                where: {
+                    id: userId,
+                },
+                select: {
+                    sentRequests: {
+                        where: {
+                            receiverId: friendId,
+                        }
+                    },
+                    receivedRequests: {
+                        where: {
+                            senderId: friendId,
+                        }
+                    },
+                }
+            })
+            if (!friendship.sentRequests[0] || !friendship.receivedRequests[0]) 
+                return { status: 'NONE' };
+            else if (friendship.sentRequests[0])
+                return { status: friendship.sentRequests[0].status };
+            else if (friendship.receivedRequests[0])
+                return { status: friendship.receivedRequests[0].status };
+        } catch(error) {
+            console.log('error getting friendship: ', error)
+        }
+    }
     
     async addFriend( senderId: number, receiverId: number ) {
         if (senderId === receiverId)
             throw new BadRequestException('You cannot send a friend request to yourself');
         try {
-            // if front doesnt store receiverId search for userName to get id
-            // check if friendship already exists in both sides
-            const frindShipExists = await this.prisma.friends.findMany({
+            const friendShipExists = await this.prisma.friends.findMany({
                 where: {
                     OR: [{ 
                             senderId: senderId, 
@@ -396,21 +500,21 @@ export class UserService {
                 }
             })
 
-            if (frindShipExists) throw new BadRequestException('Friendship already exists');
+            if (friendShipExists[0]) throw new BadRequestException('Friendship already exists');
 
             const friendShip = await this.prisma.friends.create({
                 data: {
                     sender: { connect: { id: senderId } },
                     receiver: { connect: { id: receiverId } },
-                    status: 'PENDING',
+                    status: 'ACCEPTED',
                 }
             })
             // send notification to receiver
             // create chat room
-            return friendShip;
+            return { status: friendShip.status };
         } catch(error) {
             console.log('error adding friend: ', error)
-            // throw error;
+            throw error;
         }
     }
                 
@@ -432,15 +536,6 @@ export class UserService {
                 }
             })
 
-            // const friendShip = await this.prisma.friends.findFirst({
-            //     where: {
-            //         AND: [
-            //             { senderId: senderId, },
-            //             { receiverId: receiverId, }
-            //         ]
-            //     }
-            // })
-
             if (sender) {
                 const newFriendShip = await this.prisma.friends.update({
                     where: {
@@ -452,14 +547,12 @@ export class UserService {
                 })
                 // send notification to sender
                 // create chat room
-                console.log('new friendShip:', newFriendShip)
                 sender.sentRequests[0] = newFriendShip;
-                console.log(sender);
                 return sender;
             } else throw new BadRequestException('Bad request no friendShip found');
         } catch(error) {
             console.log('error accepting friend: ', error);
-            // throw error;
+            throw error;
         }
     }
                         
@@ -473,7 +566,7 @@ export class UserService {
                         { senderId: senderId, },
                         { receiverId: receiverId, }
                     ]
-                }
+                },     
             })
 
             if (friendShip) {
@@ -493,6 +586,51 @@ export class UserService {
         }
     }
 
+    async unfriend(senderId: number, receiverId: number): Promise<any> {
+        if (senderId === receiverId)
+            throw new BadRequestException('You cannot unfriend yourself');
+        try {
+            const friendShip = await this.prisma.friends.deleteMany({
+                where: {
+                    AND: [
+                        { senderId: senderId, },
+                        { receiverId: receiverId, }
+                    ]
+                },     
+            })
+            if (friendShip.count)
+                return { unfriend: true };
+            else throw new BadRequestException('No friendShip found');
+        } catch(error) {
+            console.log('error accepting friend: ', error);
+            throw error;
+        }
+    }
+
+    async getBlockStatus( userId: number, friendId: number) {
+        try {
+            const block = await this.prisma.blocks.findMany({
+                where: {
+                    OR: [{ 
+                            blockerId: userId, 
+                            blockedId: friendId,
+                        }, { 
+                            blockerId: friendId, 
+                            blockedId: userId, 
+                        },
+                    ]
+                }
+            })
+
+            console.log('block: ', block)
+            if (block[0]) 
+                return { block: true };
+            else return { block: false };
+        } catch(error) {
+            console.log('error getting friendship: ', error)
+        }
+    }
+
     async blockUser( userId: number, blockedId: number) {
         if (userId === blockedId)
             throw new BadRequestException('You cannot block yourself');
@@ -509,16 +647,34 @@ export class UserService {
                     ]
                 }
             })
-
-            if (user) {
-                const newBlock = await this.prisma.blocks.create({
+            console.log("in block", user)
+            if (!user[0]) {
+                await this.prisma.blocks.create({
                     data: {
                         blocker: { connect: { id: userId } },
                         blocked: { connect: { id: blockedId } },
                     }
                 })
-                return newBlock;
+                return { block: true };
             } else throw new BadRequestException('User already blocked');
+        } catch(error) {
+            console.log('error blocking user: ', error);
+            throw error;
+        }
+    }
+
+    async unblockUser( userId: number, blockedId: number) {
+        if (userId === blockedId)
+            throw new BadRequestException('You cannot block yourself');
+        try {
+            const unblock = await this.prisma.blocks.deleteMany({
+                where: {
+                  blockerId: userId,
+                  blockedId: blockedId,
+                },
+              });
+            if (unblock.count) return { unblock: true }
+            else throw new BadRequestException('Cannot unblock user');
         } catch(error) {
             console.log('error blocking user: ', error);
             throw error;

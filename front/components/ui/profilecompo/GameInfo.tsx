@@ -114,19 +114,46 @@ const Informations: React.FC<{ achievement: Achievement[] }> = ({
 ///////////////////////win and loses /////////////////////////
 //////////////////////////////////////////////////////////////
 type MatchHistory = {
-  opo: string;
-  statu: boolean;
+  opo1: string;
+  result: string;
+  opo2 : string;
+  opo1image : string
+  opo2image : string
 };
 
-const getMatchHistory = () => {
-  const matchHistory: MatchHistory[] = [
-    { opo: "ael-kouc", statu: true },
-    { opo: "ael-kouc", statu: false },
-    { opo: "ael-kouc", statu: true },
-    { opo: "ael-kouc", statu: true },
-    { opo: "ael-kouc", statu: true },
-    { opo: "ael-kouc", statu: true },
-  ];
+const getMatchHistory = () : MatchHistory[] => {
+  const [matchHistory, setmatchHistory] = useState<MatchHistory[]>([
+  ]);
+  const fetchData = async () => {
+    try {
+      const response = await axios.get("http://localhost:3001/profile", 
+      {
+        withCredentials: true,
+      });
+      if (response.status === 200) {
+        console.log(response.data.match)
+        const newMatchHistory: MatchHistory[] = response.data.match.map(
+          (match: any) => ({
+            opo1: match.player1.userName,
+            opo2: match.player2.userName,
+            opo2image: match.player1.photo,
+            opo1image: match.player2.photo,
+            result: match.result,
+          })
+        );
+
+        setmatchHistory(newMatchHistory);
+        console.log(matchHistory);
+      } else {
+        console.log("failed to fetchdata");
+      }
+    } catch (error) {
+      console.error("An error occurred while fetching user data:", error);
+    }
+  };
+  useEffect(() => {
+    fetchData();
+  }, []);
   return matchHistory;
 };
 
@@ -152,8 +179,8 @@ const GameInfo: React.FC = () => {
                 className={`w-full h-full row-start-${
                   index + 1
                 } col-start-2 col-span-9`}
-                wl={historyItem.statu}
-                opo={historyItem.opo}
+                wl={historyItem.result}
+                opo={historyItem.opo1}
               />
             ))}
           </div>
