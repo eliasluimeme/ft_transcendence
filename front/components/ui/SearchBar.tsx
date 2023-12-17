@@ -2,7 +2,6 @@
 
 import Image from 'next/image'
 import { ChangeEvent, useState } from 'react';
-import  '@/app/components/ui/css/font.css'
 import axios from 'axios';
 
 

@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Style from './sideBar.module.css'
-import  '@/app/components/ui/css/font.css'
+import '@/components/ui/CSS/font.css'
 import SearchBar from './SearchBar';
 import { useState } from 'react';
 import Link from 'next/link';

@@ -3,9 +3,9 @@
 import TextareaAutosize from 'react-textarea-autosize';
 import React, { useEffect, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
-import Button from './ui/Button';
+import { Button } from './button';
 import Image from 'next/image';
-import { sl } from 'date-fns/locale';
+// import { sl } from 'date-fns/locale';
 
 const socket = io('ws://localhost:3001');
 

@@ -1,7 +1,7 @@
 "use client"
 
 import { FC, useEffect, useRef, useState } from 'react'
-import { cn } from '../lib/utils'
+import { cn } from '../../app/(pages)/(routes)/(protected)/chatn/lib/utils'
 import Image from 'next/image'
 import { format } from 'date-fns'
 import ChatInput from './ChatInput'

@@ -1,5 +1,5 @@
-import ChatInput from '@/app/components/ChatInput'
-import Messages from '@/app/components/Messages'
+import ChatInput from '@/components/ui/ChatInput';
+import Messages from '@/components/ui/Messages';
 import { Image } from 'lucide-react'
 import { FC } from 'react'
 
