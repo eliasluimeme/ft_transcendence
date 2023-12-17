@@ -129,7 +129,7 @@ model LadderLevel {
 }
 
 model DM {
-  id Int @id @default(autoincrement())
+  dmId Int @id @default(autoincrement())
 
   // user1   User @relation(fields: [user1Id], references: [id], onDelete: Cascade)
   // user1Id Int

@@ -1,6 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { CreateSearchDto } from './dto/create-search.dto';
-import { UpdateSearchDto } from './dto/update-search.dto';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 
@@ -19,9 +17,6 @@ export class SearchService {
       console.log(error);
     }
   }
-  create(createSearchDto: CreateSearchDto) {
-    return 'This action adds a new search';
-  }
 
   async findAll() {
     try {
@@ -37,34 +32,50 @@ export class SearchService {
   }
 
   async getMyFriends(myId: number, friendName: string) {
-    const friend = await this.prisma.user.findMany({
-      where: {
-        id: myId,
-        friends: { // friendship
-          some: {
-            name: {
-              contains: friendName,
-            },
-          },
-        },
-      },
-    });
-    if (!friend) {
-      console.log('friend not found');
-    }
+    console.log('myId', myId);
+    console.log('friendName', friendName);
+    // const friend = await this.prisma.user.findMany({
+    //   where: {
+    //     id: myId,
+    //     sentRequests:{
+    //       some: {
+    //         name: {
+    //           contains: friendName,
+    //         },
+    //       },
+    //     },
+    //     receivedRequests:{
+    //       some: {
+    //         name: {
+    //           contains: friendName,
+    //         },
+    //       },
+    //     }
+    //     friends: { // friendship
+    //       some: {
+    //         name: {
+    //           contains: friendName,
+    //         },
+    //       },
+    //     },
+    //   },
+    // });
+    // if (!friend) {
+    //   console.log('friend not found');
+    // }
 
     // search in friendship request
   }
 
-  findOne(userName: number) {
-    return `This action returns a #${userName} search`;
-  }
+  // findOne(userName: number) {
+  //   return `This action returns a #${userName} search`;
+  // }
 
-  update(id: number, updateSearchDto: UpdateSearchDto) {
-    return `This action updates a #${id} search`;
-  }
+  // update(id: number, updateSearchDto: UpdateSearchDto) {
+  //   return `This action updates a #${id} search`;
+  // }
 
-  remove(id: number) {
-    return `This action removes a #${id} search`;
-  }
+  // remove(id: number) {
+  //   return `This action removes a #${id} search`;
+  // }
 }

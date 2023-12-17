@@ -17,7 +17,7 @@ import { ChatModule } from './chat/chat.module';
 @Module({
   imports: [AuthModule, UserModule, PrismaModule, MulterModule, ChatModule,
     ServeStaticModule.forRoot({
-      rootPath: '/Users/elias/Documents/GitHub/ft_transcendence/backend/uploads/',
+      rootPath: '/Users/yjaadoun/Desktop/trendenen/backend/uploads',
     }),
     ConfigModule.forRoot({
       isGlobal: true,
