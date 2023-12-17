@@ -73,7 +73,8 @@ const InfoProfil = (id: any) => {
       if (response.status === 200) {
         if (response.data.status === "NONE")
           setFr("Add friend")
-        else setFr(response.data.status);
+        else if (response.data.status === "ACCEPTED")
+          setFr("Unfriend");
       } else {
         console.log("Failed to fetch friendship data");
       }

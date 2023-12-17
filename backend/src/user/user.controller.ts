@@ -51,9 +51,8 @@ export class UserController {
 
     @Get('friends/friendship')
     @UseGuards(Jwt2faAuthGuard)
-    async getFriendship(@Query() param: any, @Req() req: any) {
-      console.log("gggggggggg", param)
-        return await this.userService.getFriendship( req.user.id, parseInt(param.id) );
+    async getFriendship(@Query() param: any, @Req() req: any, @Res() res) {
+        res.json( await this.userService.getFriendship( req.user.id, parseInt(param.id) ));
     }
 
     @Get('friends/add')
@@ -84,29 +83,29 @@ export class UserController {
     @Get('users/search')
     @UseGuards(Jwt2faAuthGuard)
     async checkUser(@Req() req, @Query() params: any, @Res() res) {
-      res.json( await this.userService.checkUser(req.user.id, params.user) );
+      res.json( await this.userService.checkUser( req.user.id, params.user ) );
     }
 
     @Get('users/profile')
     @UseGuards(Jwt2faAuthGuard)
-    async getUserProfile(@Req() req: any, @Query() params: any,@Res() res) {
-      console.log('hnaaaa', params)
-      res.json( await this.userService.searchUsers(req.user, params.user) );
+    async getUserProfile(@Req() req: any, @Query() params: any, @Res() res) {
+      console.log('users profile', params.user)
+      res.json( await this.userService.searchUser( req.user, params.user ) );
     }
 
-    // @Post('users/achievement')
-    // @UseGuards(Jwt2faAuthGuard)
-    // async getUserAchievement(@Req() req: any, @Res() res) {
-    //   // console.log('hnaaaaaa', req.body)
-    //   res.json( await this.userService.searchUsers(req.user, req.body.indice.id) );
-    // }
+    @Get('users/achievement')
+    @UseGuards(Jwt2faAuthGuard)
+    async getUserAchievement(@Req() req: any, @Query() params: any, @Res() res) {
+      console.log('users achievement', params.id)
+      res.json( await this.userService.searchUserAchievements( params.user ) );
+    }
 
-    // @Post('users/history')
-    // @UseGuards(Jwt2faAuthGuard)
-    // async getUserHistory(@Req() req: any, @Res() res) {
-    //   // console.log('hnaaaaaa', req.body)
-    //   res.json( await this.userService.searchUsers(req.user, req.body.indice.id) );
-    // }
+    @Get('users/matchs')
+    @UseGuards(Jwt2faAuthGuard)
+    async getUserMatchHistory(@Req() req: any, @Query() params: any, @Res() res) {
+      console.log('users matchs', params.user)
+      res.json( await this.userService.searchUserMatchHistory( params.user ) );
+    }
 
     @Get('users/blocks')
     @UseGuards(Jwt2faAuthGuard)
@@ -135,7 +134,8 @@ export class UserController {
     @Post('settings/update') 
     @UseGuards(Jwt2faAuthGuard)
     async updateProfile(@Req() req, @Body() body): Promise<any> {
-        return await this.userService.updateProfile(req.user.id, body);
+        console.log(req.user)
+        return await this.userService.updateProfile(req.user.intraId, body);
     }
 
     @Get('photo')

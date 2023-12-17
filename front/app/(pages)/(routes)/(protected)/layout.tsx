@@ -36,7 +36,10 @@ export default function StartLayout({
       });
       console.log(response)
       if (response.status === 200) {
-        router.push('/users?search=' + inputValue);
+        if (response.data.self === true)
+          router.push('/profile');
+        else
+          router.push('/users?search=' + inputValue);
       }
 
       // console.log('Data sent to backend:', response.data);

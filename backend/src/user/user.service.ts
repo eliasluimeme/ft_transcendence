@@ -145,42 +145,43 @@ export class UserService {
         }
     }
 
-    async checkExistingData( id: number, data: { fullName: string, userName: string, country: string, number: string } ) {
-        const existingUserName = await this.prisma.user.findUnique({
+    async checkExistingData( id: string, data: { fullName: string, userName: string, country: string, number: string } ) {
+        const existingUserName = await this.prisma.user.findMany({
             where: {
                 userName: data.userName,
             },
         });
+        console.log("existingUserName", existingUserName);
         
-        if (existingUserName && existingUserName.id !== id)
+        if (existingUserName && existingUserName[0].intraId === id)
             throw new ForbiddenException('User name already in use');
     
-        const existingFullName = await this.prisma.user.findUnique({
+        const existingFullName = await this.prisma.user.findMany({
             where: {
                 fullName: data.fullName,
             },
         });
 
-        if (existingFullName && existingFullName.id !== id)
+        if (existingFullName && existingFullName[0].intraId === id)
             throw new ForbiddenException('Full name already in use');
 
-        const existingNumber = await this.prisma.user.findUnique({
+        const existingNumber = await this.prisma.user.findMany({
             where: {
                 number: data.number,
             },
         });
 
-        if (existingNumber && existingNumber.id !== id)
+        if (existingNumber && existingNumber[0].intraId === id)
             throw new ForbiddenException('Number already in use');
     }
 
-    async updateProfile(id: number, newData: { fullName: string, userName: string, country: string, number: string } ) {
-        await this.checkExistingData(id, newData);
+    async updateProfile(intraId: string , newData: { fullName: string, userName: string, country: string, number: string , photo: string } ) {
+        await this.checkExistingData(intraId, newData);
         try {
             console.log('Updated profile')
             const user = await this.prisma.user.update({
                 where: {
-                    id: id,
+                    intraId: intraId,
                 },
                 data: newData,
             });
@@ -266,6 +267,7 @@ export class UserService {
                     userName: query,
                 },
                 select: {
+                    id: true,
                     blocker: {
                         where: {
                             blockedId: userId,
@@ -279,6 +281,8 @@ export class UserService {
             else if (user.blocker.find(block => block.blockedId === userId))
                 throw new NotFoundException('User not found');
 
+            else if (user.id === userId)
+                return { user: query, self: true };
             else return { user: query };
         } catch(error) {
             if (error instanceof NotFoundException)
@@ -287,42 +291,7 @@ export class UserService {
         }
     }
 
-    // async getUserProfile( user: any, query: string ) {
-    //     try {
-    //         const userProfile = await this.prisma.user.findUnique({
-    //             where: {
-    //                 userName: query,
-    //             },
-    //             select: {
-    //                 id: true,
-    //                 userName: true,
-    //                 fullName: true,
-    //                 photo: true,
-    //                 level: {
-    //                     select: {
-    //                         level: true,
-    //                     }
-    //                 },
-    //                 sentRequests: {
-    //                     where: {
-    //                         receiverId: user.id,
-    //                     }
-    //                 },
-    //                 receivedRequests: {
-    //                     where: {
-    //                         senderId: user.id,
-    //                     }
-    //                 },
-    //             },
-    //         })
-
-
-    //     } catch(error) {
-    //         console.log(error);
-    //     }
-    // }
-
-    async searchUsers( user: any, query: string ) {
+    async searchUser( user: any, query: string ) {
         if (this.isValidQuery(query)) {
             try {
                 const foundUser = await this.prisma.user.findUnique({
@@ -339,19 +308,19 @@ export class UserService {
                                 level: true,
                             }
                         },
-                        achievements: true,
+                        // achievements: true,
                         player1: true,
                         player2: true,
-                        blocker: {
-                            where: {
-                                blockedId: user.id,
-                            }
-                        },
-                        blocked: {
-                            where: {
-                                blockerId: user.id,
-                            }
-                        },
+                        // blocker: {
+                        //     where: {
+                        //         blockedId: user.id,
+                        //     }
+                        // },
+                        // blocked: {
+                        //     where: {
+                        //         blockerId: user.id,
+                        //     }
+                        // },
                         sentRequests: {
                             where: {
                                 receiverId: user.id,
@@ -364,43 +333,25 @@ export class UserService {
                         }
                     }
                 })
-                console.log('user:', user);
 
                 if (foundUser) {
                     const rank = await this.getUserRank(user.level.level);
-                    const matchs = await this.getMatchHistory(user.id);
-
-                    const matchHistory = matchs.map( match => {
-                        if (match.player1Id === user.id) {
-                            const { id, userName, photo } = user;
-                            match.player1 = { id, userName, photo };
-                            match.player2 = { id: foundUser.id, userName: foundUser.userName, photo: foundUser.photo};
-                            match.score = match.score1.toString() + " - " + match.score2.toString();
-                        } else {
-                            const { id, userName, photo } = user;
-                            match.player2 = { id, userName, photo };
-                            match.player1 = { id: foundUser.id, userName: foundUser.userName, photo: foundUser.photo};
-                            match.score = match.score1.toString() + " - " + match.score2.toString();
-                        }
-                        const { player1, player2, score, mode } = match;
-                        return { player1, player2, score, mode };
-                    })
 
                     if (foundUser.id === user.id)
-                        return { id: foundUser.id, userName: foundUser.userName, fullName: foundUser.fullName, photo: foundUser.photo, rank: rank, achievements: foundUser.achievements, matchs: matchHistory, self: true };
+                        return { id: foundUser.id, userName: foundUser.userName, fullName: foundUser.fullName, photo: foundUser.photo, rank: rank, self: true };
                     
-                    else if (foundUser.blocker.find(block => block.blockedId === foundUser.id))
-                        return { id: foundUser.id, userName: foundUser.userName, fullName: foundUser.fullName, photo: foundUser.photo, rank: rank, achievements: foundUser.achievements, matchs: matchHistory, block: true };
-                    else if (foundUser.blocked.find(block => block.blockerId === foundUser.id))
-                        return { id: foundUser.id, userName: foundUser.userName, fullName: foundUser.fullName, photo: foundUser.photo, rank: rank, achievements: foundUser.achievements, matchs: matchHistory, block: true };
+                    // else if (foundUser.blocker.find(block => block.blockedId === foundUser.id))
+                    //     return { id: foundUser.id, userName: foundUser.userName, fullName: foundUser.fullName, photo: foundUser.photo, rank: rank, block: true };
+                    // else if (foundUser.blocked.find(block => block.blockerId === foundUser.id))
+                    //     return { id: foundUser.id, userName: foundUser.userName, fullName: foundUser.fullName, photo: foundUser.photo, rank: rank, block: true };
 
                     else if (foundUser.sentRequests && foundUser.sentRequests.find(request => request.receiverId === user.id))
-                        return { id: foundUser.id, userName: foundUser.userName, fullName: foundUser.fullName, photo: foundUser.photo, rank: rank, achievements: foundUser.achievements, matchs: matchHistory, friend: foundUser.sentRequests[0].status };
+                        return { id: foundUser.id, userName: foundUser.userName, fullName: foundUser.fullName, photo: foundUser.photo, rank: rank, friend: foundUser.sentRequests[0].status };
                     else if (foundUser.receivedRequests && foundUser.receivedRequests.find(request => request.senderId === user.id))
-                        return { id: foundUser.id, userName: foundUser.userName, fullName: foundUser.fullName, photo: foundUser.photo, rank: rank, achievements: foundUser.achievements, matchs: matchHistory, friend: foundUser.receivedRequests[0].status };
+                        return { id: foundUser.id, userName: foundUser.userName, fullName: foundUser.fullName, photo: foundUser.photo, rank: rank, friend: foundUser.receivedRequests[0].status };
                     
                     else
-                        return { id: foundUser.id, userName: foundUser.userName, fullName: foundUser.fullName, photo: foundUser.photo, rank: rank, achievements: foundUser.achievements, matchs: matchHistory, friend: "NONE" };
+                        return { id: foundUser.id, userName: foundUser.userName, fullName: foundUser.fullName, photo: foundUser.photo, rank: rank, friend: "NONE" };
                 }
                 else throw new NotFoundException('User not found');
             } catch(error) {
@@ -409,6 +360,80 @@ export class UserService {
                 console.log('error finding users: ', error)
             }
         } else throw new BadRequestException('Invalid input');
+    }
+
+    async searchUserAchievements( userName: string ) {
+        try {
+            const userAchievements = await this.prisma.user.findUnique({
+                where: {
+                    userName: userName,
+                },
+                select: {
+                    achievements: true,
+                }
+            })
+            console.log("userrr", userAchievements)
+            return userAchievements;
+        } catch (error) {
+            console.log('error finding users: ', error)
+        }
+    }
+
+    async searchUserMatchHistory( userName: string ) {
+        try {
+            const user = await this.prisma.user.findUnique({
+                where: { userName: userName },
+                select: { 
+                    id: true,
+                    userName: true,
+                    photo: true,
+                    player1: true,
+                    player2: true,
+                },
+            })
+
+            const matchs = await this.getMatchHistory(user.id);
+
+            const matchHistory = await Promise.all(matchs.map( async match => {
+                if (match.player1Id === user.id) {
+                    const { id, userName, photo } = user;
+
+                    const user2 = await this.prisma.user.findUnique({
+                        where: { userName: userName },
+                        select: { 
+                            id: true,
+                            userName: true,
+                            photo: true,
+                        },
+                    })
+
+                    match.player1 = { id, userName, photo };
+                    match.player2 = { id: user2.id, userName: user2.userName, photo: user2.photo};
+                    match.score = match.score1.toString() + " - " + match.score2.toString();
+                } else {
+                    const { id, userName, photo } = user;
+
+                    const user2 = await this.prisma.user.findUnique({
+                        where: { userName: userName },
+                        select: { 
+                            id: true,
+                            userName: true,
+                            photo: true,
+                        },
+                    })
+
+                    match.player2 = { id, userName, photo };
+                    match.player1 = { id: user2.id, userName: user2.userName, photo: user2.photo};
+                    match.score = match.score1.toString() + " - " + match.score2.toString();
+                }
+                const { player1, player2, score, mode } = match;
+                return { player1, player2, score, mode };
+            }))
+
+            return matchHistory;
+        } catch (error) {
+            console.log('error searching users: ', error)
+        }
     }
 
     async getFriends( userId: number ) {
@@ -454,30 +479,27 @@ export class UserService {
     }
 
     async getFriendship( userId: number, friendId: number) {
+        if (!friendId)
+            throw new BadRequestException('Bad request no friendShip found');
+
         try { // search in friends table
-            const friendship = await this.prisma.user.findUnique({
+            const friendship = await this.prisma.friends.findFirstOrThrow({
                 where: {
-                    id: userId,
-                },
-                select: {
-                    sentRequests: {
-                        where: {
+                    OR: [{ 
+                            senderId: userId, 
                             receiverId: friendId,
-                        }
-                    },
-                    receivedRequests: {
-                        where: {
-                            senderId: friendId,
-                        }
-                    },
+                        }, { 
+                            senderId: friendId, 
+                            receiverId: userId, 
+                        },
+                    ]
                 }
             })
-            if (!friendship.sentRequests[0] || !friendship.receivedRequests[0]) 
+           
+            if (!friendship) 
                 return { status: 'NONE' };
-            else if (friendship.sentRequests[0])
-                return { status: friendship.sentRequests[0].status };
-            else if (friendship.receivedRequests[0])
-                return { status: friendship.receivedRequests[0].status };
+            else
+                return { status: friendship.status };
         } catch(error) {
             console.log('error getting friendship: ', error)
         }

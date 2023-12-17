@@ -35,7 +35,7 @@ const getAchivment = (indice : string) => {
     const fetchData = async () => {
       console.log("Fetching data...");
       try {
-        const response = await axios.get("http://localhost:3001/users/profile", {
+        const response = await axios.get("http://localhost:3001/users/achievement", {
           withCredentials: true,
           params: {
             user: indice,
@@ -48,7 +48,6 @@ const getAchivment = (indice : string) => {
             { description: "Third achievement", achieved: response.data.achievements[2] },
             { description: "Fourth achievement", achieved: response.data.achievements[3] },
           ];
-          console.log(newAchievements);
           setAchievements(newAchievements);
         } else {
           console.log("failed to fetch data");
@@ -143,7 +142,7 @@ const getMatchHistory = (indice: string): MatchHistory[] => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/users/profile", {
+      const response = await axios.get("http://localhost:3001/users/matchs", {
         withCredentials: true,
         params: {
           user: indice,
@@ -151,7 +150,7 @@ const getMatchHistory = (indice: string): MatchHistory[] => {
       });
 
       if (response.status === 200) {
-        const newMatchHistory: MatchHistory[] = response.data.matchs.map(
+        const newMatchHistory: MatchHistory[] = response.data.map(
           (match: any) => ({
             opo1: match.player1.userName,
             opo2: match.player2.userName,
