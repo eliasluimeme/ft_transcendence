@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
   HoverCard,
@@ -7,6 +7,7 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import Link from "next/link";
+import axios from "axios";
 
 type Data = {
   image: string;
@@ -17,14 +18,38 @@ type Data = {
 };
 
 const getInitialData = (): Data => {
-  return {
-    image:
-      "https://cdn.intra.42.fr/users/9373f1cfc045b4628c01920b3000a836/ael-kouc.jpg",
-    statu: "In game...",
-    nickNane: "ael-kouc",
-    fullName: "Achraf El Kouch",
-    rank: "#3",
+  const [profileInfo, setProfileInfo] = useState<Data>({
+      image:"",
+      statu:"",
+      nickNane:"",
+      fullName:"",
+      rank:"",
+    }
+  )
+  const fetchData = async () => {
+    try {
+      const response = await axios.get("http://localhost:3001/profile", {
+        withCredentials: true,
+      });
+      if (response.status === 200) {
+        setProfileInfo({
+          image: response.data.photo,
+          statu: response.data.status,
+          nickNane: response.data.userName,
+          fullName: response.data.fullName,
+          rank: response.data.rank,
+        });
+      } else {
+        console.log("failed to fetchdata");
+      }
+    } catch (error) {
+      console.error("An error occurred while fetching user data:", error);
+    }
   };
+  useEffect(() => {
+    fetchData();
+  }, []);
+  return profileInfo;
 };
 
 const ImageStatu: React.FC<{ data: Data }> = ({ data }) => {
@@ -76,18 +101,6 @@ const InfoProfil = () => {
       <div className="w-full h-full col-start-12">
         <div className="w-full h-full grid grid-rows-6">
           <div className="w-full h-full row-start-2 flex items-center ">
-            {friend === false && (
-              <div className="w-[75%] h-[50%] rounded-full  flex items-center justify-center bg-[#FFA961] bg-opacity-[50%] text-opacity-[50%] hover:bg-opacity-[100%] ease-in-out duration-300">
-                <HoverCard>
-                  <HoverCardTrigger>
-                    <button onClick={() => sendFriend(true)}>+</button>
-                  </HoverCardTrigger>
-                  <HoverCardContent className="w-[180px] h-[40px] flex items-center justify-center">
-                    Add friend
-                  </HoverCardContent>
-                </HoverCard>
-              </div>
-            )}
           </div>
         </div>
       </div>

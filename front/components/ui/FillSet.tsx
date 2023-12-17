@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useRouter } from 'next/navigation'
+import { useRouter } from "next/navigation";
 const FillSet: React.FC = () => {
   const [inputValues, setInputValues] = useState({
     fullName: "",
@@ -9,6 +9,7 @@ const FillSet: React.FC = () => {
     country: "",
     number: "",
   });
+  const router = useRouter();
   const fetchData = async () => {
     try {
       const response = await axios.get("http://localhost:3001/settings", {
@@ -21,9 +22,8 @@ const FillSet: React.FC = () => {
           country: response.data.country,
           number: response.data.number,
         });
-        console.log(response.data);
       } else {
-        console.log("failed to fetchdata")
+        console.log("failed to fetchdata");
       }
     } catch (error) {
       console.error("An error occurred while fetching user data:", error);

@@ -31,16 +31,16 @@ export class SearchController {
   @Get('myId')
   async getMe(@Req() req: Request) {
     // return req.user;
-    try {
-      if (!req.user) {
-        return '';
-      }
-      console.log('req.user.id', req.user.id);
-      const user: User = await this.searchService.findUserById(req.user.id);
-      return user;
-    } catch (err) {
-      console.log('error: ', err);
-    }
+    // try {
+    //   if (!req.user) {
+    //     return '';
+    //   }
+    //   console.log('req.user.id', req.user.id);
+    //   const user: User = await this.searchService.findUserById(req.user.id);
+    //   return user;
+    // } catch (err) {
+    //   console.log('error: ', err);
+    // }
   }
 
   // @Post()

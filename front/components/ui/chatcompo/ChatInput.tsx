@@ -3,7 +3,7 @@
 import TextareaAutosize from 'react-textarea-autosize';
 import React, { useEffect, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
-import { Button } from './button';
+import { Button } from '../button';
 import Image from 'next/image';
 // import { sl } from 'date-fns/locale';
 

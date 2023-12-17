@@ -15,37 +15,52 @@ type Achievement = {
   description: string;
   achieved: boolean;
 };
-const getAchivment = () => {
-  const [achievements, setAchievements] = useState<Achievement[]>([
+const getAchivment = (indice : string) => {
+  console.log("indice achivements : ====> ", indice);
+  // const [achievements, setAchievements] = useState<Achievement[]>([
+  //   { description: "", achieved: true },
+  //   { description: "", achieved: false },
+  //   { description: "", achieved: true },
+  //   { description: "", achieved: true },
+  // ]);
+  const achievementsInitialState: Achievement[] = [
     { description: "", achieved: true },
     { description: "", achieved: false },
     { description: "", achieved: true },
     { description: "", achieved: true },
-  ]);
-  const fetchData = async () => {
-    try {
-      const response = await axios.get("http://localhost:3001/profile", {
-        withCredentials: true,
-      });
-      if (response.status === 200) {
-        const newAchievements: Achievement[] = [
-          { description: "First achievement", achieved: response.data.achievements[0]},
-          { description: "Second achievement", achieved: response.data.achievements[1]},
-          { description: "Third achievement", achieved: response.data.achievements[2] },
-          { description: "Fourth achievement", achieved: response.data.achievements[3]},
-        ];
-        console.log(newAchievements);
-        setAchievements(newAchievements);
-      } else {
-        console.log("failed to fetchdata");
-      }
-    } catch (error) {
-      console.error("An error occurred while fetching user data:", error);
-    }
-  };
+  ];
+  const [achievements, setAchievements] = useState<Achievement[]>(achievementsInitialState);
+  // Fetch data using useEffect only once when the component mounts
   useEffect(() => {
-    fetchData();
-  }, []);
+    const fetchData = async () => {
+      console.log("Fetching data...");
+      try {
+        const response = await axios.get("http://localhost:3001/users/profile", {
+          withCredentials: true,
+          params: {
+            user: indice,
+          },
+        });
+        if (response.status === 200) {
+          const newAchievements: Achievement[] = [
+            { description: "First achievement", achieved: response.data.achievements[0] },
+            { description: "Second achievement", achieved: response.data.achievements[1] },
+            { description: "Third achievement", achieved: response.data.achievements[2] },
+            { description: "Fourth achievement", achieved: response.data.achievements[3] },
+          ];
+          console.log(newAchievements);
+          setAchievements(newAchievements);
+        } else {
+          console.log("failed to fetch data");
+        }
+      } catch (error) {
+        console.error("An error occurred while fetching user data:", error);
+      }
+    };
+
+    fetchData(); // Call fetchData only once when the component mounts
+  }, [indice]); // Ensure that fetchData runs when indice changes (if needed)
+
   return achievements;
 };
 function setAchivement(description: string, achived: boolean, image: string) {
@@ -121,45 +136,55 @@ type MatchHistory = {
   opo2image : string
 };
 
-const getMatchHistory = () : MatchHistory[] => {
-  const [matchHistory, setmatchHistory] = useState<MatchHistory[]>([
+const getMatchHistory = (indice: string): MatchHistory[] => {
+  const [matchHistory, setMatchHistory] = useState<MatchHistory[]>([
+    // Your initial state remains the same
   ]);
+
   const fetchData = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/profile", 
-      {
+      const response = await axios.get("http://localhost:3001/users/profile", {
         withCredentials: true,
+        params: {
+          user: indice,
+        },
       });
+
       if (response.status === 200) {
-        console.log(response.data.match)
-        const newMatchHistory: MatchHistory[] = response.data.match.map(
+        const newMatchHistory: MatchHistory[] = response.data.matchs.map(
           (match: any) => ({
             opo1: match.player1.userName,
             opo2: match.player2.userName,
             opo2image: match.player1.photo,
             opo1image: match.player2.photo,
-            result: match.result,
+            result: match.score,
           })
         );
 
-        setmatchHistory(newMatchHistory);
-        console.log(matchHistory);
+        setMatchHistory(newMatchHistory);
       } else {
-        console.log("failed to fetchdata");
+        console.log("Failed to fetch data");
       }
     } catch (error) {
       console.error("An error occurred while fetching user data:", error);
     }
   };
+
   useEffect(() => {
     fetchData();
   }, []);
+  console.log(matchHistory)
+
   return matchHistory;
 };
 
-const GameInfo: React.FC = () => {
-  const achievements = getAchivment();
-  const matchHistory = getMatchHistory();
+const GameInfo = (id : any) => {
+
+  // console.log("l9laoui")
+  const indice : string = id.id;
+  // console.log("test allah allah",indice);
+  const achievements = getAchivment(indice);
+  const matchHistory = getMatchHistory(indice);
   return (
     <div className="w-full h-full">
       <div className="w-full h-full grid grid-rows-3">
@@ -174,14 +199,14 @@ const GameInfo: React.FC = () => {
               <div className="w-[2px] h-[80%] bg-[#445E86] rounded-full"></div>
             </div>
             {matchHistory.map((historyItem, index) => (
-              <WinLose
-                key={index}
-                className={`w-full h-full row-start-${
-                  index + 1
-                } col-start-2 col-span-9`}
-                wl={historyItem.result}
-                opo={historyItem.opo1}
-              />
+               <WinLose
+                 key={index}
+                 className={`w-full h-full row-start-${
+                   index + 1
+                 } col-start-2 col-span-9`}
+                 wl={historyItem.result}
+                 opo={historyItem.opo1}
+               />
             ))}
           </div>
         </div>

@@ -16,6 +16,7 @@ enum MODE {
 }
 
 enum REQUEST {
+  NONE
   PENDING
   ACCEPTED
   DECLINED
@@ -129,7 +130,7 @@ model LadderLevel {
 }
 
 model DM {
-  dmId Int @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
   // user1   User @relation(fields: [user1Id], references: [id], onDelete: Cascade)
   // user1Id Int

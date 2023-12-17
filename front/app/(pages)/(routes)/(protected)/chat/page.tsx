@@ -1,9 +1,9 @@
 import { url } from "inspector";
-import SideBar from "../../../../../components/ui/sideBar";
+import SideBar from "../../../../../components/ui/chatcompo/sideBar";
 import Image from  'next/image'
-import Conversation from "../../../../../components/ui/conversation";
-import ChatInput from "@/components/ui/ChatInput";
-import ChatConv from "../../../../../components/ui/ChatConv";
+import Conversation from "../../../../../components/ui/chatcompo/conversation";
+import ChatInput from "@/components/ui/chatcompo/ChatInput";
+import ChatConv from "../../../../../components/ui/chatcompo/ChatConv";
 
 
 function Chat (){

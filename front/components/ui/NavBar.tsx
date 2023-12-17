@@ -39,12 +39,30 @@ export default function NavBar() {
   return (
     <div className="rounded-full bg-[#36393E] flex items-center flex-col justify-around w-14">
       {links.map((link, index) => (
-        <Link className="" href={link.path} key={index}>
-          <Image src={link.icon} alt="" width={24} height={21} />
+        <Link className="w-[24px] h-[24px]" href={link.path} key={index}>
+          <div className="w-[24px] h-[24px] absolute">
+            <Image
+              src={link.icon}
+              alt=""
+              sizes="(max-width: 600px) 400px,
+                (max-width: 1200px) 800px,
+                1200px"
+              fill
+            />
+          </div>
         </Link>
       ))}
-      <button onClick={logout}>
-        <Image src="/logout.svg" alt="" width={24} height={21} />
+      <button className="w-[24px] h-[24px]" onClick={logout}>
+        <div className="w-[24px] h-[24px] absolute">
+          <Image
+            src="/logout.svg"
+            alt=""
+            sizes="(max-width: 600px) 400px,
+                (max-width: 1200px) 800px,
+                1200px"
+            fill
+          />
+        </div>
       </button>
     </div>
   );

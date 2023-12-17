@@ -2,7 +2,6 @@
 import React from "react";
 import Image from "next/image";
 import Redirect from "@/components/ui/homeComp/Redirect";
-import { useRouter } from "next/router";
 
 const Page = () => {
   return (
@@ -11,19 +10,23 @@ const Page = () => {
         <div className="border bg-transparent rounded-lg w-[70%] h-[75%] grid grid-rows-6">
           <div className="row-start-1 row-span-1 rounded-lg w-full h-full flex items-center justify-center">
             <div className="border w-[95%] h-[90%] rounded-lg flex flex-col items-center justify-center">
-              <div>Sometimes you're the paddle,</div>
-              <div> sometimes you're the ball.</div>
+              <div>Sometimes you re the paddle,</div>
+              <div> sometimes you re the ball.</div>
             </div>
           </div>
           <div className="row-start-2 row-span-5 rounded-lg w-full h-full flex items-center justify-center">
             <div className="border w-[95%] h-[95%] rounded-lg flex items-center justify-center">
-              <Image
-                src="https://mir-s3-cdn-cf.behance.net/project_modules/1400/c6a51e183973865.65499ead1b388.jpg"
-                alt=""
-                width={400}
-                height={400}
-                className="w-[90%] h-[90%] rounded-lg"
-              />
+              <div className="w-[30%] h-[55%] absolute rounded-lg border">
+                <Image
+                  src="https://mir-s3-cdn-cf.behance.net/project_modules/1400/c6a51e183973865.65499ead1b388.jpg"
+                  alt=""
+                  sizes="(max-width: 600px) 400px,
+                  (max-width: 1200px) 800px,
+                  1200px"
+                  fill
+                  className="rounded-lg"
+                />
+              </div>
             </div>
           </div>
         </div>
