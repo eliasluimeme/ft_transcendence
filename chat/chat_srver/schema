@@ -1,0 +1,191 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// i want my user to have name username email token and can add friends block freinds delete friends and this user have a level and status onilne or offline
+  model User {
+    //User account
+    id        String      @id @default(uuid()) @unique
+    username  String?   @unique
+    email     String?   @unique
+    twofasecret String? @unique
+    profileImage String?
+    ingame      Boolean? @default(false)
+    twofa       Boolean? @default(false)
+    stats     Stats[]  @relation("stats")
+    status    UserStatus?
+    authenticated Boolean @default(false)
+
+  // game
+  achievements Achievements[] @relation("achievements")
+  matchhistory MatchHistory[] @relation("matchhistory") 
+  tokenjoingame String?
+
+  //relations
+  friends   User [] @relation("friends")
+  friendsby       User[] @relation("friends")
+  blocked      User[]   @relation("blocked")
+  blockedby      User[]   @relation("blocked")
+  firstlogin Boolean @default(true)
+  friendreqsent   Notification[]   @relation("Notification")
+  friendreqreceived   Notification[]   @relation("Notificationreceived")
+  //chat
+  dmschat     Dmschat[]     @relation("DMsChat")
+  recieverDMs  Dmschat[] @relation("ReciverDMsChat")
+  messageGB    Messagegb[] @relation("UGBMessage")
+  usersgroupe  Groupchat[] @relation("GroupChat")
+  admingroupe      Groupchat[] @relation("adminsGroupChat")
+  superadmin Groupchat[] @relation("superadmin")
+  mute usermute[] @relation("mute")
+  block Groupchat[]    @relation("block")
+  requestjoinsender Requestjoingroup[] @relation("requestjoinsender")
+  requestjoinrecever Requestjoingroup[] @relation("requestjoinrecever")
+}
+
+model Dmschat {
+  id        String      @id @default(uuid()) @unique
+  senderId  String
+  sender    User     @relation("DMsChat", fields: [senderId], references: [id])
+  receiverId String
+  receiver  User      @relation("ReciverDMsChat", fields: [receiverId], references: [id])
+  messageDMs String
+  createdAt DateTime @default(now())
+}
+
+model Groupchat{
+    id        String      @id @default(uuid()) @unique
+    namegb     String   @unique
+    usersgb     User[] @relation("GroupChat")
+    admins   User[] @relation("adminsGroupChat")
+    idsuperadmin String
+    superadmin User @relation("superadmin", fields: [idsuperadmin], references: [id])
+    usersmute usermute[] @relation("mute")
+    usersblock User[] @relation("block")
+    grouptype  Grouptype
+    password String?
+    image String?
+    messagesgb Messagegb[] @relation("GBMessage")
+    requestjoinsender Requestjoingroup[] @relation("requestjoinsender")
+    }
+
+
+model  usermute{
+  id        Int     @id @default(autoincrement())
+  user      User     @relation("mute", fields: [userId], references: [id])
+  userId    String     
+  groupchat Groupchat @relation("mute", fields: [groupchatId], references: [id])
+  groupchatId String
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+}
+model Messagegb {
+  id        String      @id @default(uuid()) @unique
+  senderid  String
+  sender    User     @relation("UGBMessage", fields: [senderid], references: [id])
+  message String
+  idgp String
+  groupchat Groupchat @relation("GBMessage", fields: [idgp], references: [id])
+  createdAt DateTime @default(now())
+}
+
+enum Grouptype{
+  PUBLIC
+  PRIVATE
+  PROTECTED
+}
+
+
+
+
+model Notification{
+  id        Int     @id @default(autoincrement())
+  user    User        @relation("Notification", fields: [userId], references: [id])
+  userId  String
+  receiver  User        @relation("Notificationreceived", fields: [to], references: [id])
+  to  String
+  name        String?
+  from  String?
+  message   String?
+  status    Status?     @default(PENDING)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Stats {
+  id      Int @id @default(autoincrement()) @unique
+  level     Int?    @default(0)
+  wins      Int?    @default(0)
+  loses     Int?    @default(0)
+  numberOfMatches        Int      @default(0)
+  user      User     @relation("stats", fields: [userId], references: [id])
+  userId    String  @unique   
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  // @@unique([userId])
+}
+
+model Requestjoingroup{
+  id        String    @id @default(uuid()) @unique
+  sender    User       @relation("requestjoinsender", fields: [senderId], references: [id])
+  senderId  String
+  receiver  User      @relation("requestjoinrecever", fields: [receiverId], references: [id])
+  receiverId  String
+  groupchat Groupchat @relation("requestjoinsender", fields: [groupchatId], references: [id])
+  groupchatId String
+  namegp String
+  from String
+  createdAt DateTime @default(now())
+}
+
+
+
+enum  Status {
+  ACCEPTED
+  PENDING
+  DECLINED
+}
+
+enum  UserStatus {
+  ONLINE
+  OFFLINE
+}
+
+model Achievements{
+  id        Int    @id @default(autoincrement()) @unique
+  name      String?
+  achievementType    Type[]
+  user      User     @relation("achievements", fields: [userId], references: [id])
+  userId    String     
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, achievementType])
+}
+
+enum Type {
+  WELCOME
+  FIRSTWIN
+  FIRSTLOSE
+  WINSTRIKE
+  WIN5
+  WIN10
+}
+
+model MatchHistory {
+  id        Int    @id @default(autoincrement()) @unique
+  message      String?
+  user      User     @relation("matchhistory", fields: [userId], references: [id])
+  userId    String
+  otherid   String
+  other     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
