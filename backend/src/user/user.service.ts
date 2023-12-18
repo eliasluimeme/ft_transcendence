@@ -3,6 +3,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import * as fs from 'fs';
 import { Observable, of } from 'rxjs';
 import { CLIENT_RENEG_LIMIT } from 'tls';
+import { settingsDTO } from './dto/settings.dto';
 
 @Injectable()
 export class UserService {
@@ -145,15 +146,38 @@ export class UserService {
         }
     }
 
+    async getSettings( intraId: string ) {
+        try {
+            const user = await this.prisma.user.findUnique({
+                where: {
+                    intraId: intraId,
+                },
+                select: {
+                    fullName: true,
+                    userName: true,
+                    country: true,
+                    number: true,
+                    photo: true,
+                }
+            });
+            if (user)
+                return user;
+            else throw new NotFoundException('User not found');
+        } catch (error) {
+            console.error('Error getting user settings: ', error);
+            if (error instanceof NotFoundException)
+                throw error;
+        }
+    }
+
     async checkExistingData( id: string, data: { fullName: string, userName: string, country: string, number: string } ) {
         const existingUserName = await this.prisma.user.findMany({
             where: {
                 userName: data.userName,
             },
         });
-        console.log("existingUserName", existingUserName);
-        
-        if (existingUserName && existingUserName[0].intraId === id)
+
+        if (existingUserName[0] && existingUserName[0].intraId !== id)
             throw new ForbiddenException('User name already in use');
     
         const existingFullName = await this.prisma.user.findMany({
@@ -162,7 +186,7 @@ export class UserService {
             },
         });
 
-        if (existingFullName && existingFullName[0].intraId === id)
+        if (existingFullName[0] && existingFullName[0].intraId !== id)
             throw new ForbiddenException('Full name already in use');
 
         const existingNumber = await this.prisma.user.findMany({
@@ -171,19 +195,31 @@ export class UserService {
             },
         });
 
-        if (existingNumber && existingNumber[0].intraId === id)
+        if (existingNumber[0] && existingNumber[0].number && existingNumber[0].intraId !== id)
             throw new ForbiddenException('Number already in use');
     }
 
-    async updateProfile(intraId: string , newData: { fullName: string, userName: string, country: string, number: string , photo: string } ) {
+    async updateProfile(intraId: string , newData: settingsDTO ) {
         await this.checkExistingData(intraId, newData);
         try {
-            console.log('Updated profile')
             const user = await this.prisma.user.update({
                 where: {
                     intraId: intraId,
                 },
-                data: newData,
+                data: {
+                    fullName: newData.fullName,
+                    userName: newData.userName,
+                    country: newData.country,
+                    number: newData.number,
+                },
+                select: {
+                    id: true,
+                    fullName: true,
+                    userName: true,
+                    country: true,
+                    number: true,
+                    photo: true,
+                }
             });
 
             return user;
@@ -483,7 +519,7 @@ export class UserService {
             throw new BadRequestException('Bad request no friendShip found');
 
         try { // search in friends table
-            const friendship = await this.prisma.friends.findFirstOrThrow({
+            const friendship = await this.prisma.friends.findFirst({
                 where: {
                     OR: [{ 
                             senderId: userId, 
@@ -614,9 +650,14 @@ export class UserService {
         try {
             const friendShip = await this.prisma.friends.deleteMany({
                 where: {
-                    AND: [
-                        { senderId: senderId, },
-                        { receiverId: receiverId, }
+                    OR: [
+                        { 
+                            senderId: senderId,
+                            receiverId: receiverId,
+                        },{ 
+                            senderId: receiverId,
+                            receiverId: senderId,
+                        }
                     ]
                 },     
             })
