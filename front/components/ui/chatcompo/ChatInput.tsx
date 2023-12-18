@@ -1,37 +1,38 @@
-'use client'
+"use client";
 
-import TextareaAutosize from 'react-textarea-autosize';
-import React, { useEffect, useRef, useState } from 'react';
-import { io, Socket } from 'socket.io-client';
-import { Button } from '../button';
-import Image from 'next/image';
+import TextareaAutosize from "react-textarea-autosize";
+import React, { useEffect, useRef, useState } from "react";
+import { io, Socket } from "socket.io-client";
+import { Button } from "../button";
+import Image from "next/image";
 // import { sl } from 'date-fns/locale';
 
-const socket = io('ws://localhost:3001');
+const socket = io("ws://localhost:3001");
 
 const ChatInput = () => {
-  const textareaRef = useRef<HTMLTextAreaElement | null>(null)
-  const [message, setMessage] = useState<string>('');
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const [message, setMessage] = useState<string>("");
   const [messages, setMessages] = useState<any[]>([]);
 
   useEffect(() => {
-    console.log('Connecting to socket...');
-    socket.on('createChatDm', (data) => {
-      setMessages([...messages, {
-        sender: 'Achraf',
-        data,
-      }]);
+    console.log("Connecting to socket...");
+    socket.on("createChatDm", (data) => {
+      setMessages([
+        ...messages,
+        {
+          sender: "Achraf",
+          data,
+        },
+      ]);
     });
 
-    socket.on('createChatDm', (message) => {
-      console.log('Received message:', message);
+    socket.on("createChatDm", (message) => {
+      console.log("Received message:", message);
       setMessages([...messages, message]);
     });
   }, [messages]);
 
-  const sendMessage = () => {
-
-  } 
+  const sendMessage = () => {};
 
   // useEffect(() => {
   //   socket.on('handleSubmit', (data) => {
@@ -40,12 +41,12 @@ const ChatInput = () => {
   //       sender: 'Achraf',
   //       data,
   //     });
-  
+
   //     if (!_.isEqual(messages, newMessages)) {
   //       setMessages(newMessages);
   //     }
   //   });
-  
+
   //   socket.on('createMessage', (message) => {
   //     console.log('Received message:', message);
   //     setMessages([...messages, message]);
@@ -70,57 +71,67 @@ const ChatInput = () => {
   //   }
   // };
 
-
-
   const handleSubmit = () => {
-  console.log("here")
-  if (socket) {
-    socket.emit('createChatDm', {
-      _messsage : message,
-      _name: "YOUSSEF"
-    })
-    setMessages([...messages,message]);
-    <p className='color: white'>{message}</p>
-    console.log(`Send MSG: ${message}`);
-    // socket.on('createMessage', ){
-    //   recievMessage(message);
-    // }
-    setMessage('');
-  }
+    console.log("here");
+    if (socket) {
+      socket.emit("createChatDm", {
+        _messsage: message,
+        _name: "YOUSSEF",
+      });
+      setMessages([...messages, message]);
+      <p className="color: white">{message}</p>;
+      console.log(`Send MSG: ${message}`);
+      // socket.on('createMessage', ){
+      //   recievMessage(message);
+      // }
+      setMessage("");
+    }
   };
 
   return (
-  <div className=' px-4 pt-4 mb-2 sm:mb-0 flex items-center'>
-      <div className='relative flex-1 overflow-hidden rounded-lg shadow-sm  focus-within:ring-indigo-600'>
-        <form onSubmit={handleSubmit}>
-          <TextareaAutosize
-            ref = {textareaRef}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey){
-                e.preventDefault()
-                handleSubmit(); 
-                console.log("This is message : ",messages)
-              }
-            }}
-            rows={1}
-            value={message}
-            onChange={ (message) => setMessage(message.target.value)}
-            placeholder="Type your message"
-            className='block w-full resize-none border-0 rounded-lg text-black  placeholder:text-gray-400 focus:ring-0 sm:py-1.5 sm:text-sm sm:leading-6'
+    <div className=" w-full h-full">
+      <div className="w-full h-full grid grid-cols-8 place-items-center focus-within:ring-indigo-600">
+        <div className="col-start-1 col-span-7 w-full h-full flex items-center justify-center">
+          <form
+            className="w-full h-full flex items-center justify-center"
+            onSubmit={handleSubmit}
+          >
+            <TextareaAutosize
+              ref={textareaRef}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSubmit();
+                  console.log("This is message : ", messages);
+                }
+              }}
+              rows={1}
+              value={message}
+              onChange={(message) => setMessage(message.target.value)}
+              placeholder="Type your message"
+              className=" w-full h-full  rounded-lg text-black  placeholder:text-gray-400 focus:ring-0  sm:text-sm"
             />
-          <div onClick={() => textareaRef.current?.focus()} className='py-2 ' aria-hidden='true'>
-            <div className='py-px'>
-              <div className='h-9' />
+          </form>
+        </div>
+        {/* <div
+          onClick={() => textareaRef.current?.focus()}
+          className="py-2 "
+          aria-hidden="true"
+        ></div> */}
+        <div className="w-full h-full col-start-8 col-span-1">
+          <div className="w-full h-full flex items-center justify-center">
+            {/* <Button className="w-[80%] h-[90%]" type="submit" /> */}
+            <button
+              className="w-[80%] h-[90%] bg-[#F87B3F] rounded-lg"
+              type="submit"
+            >
+              {" "}
+              Send
+            </button>
           </div>
-            </div>
-          <div className='absolute right-0 bottom-0 flex justify-between py-2 pl-3 pr-2'>
-            <div className='flex-shrin-0'>
-              <Button className='ml-3' type='submit' />
-            </div>
-          </div>
-        </form>
+        </div>
       </div>
-  </div>
+    </div>
   );
 };
 
