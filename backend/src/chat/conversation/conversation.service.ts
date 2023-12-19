@@ -3,6 +3,7 @@ import { CreateConversationDto } from './dto/create-conversation.dto';
 import { UpdateConversationDto } from './dto/update-conversation.dto';
 import { PrismaService } from '../../prisma/prisma.service';
 import { Message } from '@prisma/client';
+import { CreateChatRoomDto } from './dto/create-chat-room.dto';
 
 @Injectable()
 export class ConversationService {
@@ -16,6 +17,8 @@ export class ConversationService {
     Promise<Message> {
     throw new Error('Method not implemented.');
   }
+
+  clientToUser = new Map<string, string>();
   
   getConversation(chatId: number): Promise<Message[]> {
     try {
@@ -33,13 +36,13 @@ export class ConversationService {
     throw new Error('Method not implemented.');
   }
 
-  create(createConversationDto: CreateConversationDto) {
-    return 'This action adds a new conversation';
-  }
+  // create(createConversationDto: CreateConversationDto) {
+  //   return 'This action adds a new conversation';
+  // }
 
-  findAll() {
-    return `This action returns all conversation`;
-  }
+  // findAll() {
+  //   return `This action returns all conversation`;
+  // }
 
   findOne(id: number) {
     return `This action returns a #${id} conversation`;
@@ -52,4 +55,26 @@ export class ConversationService {
   remove(id: number) {
     return `This action removes a #${id} conversation`;
   }
+
+  identify(name: string, clientId: string) {
+    this.clientToUser.set(clientId, name);
+    return Object.values(this.clientToUser);
+  }
+
+  getClientName(clientId: string) {
+    return this.clientToUser.get(clientId);
+  }
+
+  findAll() {
+    return this.prisma.chatroom.findMany();
+  }
+
+  // add new message to the database
+  async create(data: CreateChatRoomDto) {
+    return await this.prisma.chatroom.create({
+      data,
+    });
+  }
 }
+
+

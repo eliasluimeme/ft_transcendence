@@ -15,13 +15,13 @@ import { ChatModule } from './chat/chat.module';
 @Module({
   imports: [AuthModule, UserModule, PrismaModule, MulterModule, ChatModule,
     ServeStaticModule.forRoot({
-      rootPath: '/Users/elias/Documents/GitHub/ft_transcendence/backend/uploads/',
+      rootPath: './uploads/',
     }),
     ConfigModule.forRoot({
       isGlobal: true,
   })],
   controllers: [AppController, ChatController],
-  providers: [ AppService, ChatService]
+  providers: [ AppService, ChatService ]
 
 })
 export class AppModule {}
