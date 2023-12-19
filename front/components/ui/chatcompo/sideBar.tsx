@@ -8,6 +8,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import axios from "axios";
+import JoinRoom from "./JoinRoom";
 import {
   Popover,
   PopoverContent,
@@ -118,8 +119,8 @@ function SideBar() {
                     <PopoverTrigger className="w-[90px] h-[40px] border rounded-lg text-[10px] text-white">
                       Join Room
                     </PopoverTrigger>
-                    <PopoverContent>
-                      Place content for the popover here.
+                    <PopoverContent className="bg-[#1E2124] text-white">
+                      <JoinRoom />
                     </PopoverContent>
                   </Popover>
                 </PopoverContent>
