@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateChatRoomDto } from './dto/create-chat-room.dto';
+import { CreateChatRoomDto } from '../conversation/dto/create-chat-room.dto';
 import { PrismaClient } from '@prisma/client';
 
 @Injectable()

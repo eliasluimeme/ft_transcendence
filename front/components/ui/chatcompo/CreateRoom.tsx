@@ -1,10 +1,11 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import axios from "axios";
 
 const CreateRoom = () => {
   //////////////////ROOM//////////////////////////////
@@ -19,6 +20,31 @@ const CreateRoom = () => {
   };
   ////////////////////////type of room//////////////////
   const [roomType, setRoomType] = useState("public");
+
+
+  //////////////send data////////////////////////////////
+  const send_data = async () => {
+    try {
+      const response = await axios.post("http://localhost:3001/", {
+        roomName: roomName,
+        roomType: roomType,
+        passwordName: passwordName,
+      }, {
+        withCredentials: true,
+      });
+      if (response.status === 201) {
+        
+      } else {
+        console.log("Failed to fetch friendship data");
+      }
+    } catch (error) {
+      console.error("An error occurred while fetching friendship data:", error);
+    }
+  };
+  // useEffect(() => {
+  //   takefreind();
+  // }, []);
+  /////////////////////////////////
 
   return (
     <div className="w-full h-full space-y-4 bg-[#1E2124]">
@@ -55,7 +81,7 @@ const CreateRoom = () => {
         <div></div>
       )}
       <div className="flex justify-end mr-[10px]">
-        <button className="w-[60px] h-[40px] rounded-lg text-[10px] bg-[#F77B3F] bg-opacity-50 hover:bg-opacity-100">
+        <button onClick={() => send_data()} className="w-[60px] h-[40px] rounded-lg text-[10px] bg-[#F77B3F] bg-opacity-50 hover:bg-opacity-100">
           Save
         </button>
       </div>

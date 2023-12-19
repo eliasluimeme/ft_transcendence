@@ -6,7 +6,7 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { ChatRoomsService } from './chat-rooms.service';
-import { CreateChatRoomDto } from './dto/create-chat-room.dto';
+import { CreateChatRoomDto } from '../conversation/dto/create-chat-room.dto';
 import { Server, Socket } from 'socket.io';
 
 @WebSocketGateway({

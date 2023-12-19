@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateChatDmDto } from './dto/create-chat-dm.dto';
+import { CreateChatDmDto } from '../dto/create-chat-dm.dto';
 
 
 @Injectable()

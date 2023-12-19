@@ -22,6 +22,18 @@ enum REQUEST {
   DECLINED
 }
 
+enum ROLE {
+  OWNER
+  ADMIN
+  USER
+}
+
+enum VISIBILITY {
+  PUBLIC
+  PRIVATE
+  PROTECTED
+}
+
 model User {
   id Int @id @default(autoincrement())
 
@@ -58,11 +70,6 @@ model User {
   player1 MatchHistory[] @relation("Player1")
   player2 MatchHistory[] @relation("Player2")
 
-  // Chat
-  // dm       DM[]            @relation()
-
-  messages      Message[]
-  chatrooms     Chatroom[]      @relation("ChatroomUsers")
   ChatroomUsers ChatroomUsers[]
 
   createdAt DateTime @default(now())
@@ -129,24 +136,12 @@ model LadderLevel {
   updatedAt DateTime @updatedAt
 }
 
-model DM {
-  id Int @id @default(autoincrement())
-
-  // user1   User @relation(fields: [user1Id], references: [id], onDelete: Cascade)
-  // user1Id Int
-
-  // user2   User @relation(fields: [user2Id], references: [id], onDelete: Cascade)
-  // user2Id Int
-
-  createdAt DateTime @default(now())
-}
-
 model Message {
   id Int @id @default(autoincrement())
 
   content String
 
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   ChatroomUsers @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int
 
   chatroom   Chatroom @relation(fields: [chatroomId], references: [id], onDelete: Cascade)
@@ -161,7 +156,10 @@ model Chatroom {
 
   name String
 
-  users         User[]          @relation("ChatroomUsers")
+  group Boolean @default(false)
+  visibility VISIBILITY @default(PUBLIC)
+  password String?
+
   messages      Message[]
   ChatroomUsers ChatroomUsers[]
 
@@ -170,14 +168,21 @@ model Chatroom {
 }
 
 model ChatroomUsers {
+  id Int @id @default(autoincrement())
+
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int
+
+  role ROLE @default(USER)
 
   chatroom   Chatroom @relation(fields: [chatroomId], references: [id], onDelete: Cascade)
   chatroomId Int
 
+  messages Message[]
+
+  isMuted Boolean @default(false)
+  isBanned Boolean @default(false)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  @@id([chatroomId, userId])
 }
