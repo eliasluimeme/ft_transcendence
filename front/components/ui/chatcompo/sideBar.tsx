@@ -15,6 +15,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import CreateRoom from "./CreateRoom";
+import { useRouter } from "next/navigation";
 
 type freind = {
   id: string;
@@ -23,6 +24,7 @@ type freind = {
 };
 
 const getFriends = () => {
+  const router = useRouter();
   const [freind, setfreind] = useState<freind[]>([]);
   const takefreind = async () => {
     try {
@@ -67,7 +69,8 @@ const getFriends = () => {
       className="bg-[#D9D9D9] w-[90%] h-[50px] hover:text-[#F77B3F] text-opacity-[70%] bg-opacity-[10%] hover:bg-opacity-[100%] flex items-center justify-center space-x-8 rounded-lg"
       key={index}
 
-      onClick={() => redirectConvo(friend.id)}
+      onClick={() => 
+      router.push('/chat/chatconv?id=' + `${friend.id}`)}
     >
       <Avatar className="w-[30px] h-[30px]">
         <AvatarImage src={friend.image} alt="User Avatar" />

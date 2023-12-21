@@ -126,14 +126,19 @@
 // };
 
 // export default page;
+'use client'
 import React from "react";
 import "@/app/(pages)/(routes)/(protected)/game/style.css";
 import ChatConv from "@/components/ui/chatcompo/ChatConv";
+import { useSearchParams } from "next/navigation";
 
 const page = () => {
+const search = useSearchParams();
+const id = search.get('id');
+console.log(id);
   return (
     <div className="w-full h-full">
-      <ChatConv />
+      <ChatConv id ={id} />
     </div>
   );
 };

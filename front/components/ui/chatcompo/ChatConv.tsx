@@ -21,67 +21,25 @@ interface Members {
   memberImage: string;
 }
 
-function ChatConv() {
+function ChatConv(id : string | null) {
+  console.log("id",id);
   /////////////////end point to get rol/////////////////////////////
   const [rol, setrol] = useState(true);
   const fetchrol = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/", {
+      const response = await axios.get("http://localhost:3001/chat/settings/role",
+      {
         withCredentials: true,
-      });
+        params : {
+          id: id,
+        }
+      },
+      );
       if (response.status === 200) {
-        setrol(response.data);
-      } else {
-        console.log("Failed to fetch member data");
-      }
-    } catch (error) {
-      console.error("An error occurred while fetching member data:", error);
-    }
-  };
-  // useEffect(() => {
-  //   fetchrol();
-  // }, []);
-
-  /////////////////end point to get owner image/////////////////////////////
-  const [Owner, OwnerImage] = useState<string>(
-    "https://cdn.intra.42.fr/users/9373f1cfc045b4628c01920b3000a836/ael-kouc.jpg"
-  );
-
-  const fetchownerimage = async () => {
-    try {
-      const response = await axios.get("http://localhost:3001/", {
-        withCredentials: true,
-      });
-      if (response.status === 200) {
-        OwnerImage(response.data);
-      } else {
-        console.log("Failed to fetch member data");
-      }
-    } catch (error) {
-      console.error("An error occurred while fetching member data:", error);
-    }
-  };
-  // useEffect(() => {
-  //   fetchownerimage();
-  // }, []);
-
-  /////////////////////////end point to get admines images////////////////////
-  const [admins, setAdmines] = useState<string[]>([
-    "https://cdn.intra.42.fr/users/9373f1cfc045b4628c01920b3000a836/ael-kouc.jpg",
-    "https://cdn.intra.42.fr/users/9373f1cfc045b4628c01920b3000a836/ael-kouc.jpg",
-    "https://cdn.intra.42.fr/users/9373f1cfc045b4628c01920b3000a836/ael-kouc.jpg",
-  ]);
-
-  const fetchadminesimage = async () => {
-    try {
-      const response = await axios.get("http://localhost:3001/", {
-        withCredentials: true,
-      });
-      if (response.status === 200) {
-        const newAdmines: string[] = response.data.map((admines: any) => ({
-          image: admines.image,
-        }));
-        setAdmines(newAdmines);
+        if(response.data.role === "OWNER" || response.data.role === "ADMIN")
+          setrol(true);
+        else 
+          setrol(false);
       } else {
         console.log("Failed to fetch member data");
       }
@@ -90,57 +48,88 @@ function ChatConv() {
     }
   };
   useEffect(() => {
-    fetchadminesimage();
-  }, []);
+    fetchrol();
+  }, [id]);
+
+  /////////////////end point to get owner image/////////////////////////////
+  const [Owner, OwnerImage] = useState<string>(
+  );
+  
+  const [admins, setAdmines] = useState<string[]>([
+  ]);
+  const fetchownerimage = async () => {
+    try {
+      const response = await axios.get("http://localhost:3001/chat/settings/staff",
+      {
+        withCredentials: true,
+        params : {
+          id: id,
+        }
+      },
+      );
+      if (response.status === 200) {
+        console.log("tkharbi9a", response.data)
+        OwnerImage(response.data.owner.photo);
+        const adminPhotos: string[] = response.data.admins.map((admin: any) => admin.photo);
+        console.log("test allah allah", adminPhotos);
+        setAdmines(adminPhotos);
+      } else {
+        console.log("Failed to fetch member data");
+      }
+    } catch (error) {
+      console.error("An error occurred while fetching member data:", error);
+    }
+  };
+  useEffect(() => {
+    fetchownerimage();
+  }, [id]);
+
+  /////////////////////////end point to get admines images////////////////////
+
+  // const fetchadminesimage = async () => {
+  //   try {
+  //     const response = await axios.get("http://localhost:3001/", {
+  //       withCredentials: true,
+  //     });
+  //     if (response.status === 200) {
+  //       const newAdmines: string[] = response.data.map((admines: any) => ({
+  //         image: admines.image,
+  //       }));
+  //       setAdmines(newAdmines);
+  //     } else {
+  //       console.log("Failed to fetch member data");
+  //     }
+  //   } catch (error) {
+  //     console.error("An error occurred while fetching member data:", error);
+  //   }
+  // };
+  // useEffect(() => {
+  //   fetchadminesimage();
+  // }, []);
 
   const [muteStatue, setMuteStatu] = useState<boolean>(false);
   const [admine, setAdmine] = useState<boolean>(false);
 
   //////////endpoint to get all memebres in room exept admines and owner////////////////
   const [members, setMembers] = useState<Members[]>([
-    {
-      id: 1,
-      nickname: "ael-kouc",
-      memberImage:
-        "https://cdn.intra.42.fr/users/9373f1cfc045b4628c01920b3000a836/ael-kouc.jpg",
-    },
-    {
-      id: 2,
-      nickname: "ael-kouc",
-      memberImage:
-        "https://cdn.intra.42.fr/users/9373f1cfc045b4628c01920b3000a836/ael-kouc.jpg",
-    },
-    {
-      id: 3,
-      nickname: "ael-kouc",
-      memberImage:
-        "https://cdn.intra.42.fr/users/9373f1cfc045b4628c01920b3000a836/ael-kouc.jpg",
-    },
-    {
-      id: 4,
-      nickname: "ael-kouc",
-      memberImage:
-        "https://cdn.intra.42.fr/users/9373f1cfc045b4628c01920b3000a836/ael-kouc.jpg",
-    },
-    {
-      id: 5,
-      nickname: "ael-kouc",
-      memberImage:
-        "https://cdn.intra.42.fr/users/9373f1cfc045b4628c01920b3000a836/ael-kouc.jpg",
-    },
   ]);
   const [exist, setexist] = useState<boolean>(false);
   //////////////////////////fetching memebers data///////////////////////////////
   const fetchmemberdata = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/", {
+      const response = await axios.get("http://localhost:3001/chat/settings/members", 
+      {
         withCredentials: true,
-      });
+        params : {
+          id: id,
+        }
+      },
+      );
       if (response.status === 200) {
-        const newMembers: Members[] = response.data.map((members: any) => ({
-          id: members.id,
-          nickname: members.nickname,
-          memberImage: members.memberImage,
+        const newMembers: Members[] = response.data.map((member: any) => ({
+          id: member.id,
+          nickname: member.userName, // Assuming userName is mapped to nickname
+          memberImage: member.photo, // Assuming photo is mapped to memberImage
         }));
         setMembers(newMembers);
       } else {
@@ -150,9 +139,9 @@ function ChatConv() {
       console.error("An error occurred while fetching member data:", error);
     }
   };
-  // useEffect(() => {
-  //   fetchmemberdata();
-  // }, [exist]);
+  useEffect(() => {
+    fetchmemberdata();
+  }, [exist, id]);
   ///////////////////////////////////////////////////////////////////////////
 
   //////////end point to get mutestatue and adminestatus//////////////

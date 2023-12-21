@@ -9,6 +9,10 @@ import { JoinGroupChatDTO } from './dto/joinGroupChat.dto';
 export class ChatService {
     constructor(private prisma: PrismaService) {}
 
+    // chat owner should be able to change and remove password
+    // The user should be able to invite other users to play a Pong game through the chat interface.
+    // The user should be able to access other players profiles through the chat interface.
+
     async getConversations(userId: number) {
         try {
             const convos = await this.prisma.chatroom.findMany({
@@ -33,7 +37,7 @@ export class ChatService {
                     },
                 }
             })
-            
+            // Exclude messages of blocked users
             const conv = convos.map(conv => {
                 const { id, name, group, photo } = conv;
                 if (group) {
@@ -184,7 +188,7 @@ export class ChatService {
                     const { id, content, createdAt, sender } = msg;
                     const { userName, photo } = sender.user;
 
-                    // TODO: check ckicked users messages
+                    // TODO: check ckicked and banned users messages
 
                     if ( msg.senderId === userId )
                         return { userId: msg.senderId, sender: "me", photo, role: sender.role , content, createdAt,  }
