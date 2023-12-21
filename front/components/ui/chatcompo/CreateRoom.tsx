@@ -6,8 +6,10 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 
 const CreateRoom = () => {
+  const router = useRouter();
   //////////////////ROOM//////////////////////////////
   const [roomName, setRoomName] = useState("");
   const handleRoomnNme = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -19,26 +21,26 @@ const CreateRoom = () => {
     setPasswordName(event.target.value);
   };
   ////////////////////////type of room//////////////////
-  const [roomType, setRoomType] = useState("public");
+  const [roomType, setRoomType] = useState("PUBLIC");
 
 
   //////////////send data////////////////////////////////
   const send_data = async () => {
     try {
-      const response = await axios.post("http://localhost:3001/", {
+      const response = await axios.post("http://localhost:3001/chat/create", {
         roomName: roomName,
         roomType: roomType,
-        passwordName: passwordName,
+        pw: passwordName,
       }, {
         withCredentials: true,
       });
       if (response.status === 201) {
-        
+        console.log("success");
       } else {
-        console.log("Failed to fetch friendship data");
+        console.log("Failed to fetch group data");
       }
     } catch (error) {
-      console.error("An error occurred while fetching friendship data:", error);
+      console.error("An error occurred while fetching group data:", error);
     }
   };
   // useEffect(() => {
@@ -62,12 +64,12 @@ const CreateRoom = () => {
           {roomType}
         </PopoverTrigger>
         <PopoverContent className="w-[100px]">
-          <button onClick={() => setRoomType("Private")}>Private</button>
-          <button onClick={() => setRoomType("Public")}>Public</button>
-          <button onClick={() => setRoomType("Protected")}>Protected</button>
+          <button onClick={() => setRoomType("PRIVATE")}>Private</button>
+          <button onClick={() => setRoomType("PUBLIC")}>Public</button>
+          <button onClick={() => setRoomType("PROTECTED")}>Protected</button>
         </PopoverContent>
       </Popover>
-      {roomType === "Protected" ? (
+      {roomType === "PROTECTED" ? (
         <div>
           <div>Password : </div>
           <input

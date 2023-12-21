@@ -29,6 +29,7 @@ enum ROLE {
 }
 
 enum VISIBILITY {
+  DM
   PUBLIC
   PRIVATE
   PROTECTED
@@ -71,6 +72,7 @@ model User {
   player2 MatchHistory[] @relation("Player2")
 
   ChatroomUsers ChatroomUsers[]
+  // chatRooms Chatroom[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -141,8 +143,8 @@ model Message {
 
   content String
 
-  user   ChatroomUsers @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId Int
+  sender   ChatroomUsers @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  senderId Int
 
   chatroom   Chatroom @relation(fields: [chatroomId], references: [id], onDelete: Cascade)
   chatroomId Int
@@ -155,9 +157,10 @@ model Chatroom {
   id Int @id @default(autoincrement())
 
   name String
+  photo String?
 
   group Boolean @default(false)
-  visibility VISIBILITY @default(PUBLIC)
+  visibility VISIBILITY @default(DM)
   password String?
 
   messages      Message[]

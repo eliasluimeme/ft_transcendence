@@ -252,9 +252,10 @@ export class UserService {
                     level: true,
                 }
             });
-
-            delete user.hash;
-            return user;
+            if (user) {
+                delete user.hash;
+                return user;
+            } else return user;
         } catch (error) {
             // check prisma error status code
             console.error('Error finding user: ', error);
@@ -565,10 +566,32 @@ export class UserService {
                     sender: { connect: { id: senderId } },
                     receiver: { connect: { id: receiverId } },
                     status: 'ACCEPTED',
+                },
+                include: {
+                    receiver: true,
                 }
             })
-            // send notification to receiver
+            // check if room already exists
             // create chat room
+            const room = await this.prisma.chatroom.create({
+                data: {
+                    name: "DM",
+                    ChatroomUsers: {
+                      createMany: {
+                        data: [
+                          { userId: senderId, role: 'USER' },
+                          { userId: receiverId, role: 'USER' },
+                        ],
+                      },
+                    },
+                  },
+                include: {
+                  ChatroomUsers: true,
+                },
+            })
+            console.log('room: ', room)
+
+            // send notification to receiver
             return { status: friendShip.status };
         } catch(error) {
             console.log('error adding friend: ', error)

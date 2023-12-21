@@ -10,12 +10,13 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { ChatService } from './chat/chat.service';
 import { ChatController } from './chat/chat.controller';
 import { ChatModule } from './chat/chat.module';
+import { join } from 'path';
 
 
 @Module({
   imports: [AuthModule, UserModule, PrismaModule, MulterModule, ChatModule,
     ServeStaticModule.forRoot({
-      rootPath: './uploads/',
+      rootPath: join(__dirname, '..', 'uploads'),
     }),
     ConfigModule.forRoot({
       isGlobal: true,

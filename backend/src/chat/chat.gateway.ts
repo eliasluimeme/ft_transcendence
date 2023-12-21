@@ -1,3 +1,9 @@
+import { Server, Socket } from 'socket.io';
+import { ChatService } from './chat.service';
+import { AuthService } from 'src/auth/auth.service';
+import { userIdDTO } from 'src/user/dto/userId.dto';
+import { UserService } from 'src/user/user.service';
+import { UnauthorizedException } from '@nestjs/common';
 import {
   WebSocketGateway,
   SubscribeMessage,
@@ -5,43 +11,76 @@ import {
   WebSocketServer,
   OnGatewayDisconnect,
   OnGatewayConnection,
-  ConnectedSocket,
 } from '@nestjs/websockets';
-
-import { Server, Socket } from 'socket.io';
-import { ChatService } from './chat.service';
-import { CreateChatDmDto } from './dto/create-chat-dm.dto';
 
 @WebSocketGateway({
   cors: {
     origin: 'http://localhost:3000',
   },
+  namespace: 'chat',
 })
-export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect{
-  constructor(private readonly chatService: ChatService) {}
+export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
+  constructor(
+    private readonly chatService: ChatService,
+    private authService: AuthService,
+    private userService: UserService,
+  ) {}
 
   @WebSocketServer()
   server: Server;
 
-  handleConnection(client: Socket) {
-    console.log("heheh")
-    if (!client.handshake.headers.cookie)
-        client.disconnect();
-    client.join('1234');
+  userToClient = new Map<number, string>();
+
+  async handleConnection(client: Socket) {
     // Handle connection event
+    try {
+      // const decodedToken = await this.authService.verifyJwt(
+      //   client.handshake.headers.cookie,
+      // ); //  TODO : Endpoint to verify JWT
+      // const user: userIdDTO = await this.userService.getOne(
+      //   decodedToken.user.id,
+      // ); // TODO endpoint to get user
+      const user = { id: 1 };
+      if (!user) {
+        return this.disconnect(client);
+      } else {
+        //////////////////////
+        this.userToClient.set(user.id, client.id);
+      }
+      console.log(client.id, 'successfully connected ');
+      // if (!client.handshake.headers.cookie) client.disconnect();
+    } catch {
+      return this.disconnect(client);
+    }
   }
 
   handleDisconnect(client: Socket) {
-    console.log('disconnected');
     // Handle disconnection event
+    delete this.userToClient[client.id];
+    this.disconnect(client);
+    console.log('disconnected', client.id);
   }
 
-  @SubscribeMessage('createChat')
-  async create(@MessageBody() createChatDmDto: any, @ConnectedSocket() client: Socket) {
-    // const message = await this.chatService.create(createChatDmDto, id); // TODO check id
-    this.server.to("1234").emit('message', createChatDmDto);
-    // return this.chatService.create(createChatDmDto, id);
+  private disconnect(client: Socket) {
+    client.emit('error', new UnauthorizedException());
+    client.disconnect();
   }
 
-
+  @SubscribeMessage('conversation')
+  async handelConversation(@MessageBody() data: any) {
+    console.log('data is ++++++++++++++=');
+    const { senderId, reciverId, messageContent, type } = data;
+    console.log('data is ', data);
+    if (type === 'DM') {
+      this.server
+        .to(this.userToClient[senderId])
+        .emit('conversation', messageContent);
+      this.server
+        .to(this.userToClient[reciverId])
+        .emit('conversation', messageContent);
+      console.log('data is ', data);
+    } else if (type === 'GROUP') {
+      this.server.emit('conversation', messageContent);
+    }
+  }
 }

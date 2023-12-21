@@ -1,8 +1,11 @@
 "use client";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 import React from "react";
 import { useState } from "react";
 
 const JoinRoom = () => {
+  const router = useRouter();
   //////////////////ROOM//////////////////////////////
   const [roomName, setRoomName] = useState("");
   const handleRoomnNme = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -13,8 +16,28 @@ const JoinRoom = () => {
   const handlePasswordnNme = (event: React.ChangeEvent<HTMLInputElement>) => {
     setPasswordName(event.target.value);
   };
-  ////////////////////////type of room//////////////////
-  const [roomType, setRoomType] = useState("public");
+  ////////////////////////room id//////////////////
+  const [roomId, setRoomId] = useState("");
+
+  const join = async () => {
+    try {
+      const response = await axios.post("http://localhost:3001/chat/join", {
+        roomName: roomName,
+        pw: passwordName,
+      }, {
+        withCredentials: true,
+      });
+      if (response.status === 201) {
+        setRoomId(response.data.id);
+        console.log("success:", roomId);
+        router.refresh();
+      } else {
+        console.log("Failed to fetch group data");
+      }
+    } catch (error) {
+      console.error("An error occurred while fetching group data:", error);
+    }
+  };
 
   return (
     <div className="w-full h-full space-y-4 bg-[#1E2124]">
@@ -37,7 +60,7 @@ const JoinRoom = () => {
         />
       </div>
       <div className="flex justify-end mr-[10px]">
-        <button className="w-[60px] h-[40px] rounded-lg text-[10px] bg-[#F77B3F] bg-opacity-50 hover:bg-opacity-100">
+        <button onClick={() => join()} className="w-[60px] h-[40px] rounded-lg text-[10px] bg-[#F77B3F] bg-opacity-50 hover:bg-opacity-100">
           Join
         </button>
       </div>

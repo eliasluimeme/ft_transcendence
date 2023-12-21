@@ -14,6 +14,7 @@ import { useState, useEffect } from "react";
 import internal from "stream";
 import { StaticRequire } from "next/dist/shared/lib/get-img-props";
 import axios from "axios";
+import { useRouter } from 'next/router';
 interface Members {
   id: number;
   nickname: string;
@@ -21,7 +22,15 @@ interface Members {
 }
 
 function ChatConv() {
+  ///////fetch data of my role in the roon////////////////////////////////
   const [rol, setrol] = useState(true);
+  
+  // const router = useRouter();
+  // if (!router.isReady) {
+  //   return <div>Loading...</div>;
+  // }
+  // const { id } = router.query;
+  // console.log('Chat room ID:', id);
 
   /////////////////end point to get owner image/////////////////////////////
   const [Owner, OwnerImage] = [
@@ -88,17 +97,22 @@ function ChatConv() {
 
   function postmute(id: number | undefined) {
     /////////endpoint to post mute statue//////////////
+    setexist(false)
   }
   function postkick(id: number | undefined) {
+    setexist(false)
     /////////endpoint to post kick//////////////
   }
   function postban(id: number | undefined) {
+    setexist(false)
     /////////endpoint to post  ban//////////////
   }
   function postadmine(id: number | undefined) {
+    setexist(false)
     /////////endpoint to post adminestatue//////////////
   }
   function postLeavee(id: number | undefined) {
+    setexist(false)
     /////////endpoint to post leaving room//////////////
   }
 

@@ -17,6 +17,7 @@ import {
 import CreateRoom from "./CreateRoom";
 
 type freind = {
+  id: string;
   image: string;
   name: string;
 };
@@ -25,13 +26,14 @@ const getFriends = () => {
   const [freind, setfreind] = useState<freind[]>([]);
   const takefreind = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/friends", {
+      const response = await axios.get("http://localhost:3001/chat/conversations", {
         withCredentials: true,
       });
       if (response.status === 200) {
         const newfreind: freind[] = response.data.map((l: any) => ({
-          image: l.photo,
-          name: l.userName,
+          id: l.convId,
+          image: l.photo ?? "https://t4.ftcdn.net/jpg/03/78/40/51/360_F_378405187_PyVLw51NVo3KltNlhUOpKfULdkUOUn7j.jpg",
+          name: l.name,
         }));
         setfreind(newfreind);
       } else {
@@ -45,10 +47,27 @@ const getFriends = () => {
     takefreind();
   }, []);
 
+  const redirectConvo = async (id: string) =>  {
+    try {
+      const resp = await axios.get(`http://localhost:3000/chat/${id}`, {
+        withCredentials: true,
+      });
+      if (resp.status === 200) {
+        console.log("success");
+      } else {
+        console.log("Failed to fetch group data");
+      }
+    } catch (error) {
+
+    }
+  };
+
   return Object.values(freind).map((friend, index) => (
     <button
       className="bg-[#D9D9D9] w-[90%] h-[50px] hover:text-[#F77B3F] text-opacity-[70%] bg-opacity-[10%] hover:bg-opacity-[100%] flex items-center justify-center space-x-8 rounded-lg"
       key={index}
+
+      onClick={() => redirectConvo(friend.id)}
     >
       <Avatar className="w-[30px] h-[30px]">
         <AvatarImage src={friend.image} alt="User Avatar" />
