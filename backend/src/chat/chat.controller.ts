@@ -53,21 +53,32 @@ export class ChatController {
 
 
 
-  @Get('/settings')
+  @Get('/settings/role')
   @UseGuards(Jwt2faAuthGuard)
   async getRole(@Req() req, @Query() param, @Res() res) {
     console.log('settings', param)
-    const settings = await this.chatService.getChatMembers(req.user.id, parseInt(param.id));
-    res.json(settings);
+    // const settings = await this.chatService.getChatMembers(req.user.id, parseInt(param.id));
+    // res.json(await this.chatService.getChatMembers(req.user.id, parseInt(param.id)));
+    res.json(await this.chatService.getRole(req.user.id, parseInt(param.id)));
   }
 
-  // Get('/settings/members')
-  // @UseGuards(Jwt2faAuthGuard)
-  // async getChatMembers(@Req() req, @Query() param, @Res() res) {
-  //   console.log('settings', param)
-  //   const settings = await this.chatService.getChatMembers(req.user.id, parseInt(param.id));
-  //   res.json(settings);
-  // }
+  @Get('/settings/staff')
+  @UseGuards(Jwt2faAuthGuard)
+  async getStaff(@Req() req, @Query() param, @Res() res) {
+    res.json(await this.chatService.getStaff(req.user.id, parseInt(param.id)));
+  }
+
+  @Get('/settings/members')
+  @UseGuards(Jwt2faAuthGuard)
+  async getChatMembers(@Req() req, @Query() param, @Res() res) {
+    res.json( await this.chatService.getMembers(req.user.id, parseInt(param.id)) );
+  }
+
+  @Get('/settings/members/infos')
+  @UseGuards(Jwt2faAuthGuard)
+  async getMemberInfos(@Req() req, @Query() param, @Res() res) {
+    res.json( await this.chatService.getMembersInfos(req.user.id, parseInt(param.id), parseInt(param.userId)) );
+  }
 
   @Post('/settings/mute')
   @UseGuards(Jwt2faAuthGuard)
@@ -90,7 +101,7 @@ export class ChatController {
   @Post('/settings/ban')
   @UseGuards(Jwt2faAuthGuard)
   async banMember(@Req() req, @Body() body: any, @Res() res) {
-    // res.json( await this.chatService.banMember(req.user.id, parseInt(body.roomId), parseInt(body.userId)) );
+    res.json( await this.chatService.banMember(req.user.id, parseInt(body.roomId), parseInt(body.userId)) );
   }
 
 }

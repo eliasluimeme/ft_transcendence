@@ -259,7 +259,62 @@ export class ChatService {
         }
     }
 
-    async getChatMembers(userId: number, roomId: number) {
+    async getRole(userId: number, roomId: number) {
+        try {
+            const role = await this.prisma.chatroomUsers.findFirst({
+                where: {
+                    userId: userId,
+                    chatroomId: roomId,
+                },
+            })
+
+            if (!role)
+                throw new NotFoundException('Room does not exist')
+
+            return { role: role.role };
+        } catch (error) {
+            if ( error instanceof NotFoundException )
+                throw error;
+            console.log(error);
+        }
+    }
+
+    async getStaff(userId: number, roomId: number) {
+        try {
+            const role = await this.prisma.chatroomUsers.findMany({
+                where: {
+                    chatroomId: roomId,
+                    OR: [
+                        { role: 'OWNER'},
+                        { role: 'ADMIN'}
+                    ]
+                },
+                include: {
+                    user: {
+                        select: {
+                            id: true,
+                            userName: true,
+                            photo: true,
+                        }
+                    }
+                }
+            })
+
+            if (!role)
+                throw new NotFoundException('Room does not exist')
+
+            const owner = role.find(user => user.role === 'OWNER');
+            const admins = role.filter(user => user.role === 'ADMIN');
+
+            return { owner: owner.user , admins: admins.map(admin => admin.user) };
+        } catch (error) {
+            if ( error instanceof NotFoundException )
+                throw error;
+            console.log(error);
+        }
+    }
+
+    async getMembers(userId: number, roomId: number) {
         try {
             const groupChatUsers = await this.prisma.chatroom.findFirst({
                 where: {
@@ -283,18 +338,60 @@ export class ChatService {
             if (!groupChatUsers)
                 throw new NotFoundException('Room does not exist')
 
-            console.log('users:', groupChatUsers)
-            if (groupChatUsers.ChatroomUsers.find(user => user.role === 'OWNER')) {
+            if ( groupChatUsers.ChatroomUsers.find(user => user.userId === userId).role === 'OWNER' ) {
+                return groupChatUsers.ChatroomUsers.map( user => {
+                    if ( (user.role === 'ADMIN' || user.role === 'USER') && !user.isBanned ) {
+                        const { id, userName, photo } = user.user;
+                        return { id, userName, photo, role: user.role };
+                    }
+                    return null
+                }).filter(user => user !== null);
+            } else if ( groupChatUsers.ChatroomUsers.find(user => user.userId === userId).role === 'ADMIN' ) {
+                return groupChatUsers.ChatroomUsers.map( user => {
+                    if ( user.role === 'USER' && !user.isBanned ) {
+                        const { id, userName, photo } = user.user;
+                        return { id, userName, photo, role: user.role };
+                    }
+                    return null
+                }).filter(user => user !== null);
+            } else return null;
+           
+        } catch (error) {
+            if ( error instanceof NotFoundException)
+                throw error;
+            console.log(error);
+        }
+    }
 
-            }
-            
-            const users = groupChatUsers.ChatroomUsers.map(user => {
-                // const owner = user[0].find(user => user.role === 'OWNER')
-                const { id, userName, photo } = user.user;
-                return { id, userName, photo, role: user.role, isMuted: user.isMuted, isBanned: user.isBanned };
+    async getMembersInfos(userId: number, roomId: number, memberId: number): Promise<any> {
+        try {
+            const user = await this.prisma.chatroom.findFirst({
+                where: {
+                    id: roomId,
+                },
+                select: {
+                    ChatroomUsers: {
+                        where: {
+                            userId: memberId
+                        },
+                        include: {
+                            user: {
+                                select: {
+                                    id: true,
+                                    userName: true,
+                                    photo: true,
+                                }
+                            }
+                        }
+                    }
+                }
             })
 
-            return { groupChatUsers };
+            if (!user)
+                throw new NotFoundException('Room does not exist')
+
+            return {id: user.ChatroomUsers[0].userId, photo: user.ChatroomUsers[0].user.photo, role: user.ChatroomUsers[0].role, isMuted: user.ChatroomUsers[0].isMuted}
+           
         } catch (error) {
             if ( error instanceof NotFoundException)
                 throw error;
@@ -484,53 +581,53 @@ export class ChatService {
         return user;
     }
 
-    async unbanMember(userId: number, roomId: number, memberId: number) {
-        const user = await this.prisma.chatroomUsers.findFirst({
-            where: {
-                userId: userId,
-                chatroomId: roomId,
-            },
-            include: {
-                chatroom: {
-                    include: {
-                        ChatroomUsers: true,
-                    }
-                },
-            }
-        }).then( async (user) => {
-            if (!user)
-                throw new NotFoundException('Room does not exist')
-            if (user.role !== 'OWNER' && user.role !== 'ADMIN')
-                throw new ForbiddenException('You are not allowed to unban members')
-            if (!user.chatroom.ChatroomUsers.find( user => user.userId === memberId))
-                throw new ForbiddenException('Member does not exist')
-            if (user.chatroom.ChatroomUsers.find( user => user.isBanned === true))
-                throw new ForbiddenException('Member already unbanned')
+    // async unbanMember(userId: number, roomId: number, memberId: number) {
+    //     const user = await this.prisma.chatroomUsers.findFirst({
+    //         where: {
+    //             userId: userId,
+    //             chatroomId: roomId,
+    //         },
+    //         include: {
+    //             chatroom: {
+    //                 include: {
+    //                     ChatroomUsers: true,
+    //                 }
+    //             },
+    //         }
+    //     }).then( async (user) => {
+    //         if (!user)
+    //             throw new NotFoundException('Room does not exist')
+    //         if (user.role !== 'OWNER' && user.role !== 'ADMIN')
+    //             throw new ForbiddenException('You are not allowed to unban members')
+    //         if (!user.chatroom.ChatroomUsers.find( user => user.userId === memberId))
+    //             throw new ForbiddenException('Member does not exist')
+    //         if (user.chatroom.ChatroomUsers.find( user => user.isBanned === true))
+    //             throw new ForbiddenException('Member already unbanned')
 
-            const chatRoomUserId = user.chatroom.ChatroomUsers.find( user => user.userId === memberId).id;
+    //         const chatRoomUserId = user.chatroom.ChatroomUsers.find( user => user.userId === memberId).id;
 
-            await this.prisma.chatroomUsers.update({
-                where: {
-                    id: chatRoomUserId,
-                },
-                data: {
-                    isBanned: false,
-                }
-            }).then(() => {
-                return { success: true, message: 'Member unbanned' }
-            }).catch((error) => {
-                console.log(error);
-                throw new BadRequestException('Something went wrong')
-            })
+    //         await this.prisma.chatroomUsers.update({
+    //             where: {
+    //                 id: chatRoomUserId,
+    //             },
+    //             data: {
+    //                 isBanned: false,
+    //             }
+    //         }).then(() => {
+    //             return { success: true, message: 'Member unbanned' }
+    //         }).catch((error) => {
+    //             console.log(error);
+    //             throw new BadRequestException('Something went wrong')
+    //         })
 
-        }).catch( (error) => {
-            if (error instanceof ForbiddenException || error instanceof NotFoundException)
-                throw error;
-            console.log(error);
-        })
+    //     }).catch( (error) => {
+    //         if (error instanceof ForbiddenException || error instanceof NotFoundException)
+    //             throw error;
+    //         console.log(error);
+    //     })
 
-        return user;
-    }
+    //     return user;
+    // }
 
     async addAdmin(userId: number, roomId: number, memberId: number) {
         const user = await this.prisma.chatroomUsers.findFirst({
