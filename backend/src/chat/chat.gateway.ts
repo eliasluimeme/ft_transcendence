@@ -1,7 +1,7 @@
 import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
 import { AuthService } from 'src/auth/auth.service';
-import { userIdDTO } from 'src/user/dto/userId.dto';
+// import { userIdDTO } from 'src/user/dto/userId.dto';
 import { UserService } from 'src/user/user.service';
 import { UnauthorizedException } from '@nestjs/common';
 import {
