@@ -88,17 +88,22 @@ function ChatConv() {
 
   function postmute(id: number | undefined) {
     /////////endpoint to post mute statue//////////////
+    setexist(false);
   }
   function postkick(id: number | undefined) {
+    setexist(false);
     /////////endpoint to post kick//////////////
   }
   function postban(id: number | undefined) {
+    setexist(false);
     /////////endpoint to post  ban//////////////
   }
   function postadmine(id: number | undefined) {
+    setexist(false);
     /////////endpoint to post adminestatue//////////////
   }
   function postLeavee(id: number | undefined) {
+    setexist(false);
     /////////endpoint to post leaving room//////////////
   }
 
