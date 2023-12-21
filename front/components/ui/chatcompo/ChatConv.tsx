@@ -21,13 +21,48 @@ interface Members {
 }
 
 function ChatConv() {
+  /////////////////end point to get rol/////////////////////////////
   const [rol, setrol] = useState(true);
+  const fetchrol = async () => {
+    try {
+      const response = await axios.get("http://localhost:3001/", {
+        withCredentials: true,
+      });
+      if (response.status === 200) {
+        setrol(response.data);
+      } else {
+        console.log("Failed to fetch member data");
+      }
+    } catch (error) {
+      console.error("An error occurred while fetching member data:", error);
+    }
+  };
+  // useEffect(() => {
+  //   fetchrol();
+  // }, []);
 
   /////////////////end point to get owner image/////////////////////////////
-  const [Owner, OwnerImage] = [
-    "ael-kouc",
-    "https://cdn.intra.42.fr/users/9373f1cfc045b4628c01920b3000a836/ael-kouc.jpg",
-  ];
+  const [Owner, OwnerImage] = useState<string>(
+    "https://cdn.intra.42.fr/users/9373f1cfc045b4628c01920b3000a836/ael-kouc.jpg"
+  );
+
+  const fetchownerimage = async () => {
+    try {
+      const response = await axios.get("http://localhost:3001/", {
+        withCredentials: true,
+      });
+      if (response.status === 200) {
+        OwnerImage(response.data);
+      } else {
+        console.log("Failed to fetch member data");
+      }
+    } catch (error) {
+      console.error("An error occurred while fetching member data:", error);
+    }
+  };
+  // useEffect(() => {
+  //   fetchownerimage();
+  // }, []);
 
   /////////////////////////end point to get admines images////////////////////
   const [admins, setAdmines] = useState<string[]>([
@@ -36,11 +71,32 @@ function ChatConv() {
     "https://cdn.intra.42.fr/users/9373f1cfc045b4628c01920b3000a836/ael-kouc.jpg",
   ]);
 
+  const fetchadminesimage = async () => {
+    try {
+      const response = await axios.get("http://localhost:3001/", {
+        withCredentials: true,
+      });
+      if (response.status === 200) {
+        const newAdmines: string[] = response.data.map((admines: any) => ({
+          image: admines.image,
+        }));
+        setAdmines(newAdmines);
+      } else {
+        console.log("Failed to fetch member data");
+      }
+    } catch (error) {
+      console.error("An error occurred while fetching member data:", error);
+    }
+  };
+  useEffect(() => {
+    fetchadminesimage();
+  }, []);
+
   const [muteStatue, setMuteStatu] = useState<boolean>(false);
   const [admine, setAdmine] = useState<boolean>(false);
 
+  //////////endpoint to get all memebres in room exept admines and owner////////////////
   const [members, setMembers] = useState<Members[]>([
-    //////////endpoint to get all memebres in room exept admines and owner////////////////
     {
       id: 1,
       nickname: "ael-kouc",
@@ -72,12 +128,59 @@ function ChatConv() {
         "https://cdn.intra.42.fr/users/9373f1cfc045b4628c01920b3000a836/ael-kouc.jpg",
     },
   ]);
+  const [exist, setexist] = useState<boolean>(false);
+  //////////////////////////fetching memebers data///////////////////////////////
+  const fetchmemberdata = async () => {
+    try {
+      const response = await axios.get("http://localhost:3001/", {
+        withCredentials: true,
+      });
+      if (response.status === 200) {
+        const newMembers: Members[] = response.data.map((members: any) => ({
+          id: members.id,
+          nickname: members.nickname,
+          memberImage: members.memberImage,
+        }));
+        setMembers(newMembers);
+      } else {
+        console.log("Failed to fetch member data");
+      }
+    } catch (error) {
+      console.error("An error occurred while fetching member data:", error);
+    }
+  };
+  // useEffect(() => {
+  //   fetchmemberdata();
+  // }, [exist]);
+  ///////////////////////////////////////////////////////////////////////////
+
+  //////////end point to get mutestatue and adminestatus//////////////
+  const fetchMuteAndAdmine = async (id: number) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:3001/",
+        {
+          id,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+      if (response.status === 200) {
+        setMuteStatu(response.data.mute);
+        setAdmine(response.data.admine);
+      } else {
+        console.log("Failed to fetch member data");
+      }
+    } catch (error) {
+      console.error("An error occurred while fetching member data:", error);
+    }
+  };
 
   const [data, setData] = useState<Members>();
-  const [exist, setexist] = useState<boolean>(false);
 
   function makeModifications(memberdata: Members) {
-    //////////end point to get mutestatue and adminestatus//////////////
+    // fetchMuteAndAdmine(memberdata.id);
     setexist(true);
     setData({
       id: memberdata.id,
@@ -86,26 +189,139 @@ function ChatConv() {
     });
   }
 
-  function postmute(id: number | undefined) {
-    /////////endpoint to post mute statue//////////////
+  /////////endpoint to post mute statue//////////////
+
+  const postmute = (id: number | undefined) => {
+    const sendmute = async () => {
+      try {
+        const response = await axios.post(
+          "http://localhost:3001/",
+          {
+            id,
+          },
+          {
+            withCredentials: true,
+          }
+        );
+        if (response.status === 201) {
+          setMuteStatu(response.data);
+        } else {
+          console.log("Failed to fetch friendship data");
+        }
+      } catch (error) {
+        console.error(
+          "An error occurred while fetching friendship data:",
+          error
+        );
+      }
+    };
     setexist(false);
-  }
-  function postkick(id: number | undefined) {
+  };
+  /////////endpoint to post kick//////////////
+  const postkick = (id: number | undefined) => {
+    const sendkick = async () => {
+      try {
+        const response = await axios.post(
+          "http://localhost:3001/",
+          {
+            id,
+          },
+          {
+            withCredentials: true,
+          }
+        );
+        if (response.status === 201) {
+        } else {
+          console.log("Failed to fetch friendship data");
+        }
+      } catch (error) {
+        console.error(
+          "An error occurred while fetching friendship data:",
+          error
+        );
+      }
+    };
     setexist(false);
-    /////////endpoint to post kick//////////////
-  }
-  function postban(id: number | undefined) {
+  };
+  /////////endpoint to post  ban//////////////
+  const postban = (id: number | undefined) => {
+    const sendban = async () => {
+      try {
+        const response = await axios.post(
+          "http://localhost:3001/",
+          {
+            id,
+          },
+          {
+            withCredentials: true,
+          }
+        );
+        if (response.status === 201) {
+        } else {
+          console.log("Failed to fetch friendship data");
+        }
+      } catch (error) {
+        console.error(
+          "An error occurred while fetching friendship data:",
+          error
+        );
+      }
+    };
     setexist(false);
-    /////////endpoint to post  ban//////////////
-  }
-  function postadmine(id: number | undefined) {
+  };
+  /////////endpoint to post adminestatue//////////////
+  const postadmine = (id: number | undefined) => {
+    const sendadmine = async () => {
+      try {
+        const response = await axios.post(
+          "http://localhost:3001/",
+          {
+            id,
+          },
+          {
+            withCredentials: true,
+          }
+        );
+        if (response.status === 201) {
+          setAdmine(response.data);
+        } else {
+          console.log("Failed to fetch friendship data");
+        }
+      } catch (error) {
+        console.error(
+          "An error occurred while fetching friendship data:",
+          error
+        );
+      }
+    };
     setexist(false);
-    /////////endpoint to post adminestatue//////////////
-  }
-  function postLeavee(id: number | undefined) {
+  };
+  /////////endpoint to post leaving room//////////////
+  const posleave = (id: number | undefined) => {
+    const sendleave = async () => {
+      try {
+        const response = await axios.post(
+          "http://localhost:3001/",
+          {
+            id,
+          },
+          {
+            withCredentials: true,
+          }
+        );
+        if (response.status === 201) {
+        } else {
+          console.log("Failed to fetch friendship data");
+        }
+      } catch (error) {
+        console.error(
+          "An error occurred while fetching friendship data:",
+          error
+        );
+      }
+    };
     setexist(false);
-    /////////endpoint to post leaving room//////////////
-  }
+  };
 
   //////////////////ADD Freind//////////////////////////////
   const [frdName, setfrName] = useState("");
@@ -157,7 +373,7 @@ function ChatConv() {
                     <div className="flex items-center justify-center space-x-6 border bg-[#F87B3F] rounded-lg">
                       <div>Owner :</div>
                       <Avatar className="">
-                        <AvatarImage src={OwnerImage} />
+                        <AvatarImage src={Owner} />
                         <AvatarFallback>owner image</AvatarFallback>
                       </Avatar>
                     </div>
@@ -257,7 +473,7 @@ function ChatConv() {
                     </div>
                     <div className="flex items-center justify-center">
                       <button
-                        onClick={() => postLeavee(data?.id)}
+                        onClick={() => posleave(data?.id)}
                         className="w-[80px]  rounded-lg bg-red-500 bg-opacity-50 hover:bg-opacity-100"
                       >
                         Leave
@@ -267,7 +483,7 @@ function ChatConv() {
                 ) : (
                   <div className="flex items-center justify-center">
                     <button
-                      onClick={() => postLeavee(data?.id)}
+                      onClick={() => posleave(data?.id)}
                       className="w-[80px]  border rounded-lg bg-red-500"
                     >
                       Leave
