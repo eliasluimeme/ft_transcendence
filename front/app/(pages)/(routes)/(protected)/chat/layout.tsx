@@ -8,6 +8,7 @@ import "@/app/(pages)/(routes)/(protected)/game/style.css";
 
 export default function Chat({ children }: { children: React.ReactNode }) {
   return (
+    
     <div className="h-full w-full font-Goldman flex justify-around bg-[#36393E] rounded-lg ">
       <div className="flex items-center justify-around space-x-3 w-full h-full">
         {/* <div className="w-full h-full rounded-lg grid grid-container ">
