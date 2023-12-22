@@ -14,32 +14,33 @@ import { useState, useEffect } from "react";
 import internal from "stream";
 import { StaticRequire } from "next/dist/shared/lib/get-img-props";
 import axios from "axios";
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
 interface Members {
   id: number;
   nickname: string;
   memberImage: string;
+  isMuted: boolean;
 }
 
-function ChatConv(id : string | null) {
-  console.log("id",id);
+function ChatConv(id: string | null) {
+  console.log("id", id);
   /////////////////end point to get rol/////////////////////////////
   const [rol, setrol] = useState(true);
   const fetchrol = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/chat/settings/role",
-      {
-        withCredentials: true,
-        params : {
-          id: id,
+      const response = await axios.get(
+        "http://localhost:3001/chat/settings/role",
+        {
+          withCredentials: true,
+          params: {
+            id: id,
+          },
         }
-      },
       );
       if (response.status === 200) {
-        if(response.data.role === "OWNER" || response.data.role === "ADMIN")
+        if (response.data.role === "OWNER" || response.data.role === "ADMIN")
           setrol(true);
-        else 
-          setrol(false);
+        else setrol(false);
       } else {
         console.log("Failed to fetch member data");
       }
@@ -52,25 +53,26 @@ function ChatConv(id : string | null) {
   }, [id]);
 
   /////////////////end point to get owner image/////////////////////////////
-  const [Owner, OwnerImage] = useState<string>(
-  );
-  
-  const [admins, setAdmines] = useState<string[]>([
-  ]);
+  const [Owner, OwnerImage] = useState<string>();
+
+  const [admins, setAdmines] = useState<string[]>([]);
   const fetchownerimage = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/chat/settings/staff",
-      {
-        withCredentials: true,
-        params : {
-          id: id,
+      const response = await axios.get(
+        "http://localhost:3001/chat/settings/staff",
+        {
+          withCredentials: true,
+          params: {
+            id: id,
+          },
         }
-      },
       );
       if (response.status === 200) {
-        console.log("tkharbi9a", response.data)
+        console.log("tkharbi9a", response.data);
         OwnerImage(response.data.owner.photo);
-        const adminPhotos: string[] = response.data.admins.map((admin: any) => admin.photo);
+        const adminPhotos: string[] = response.data.admins.map(
+          (admin: any) => admin.photo
+        );
         console.log("test allah allah", adminPhotos);
         setAdmines(adminPhotos);
       } else {
@@ -107,29 +109,31 @@ function ChatConv(id : string | null) {
   //   fetchadminesimage();
   // }, []);
 
-  const [muteStatue, setMuteStatu] = useState<boolean>(false);
+  const [muteStatue, setMuteStatu] = useState<boolean | undefined>(false);
   const [admine, setAdmine] = useState<boolean>(false);
 
   //////////endpoint to get all memebres in room exept admines and owner////////////////
-  const [members, setMembers] = useState<Members[]>([
-  ]);
+  const [members, setMembers] = useState<Members[]>([]);
   const [exist, setexist] = useState<boolean>(false);
   //////////////////////////fetching memebers data///////////////////////////////
   const fetchmemberdata = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/chat/settings/members", 
-      {
-        withCredentials: true,
-        params : {
-          id: id,
+      const response = await axios.get(
+        "http://localhost:3001/chat/settings/members",
+        {
+          withCredentials: true,
+          params: {
+            id: id,
+          },
         }
-      },
       );
       if (response.status === 200) {
+        console.log("to test :", response.data);
         const newMembers: Members[] = response.data.map((member: any) => ({
           id: member.id,
           nickname: member.userName, // Assuming userName is mapped to nickname
-          memberImage: member.photo, // Assuming photo is mapped to memberImage
+          memberImage: member.photo,
+          isMuted: member.isMuted, // Assuming photo is mapped to memberImage
         }));
         setMembers(newMembers);
       } else {
@@ -145,20 +149,22 @@ function ChatConv(id : string | null) {
   ///////////////////////////////////////////////////////////////////////////
 
   //////////end point to get mutestatue and adminestatus//////////////
-  const fetchMuteAndAdmine = async (id: number) => {
+  const fetchMuteAndAdmine = async () => {
     try {
-      const response = await axios.post(
-        "http://localhost:3001/",
-        {
-          id,
-        },
+      const response = await axios.get(
+        "http://localhost:3001/chat/settings/members/infos",
         {
           withCredentials: true,
+          params: {
+            id: id,
+            userId: data?.id,
+          },
         }
       );
       if (response.status === 200) {
-        setMuteStatu(response.data.mute);
-        setAdmine(response.data.admine);
+        console.log(response.data);
+        setMuteStatu(response.data.isMuted);
+        if (rol === true && response.data.role === "USER") setAdmine(false);
       } else {
         console.log("Failed to fetch member data");
       }
@@ -169,25 +175,36 @@ function ChatConv(id : string | null) {
 
   const [data, setData] = useState<Members>();
 
+  useEffect(() => {
+    if (data && exist) {
+      fetchMuteAndAdmine();
+    }
+  }, [data]);
+
   function makeModifications(memberdata: Members) {
-    // fetchMuteAndAdmine(memberdata.id);
-    setexist(true);
     setData({
       id: memberdata.id,
       nickname: memberdata.nickname,
       memberImage: memberdata.memberImage,
+      isMuted: memberdata.isMuted,
     });
+    setexist(true);
   }
 
   /////////endpoint to post mute statue//////////////
 
-  const postmute = (id: number | undefined) => {
+  const postmute = () => {
     const sendmute = async () => {
       try {
+        if (!data) {
+          return;
+        }
+        console.log("this is the id befor", id);
         const response = await axios.post(
-          "http://localhost:3001/",
+          "http://localhost:3001/chat/settings/mute",
           {
-            id,
+            roomId: id,
+            userId: data.id,
           },
           {
             withCredentials: true,
@@ -205,16 +222,21 @@ function ChatConv(id : string | null) {
         );
       }
     };
+    sendmute();
     setexist(false);
   };
   /////////endpoint to post kick//////////////
-  const postkick = (id: number | undefined) => {
+  const postkick = () => {
     const sendkick = async () => {
       try {
+        if (!data) {
+          return;
+        }
         const response = await axios.post(
-          "http://localhost:3001/",
+          "http://localhost:3001/chat/settings/kick",
           {
-            id,
+            roomId: id,
+            userId: data.id,
           },
           {
             withCredentials: true,
@@ -231,14 +253,15 @@ function ChatConv(id : string | null) {
         );
       }
     };
+    sendkick();
     setexist(false);
   };
   /////////endpoint to post  ban//////////////
-  const postban = (id: number | undefined) => {
+  const postban = () => {
     const sendban = async () => {
       try {
         const response = await axios.post(
-          "http://localhost:3001/",
+          "http://localhost:3001/chat/settings/ban",
           {
             id,
           },
@@ -410,19 +433,19 @@ function ChatConv(id : string | null) {
                           </div>
                           <div className="flex  space-x-1 items-center justify-around">
                             <button
-                              onClick={() => postmute(data?.id)}
+                              onClick={() => postmute()}
                               className="w-[80px] bg-[#F87B3F] rounded-lg bg-opacity-50 hover:bg-opacity-100"
                             >
                               {muteStatue ? <div>unmute</div> : <div>mute</div>}
                             </button>
                             <button
-                              onClick={() => postkick(data?.id)}
+                              onClick={() => postkick()}
                               className="w-[80px] bg-[#F87B3F] rounded-lg bg-opacity-50 hover:bg-opacity-100"
                             >
                               kick
                             </button>
                             <button
-                              onClick={() => postban(data?.id)}
+                              onClick={() => postban()}
                               className="w-[80px] bg-[#F87B3F] rounded-lg bg-opacity-50 hover:bg-opacity-100"
                             >
                               ban
