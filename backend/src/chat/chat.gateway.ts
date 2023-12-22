@@ -3,7 +3,7 @@ import { ChatService } from './chat.service';
 import { AuthService } from 'src/auth/auth.service';
 import { userIdDTO } from 'src/user/dto/userId.dto';
 import { UserService } from 'src/user/user.service';
-import { UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import {
   WebSocketGateway,
   SubscribeMessage,
@@ -12,8 +12,10 @@ import {
   OnGatewayDisconnect,
   OnGatewayConnection,
 } from '@nestjs/websockets';
-import { JwtService } from '@nestjs/jwt';
+import { JwtService, TokenExpiredError } from '@nestjs/jwt';
+import { PrismaService } from 'src/prisma/prisma.service';
 
+@Injectable()
 @WebSocketGateway({
   cors: {
     origin: '*',
@@ -22,9 +24,10 @@ import { JwtService } from '@nestjs/jwt';
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
-    private readonly chatService: ChatService,
-    private authService: AuthService,
-    private userService: UserService,
+    // private readonly chatService: ChatService,
+    // private authService: AuthService,
+    private prisma: PrismaService,
+    // private userService: UserService,
     private jwtService: JwtService,
   ) {}
 
@@ -33,12 +36,32 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   userToClient = new Map<number, string>();
 
-  private extractTokenFromCookies(cookies: any): string | null {
+  extractTokenFromCookies(cookies: any): string | null {
     const accessToken = cookies.split('=')[1].replace(/"/g, '');
     if (accessToken)
       return accessToken;
     return null;
   }
+
+  async findUserByIntraId(userId: string) {
+    try {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                intraId: userId,
+            },
+            include: {
+                level: true,
+            }
+        });
+        if (user) {
+            delete user.hash;
+            return user;
+        } else return user;
+    } catch (error) {
+        // check prisma error status code
+        console.error('Error finding user: ', error);
+    }
+}
 
   async handleConnection(client: Socket) {
     // Handle connection event
@@ -54,7 +77,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (!verifiedToken)
         return this.disconnect(client);
 
-      const user = await this.userService.findUserByIntraId(verifiedToken.userId)
+      const user = await this.findUserByIntraId(verifiedToken.userId)
       if (!user)
         return this.disconnect(client);
 
@@ -94,4 +117,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.server.emit('conversation', messageContent);
     }
   }
+
+  @SubscribeMessage('notifications')
+  async notifications(@MessageBody() data: any) {
+    const { senderId, reciverId, content } = data;
+    this.server.to(this.userToClient[reciverId]).emit('notifications', content);
+  }
+
 }

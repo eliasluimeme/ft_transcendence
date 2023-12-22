@@ -307,13 +307,21 @@ export class ChatService {
             if (!role)
                 throw new NotFoundException('Room does not exist')
 
-            // if (role)
-            const owner = role.find(user => user.role === 'OWNER');
+            const room = await this.prisma.chatroom.findUnique({
+                where: {
+                    id: roomId,
+                },
+                select: { visibility: true }
+            })
 
-            const admins = role.filter(user => user.role === 'ADMIN');
-            if (admins[0])
-                return { owner: owner.user , admins: admins.map(admin => admin.user) };
-            else return { owner: owner.user , admins: null };
+            if (room.visibility !== VISIBILITY.DM) {
+                const owner = role.find(user => user.role === 'OWNER');
+                const admins = role.filter(user => user.role === 'ADMIN');
+                if (admins[0])
+                    return { owner: owner.user , admins: admins.map(admin => admin.user) };
+                else return { owner: owner.user , admins: null };
+            } else 
+                return { id: roomId, visibility: room.visibility };
         } catch (error) {
             if ( error instanceof NotFoundException )
                 throw error;
@@ -345,22 +353,24 @@ export class ChatService {
             if (!groupChatUsers)
                 throw new NotFoundException('Room does not exist')
 
-            if ( groupChatUsers.ChatroomUsers.find(user => user.userId === userId).role === 'OWNER' ) {
-                return groupChatUsers.ChatroomUsers.map( user => {
-                    if ( (user.role === 'ADMIN' || user.role === 'USER') && !user.isBanned ) {
-                        const { id, userName, photo } = user.user;
-                        return { id, userName, photo, role: user.role };
-                    }
-                    return null
-                }).filter(user => user !== null);
-            } else if ( groupChatUsers.ChatroomUsers.find(user => user.userId === userId).role === 'ADMIN' ) {
-                return groupChatUsers.ChatroomUsers.map( user => {
-                    if ( user.role === 'USER' && !user.isBanned ) {
-                        const { id, userName, photo } = user.user;
-                        return { id, userName, photo, role: user.role };
-                    }
-                    return null
-                }).filter(user => user !== null);
+            if ( groupChatUsers.ChatroomUsers.find(user => user.userId === userId) ) {
+                if (groupChatUsers.ChatroomUsers.find(user => user.userId === userId).role === 'OWNER')
+                    return groupChatUsers.ChatroomUsers.map( user => {
+                        if ( (user.role === 'ADMIN' || user.role === 'USER') && !user.isBanned ) {
+                            const { id, userName, photo } = user.user;
+                            return { id, userName, photo, role: user.role };
+                        }
+                        return null
+                    }).filter(user => user !== null);
+            } if ( groupChatUsers.ChatroomUsers.find(user => user.userId === userId) ) {
+                if (groupChatUsers.ChatroomUsers.find(user => user.userId === userId).role === 'ADMIN')
+                    return groupChatUsers.ChatroomUsers.map( user => {
+                        if ( user.role === 'USER' && !user.isBanned ) {
+                            const { id, userName, photo } = user.user;
+                            return { id, userName, photo, role: user.role };
+                        }
+                        return null
+                    }).filter(user => user !== null);
             } else return null;
            
         } catch (error) {
@@ -426,24 +436,34 @@ export class ChatService {
                 throw new ForbiddenException('You are not allowed to mute members')
             if (!user.chatroom.ChatroomUsers.find( user => user.userId === memberId))
                 throw new ForbiddenException('Member does not exist')
-            if (user.chatroom.ChatroomUsers.find( user => user.userId === memberId).isMuted === true)
-                throw new ForbiddenException('Member already muted')
+            // if (user.chatroom.ChatroomUsers.find( user => user.userId === memberId).isMuted === true)
+            //     throw new ForbiddenException('Member already muted')
 
             const chatRoomUserId = user.chatroom.ChatroomUsers.find( user => user.userId === memberId).id;
+            const status = user.chatroom.ChatroomUsers.find( user => user.userId === memberId).isMuted;
 
-            return await this.prisma.chatroomUsers.update({
-                where: {
-                    id: chatRoomUserId,
-                },
-                data: {
-                    isMuted: true,
-                }
-            }).then(() => {
-                return { success: true, message: 'Member muted' }
-            }).catch((error) => {
-                console.log(error);
-                throw new BadRequestException('Something went wrong')
-            })
+            let update: any;
+            if (status) {
+                update = await this.prisma.chatroomUsers.update({
+                    where: {
+                        id: chatRoomUserId,
+                    },
+                    data: {
+                        isMuted: false,
+                    }
+                })
+            }
+            else {
+                update = await this.prisma.chatroomUsers.update({
+                    where: {
+                        id: chatRoomUserId,
+                    },
+                    data: {
+                        isMuted: true,
+                    }
+                })
+            }
+            return {isMuted: update.isMuted}
         }).catch( (error) => {
             if (error instanceof ForbiddenException || error instanceof NotFoundException)
                 throw error;
@@ -755,6 +775,25 @@ export class ChatService {
                 return { success: true, message: 'Password disabled' }
             else throw new BadRequestException('Something went wrong. Please try again');
         } catch (error) {
+            console.log(error)
+        }
+    }
+
+    async leaveRoom(userId: number, roomId: number) {
+        try {
+            const user = await this.prisma.chatroomUsers.deleteMany({
+                where: {
+                    userId: userId,
+                    chatroomId: roomId,
+                }
+            })
+
+            if (user)
+                return { success: true, message: 'User left' }
+            else throw new BadRequestException('Something went wrong. Please try again');
+        } catch (error) {
+            if (error instanceof BadRequestException)
+                throw error;
             console.log(error)
         }
     }
