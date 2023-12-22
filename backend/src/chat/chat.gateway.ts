@@ -12,6 +12,7 @@ import {
   OnGatewayDisconnect,
   OnGatewayConnection,
 } from '@nestjs/websockets';
+// import { MESSAGES } from '@nestjs/core/constants';
 
 @WebSocketGateway({
   cors: {
@@ -70,18 +71,22 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handelConversation(@MessageBody() data: any) {
     console.log('data is ++++++++++++++=');
     const { senderId, reciverId, messageContent, type } = data;
-    console.log('data is ', data);
+    // console.log('data is ', data);
     if (type === 'DM') {
-      console.log('data is ', senderId);
+      // this.server.on('conversation', (messageContent) => {
+      // console.log('data is ', reciverId);
+      // console.log('data is ', senderId);
       this.server
         .to(this.userToClient[senderId])
-        .emit('received', messageContent);
+        .emit('conversation', messageContent);
       this.server
         .to(this.userToClient[reciverId])
-        .emit('received', messageContent);
-      console.log('data is ', data);
+        .emit('conversation', messageContent);
+      console.log('data is ', messageContent);
+      // });
+      // this.server.emit('received', messageContent);
     } else if (type === 'GROUP') {
-      this.server.emit('received', messageContent);
+      this.server.emit('conversation', messageContent);
     }
   }
 }
