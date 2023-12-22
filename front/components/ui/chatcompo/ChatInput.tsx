@@ -9,6 +9,7 @@ import Image from "next/image";
 const socket = io("http://localhost:3001/chat");
 
 interface Messages {
+  messageContent: string
   senderId: string
   reciverId: string
   type: string
@@ -21,25 +22,26 @@ const ChatInput = () => {
   const [messages, setMessages] = useState<any[]>([]);
   
   // console.log(messages);
-  // useEffect(() => {
-  //   console.log("Connecting to socket...");
-  //   // socket.on('conversation', (data) => {
-  //   //   setMessages((prevMessages) =>[...prevMessages, data]);});
-
-  //     console.log(messages);
-
-  //   }, [messages]);
-    
-    const handleSubmit = (senderId: string, reciverId: string, messageContent: string, type: string) => {
-      console.log("send MSG: from ", senderId, "to ", reciverId, messageContent, type);
-      socket.emit('conversation', {senderId, reciverId, messageContent, type});
-      setMessage("");
-      socket.on('conversation', (message) => {
-        console.log("Received message: From " , message);
-        setMessages((prevMess) => [...prevMess, message]);
-      });
+  
+  const handleSubmit = (senderId: string, reciverId: string, messageContent: string, type: string) => {
+    console.log("send MSG: from ", senderId, "to ", reciverId, messageContent, type);
+    setMessages((prevMess) => [...prevMess, messageContent]);
+    socket.emit('conversation', {senderId, reciverId, messageContent, type});
+    setMessage("");
   };
 
+  useEffect(() => {
+    console.log("Connecting to socket...");
+    // socket.on('conversation', (data) => {
+    //   setMessages((prevMessages) =>[...prevMessages, data]);});
+
+    
+    socket.on('recieve', () => {
+      setMessages((prevMess) => [...prevMess, message]);
+    });
+  }, [messages, message]);
+  
+  // console.log("historique ======", messages);
   
   return (
     
@@ -77,9 +79,9 @@ const ChatInput = () => {
           >
             <TextareaAutosize
               ref={textareaRef}
-              rows={1}
+              rows={4}
               value={message}
-              onChange={(message) => setMessage(message.target.value)}
+              onChange={(e) => setMessage(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   console.log("This is message : ", message);

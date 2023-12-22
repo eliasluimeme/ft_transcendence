@@ -72,15 +72,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const { senderId, reciverId, messageContent, type } = data;
     console.log('data is ', data);
     if (type === 'DM') {
+      console.log('data is ', senderId);
       this.server
         .to(this.userToClient[senderId])
-        .emit('conversation', messageContent);
+        .emit('received', messageContent);
       this.server
         .to(this.userToClient[reciverId])
-        .emit('conversation', messageContent);
+        .emit('received', messageContent);
       console.log('data is ', data);
     } else if (type === 'GROUP') {
-      this.server.emit('conversation', messageContent);
+      this.server.emit('received', messageContent);
     }
   }
 }
