@@ -12,10 +12,11 @@ import {
   OnGatewayDisconnect,
   OnGatewayConnection,
 } from '@nestjs/websockets';
+import { JwtService } from '@nestjs/jwt';
 
 @WebSocketGateway({
   cors: {
-    origin: 'http://localhost:3000',
+    origin: '*',
   },
   namespace: 'chat',
 })
@@ -24,6 +25,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly chatService: ChatService,
     private authService: AuthService,
     private userService: UserService,
+    private jwtService: JwtService,
   ) {}
 
   @WebSocketServer()
@@ -31,25 +33,35 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   userToClient = new Map<number, string>();
 
+  private extractTokenFromCookies(cookies: any): string | null {
+    const accessToken = cookies.split('=')[1].replace(/"/g, '');
+    if (accessToken)
+      return accessToken;
+    return null;
+  }
+
   async handleConnection(client: Socket) {
     // Handle connection event
     try {
-      // const decodedToken = await this.authService.verifyJwt(
-      //   client.handshake.headers.cookie,
-      // ); //  TODO : Endpoint to verify JWT
-      // const user: userIdDTO = await this.userService.getOne(
-      //   decodedToken.user.id,
-      // ); // TODO endpoint to get user
-      const user = { id: 1 };
-      if (!user) {
+      const token = this.extractTokenFromCookies(client.handshake.headers.cookie);
+      if (!token)
         return this.disconnect(client);
-      } else {
-        //////////////////////
-        this.userToClient.set(user.id, client.id);
-      }
+
+      const verifiedToken = await this.jwtService.verifyAsync(
+        token,
+        { secret: process.env.JWT_SECRET },
+      );
+      if (!verifiedToken)
+        return this.disconnect(client);
+
+      const user = await this.userService.findUserByIntraId(verifiedToken.userId)
+      if (!user)
+        return this.disconnect(client);
+
+      this.userToClient.set(user.id, client.id);
       console.log(client.id, 'successfully connected ');
-      // if (!client.handshake.headers.cookie) client.disconnect();
-    } catch {
+    } catch (error) {
+      console.log("erroooor: ", error);
       return this.disconnect(client);
     }
   }
@@ -68,7 +80,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('conversation')
   async handelConversation(@MessageBody() data: any) {
-    console.log('data is ++++++++++++++=');
     const { senderId, reciverId, messageContent, type } = data;
     console.log('data is ', data);
     if (type === 'DM') {

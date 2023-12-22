@@ -76,7 +76,7 @@ export class ChatController {
   @Post('/settings/unmute')
   @UseGuards(Jwt2faAuthGuard)
   async unmuteMember(@Req() req, @Body() body: any, @Res() res) {
-    res.json( await this.chatService.muteMember(req.user.id, parseInt(body.roomId), parseInt(body.userId)) );
+    res.json( await this.chatService.unmuteMember(req.user.id, parseInt(body.roomId), parseInt(body.userId)) );
   }
 
   @Post('/settings/kick')
@@ -89,6 +89,18 @@ export class ChatController {
   @UseGuards(Jwt2faAuthGuard)
   async banMember(@Req() req, @Body() body: any, @Res() res) {
     res.json( await this.chatService.banMember(req.user.id, parseInt(body.roomId), parseInt(body.userId)) );
+  }
+
+  @Post('/settings/update')
+  @UseGuards(Jwt2faAuthGuard)
+  async changeRoomPw(@Req() req, @Body() body: any, @Res() res) {
+    res.json( await this.chatService.changeRoomPw(req.user.id, parseInt(body.roomId), body.pw) );
+  }
+
+  @Post('/settings/disable')
+  @UseGuards(Jwt2faAuthGuard)
+  async disableRoomPw(@Req() req, @Body() body: any, @Res() res) {
+    res.json( await this.chatService.disableRoomPw(req.user.id, parseInt(body.roomId)) );
   }
 
 }

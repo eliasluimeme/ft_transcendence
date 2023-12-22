@@ -30,7 +30,7 @@ const JoinRoom = () => {
       if (response.status === 201) {
         setRoomId(response.data.id);
         console.log("success:", roomId);
-        router.refresh();
+        router.push('/chat/chatconv?id=' + roomId);
       } else {
         console.log("Failed to fetch group data");
       }
