@@ -68,7 +68,6 @@ function ChatConv(id: string | null) {
         }
       );
       if (response.status === 200) {
-        console.log("tkharbi9a", response.data);
         OwnerImage(response.data.owner.photo);
         const adminPhotos: string[] = response.data.admins.map(
           (admin: any) => admin.photo
@@ -85,29 +84,6 @@ function ChatConv(id: string | null) {
   useEffect(() => {
     fetchownerimage();
   }, [id]);
-
-  /////////////////////////end point to get admines images////////////////////
-
-  // const fetchadminesimage = async () => {
-  //   try {
-  //     const response = await axios.get("http://localhost:3001/", {
-  //       withCredentials: true,
-  //     });
-  //     if (response.status === 200) {
-  //       const newAdmines: string[] = response.data.map((admines: any) => ({
-  //         image: admines.image,
-  //       }));
-  //       setAdmines(newAdmines);
-  //     } else {
-  //       console.log("Failed to fetch member data");
-  //     }
-  //   } catch (error) {
-  //     console.error("An error occurred while fetching member data:", error);
-  //   }
-  // };
-  // useEffect(() => {
-  //   fetchadminesimage();
-  // }, []);
 
   const [muteStatue, setMuteStatu] = useState<boolean | undefined>(false);
   const [admine, setAdmine] = useState<boolean>(false);
@@ -481,6 +457,23 @@ function ChatConv(id: string | null) {
                           className="w-full h-full text-[13px]  "
                         >
                           ADD
+                        </button>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-center space-x-4 border h-[50px] rounded-lg">
+                      <div className="text-[14px]">change password : </div>
+                      <input
+                        type="text"
+                        value={frdName}
+                        onChange={handleFrNme}
+                        className="border-color: rgb(255 255 255) bg-transparent border rounded-full text-[15px]  border-gray-500 text-gray-500"
+                      />
+                      <div className="flex h-[30px] w-[100px] bg-[#F77B3F] bg-opacity-50 hover:bg-opacity-100 rounded-lg ">
+                        <button
+                          onClick={() => send_data()}
+                          className="w-full h-full text-[13px]  "
+                        >
+                          change
                         </button>
                       </div>
                     </div>
