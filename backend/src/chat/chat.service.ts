@@ -673,29 +673,39 @@ export class ChatService {
         }).then( async (user) => {
             if (!user)
                 throw new NotFoundException('Room does not exist')
-            if (user.role !== 'OWNER' && user.role !== 'ADMIN')
+            if (user.role !== 'OWNER')
                 throw new ForbiddenException('You are not allowed to add admins to this room')
             if (!user.chatroom.ChatroomUsers.find( user => user.userId === memberId))
                 throw new ForbiddenException('Member does not exist')
-            if (user.chatroom.ChatroomUsers.find( user => user.role === "ADMIN"))
-                throw new ForbiddenException('Member already admin')
+            // if (user.chatroom.ChatroomUsers.find( user => user.userId === memberId).role === 'ADMIN')
+            //     throw new ForbiddenException('Member already admin')
 
             const chatRoomUserId = user.chatroom.ChatroomUsers.find( user => user.userId === memberId).id;
+            const role = user.chatroom.ChatroomUsers.find( user => user.userId === memberId).role;
 
-            await this.prisma.chatroomUsers.update({
-                where: {
-                    id: chatRoomUserId,
-                },
-                data: {
-                    role: 'ADMIN',
-                }
-            }).then(() => {
-                return { success: true, message: 'Admin added' }
-            }).catch((error) => {
-                console.log(error);
-                throw new BadRequestException('Something went wrong')
-            })
+            let update: any;
+            if (role === 'ADMIN') {
+                update = await this.prisma.chatroomUsers.update({
+                    where: {
+                        id: chatRoomUserId,
+                    },
+                    data: {
+                        role: 'USER',
+                    }
+                })
+            } else if (role === 'USER') {
+                update = await this.prisma.chatroomUsers.update({
+                    where: {
+                        id: chatRoomUserId,
+                    },
+                    data: {
+                        role: 'ADMIN',
+                    }
+                })
+            }
 
+            if (update)
+                return { role: update.role }
         }).catch( (error) => {
             if (error instanceof ForbiddenException || error instanceof NotFoundException)
                 throw error;
@@ -794,6 +804,51 @@ export class ChatService {
         } catch (error) {
             if (error instanceof BadRequestException)
                 throw error;
+            console.log(error)
+        }
+    }
+
+    async addMember(userId: number, roomId: number, memberName: string) {
+        try {
+            const room = await this.prisma.chatroom.findUnique({
+                where: {
+                    id: roomId,
+                },
+                include: {
+                    ChatroomUsers: true,
+                }
+            });
+            if (!room) throw new BadRequestException('Room does not exist');
+            // if (room.ChatroomUsers.find(user => user.userId === userId).role !== 'OWNER')
+            //     throw new ForbiddenException('You are not allowed to add members')
+
+            const member = await this.prisma.user.findUnique({
+                where: {
+                    userName: memberName,
+                }
+            })
+            if (!member) throw new BadRequestException('User does not exist');
+
+            const memberInRoom = await this.prisma.chatroomUsers.findFirst({
+                where: {
+                    userId: member.id,
+                    chatroomId: roomId,
+                }
+            })
+            if (memberInRoom) throw new ForbiddenException('User already in room');
+
+            const newMember = await this.prisma.chatroomUsers.create({
+                data: {
+                    // userId: { connect: { id: member.id }},
+                    userId: member.id,
+                    chatroomId: roomId,
+                }
+            })
+            console.log('new member', newMember)
+            return newMember
+        } catch (error) {
+            if (error instanceof BadRequestException || error instanceof ForbiddenException)
+                throw error
             console.log(error)
         }
     }
