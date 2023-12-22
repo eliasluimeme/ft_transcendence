@@ -11,6 +11,8 @@ import { ChatService } from './chat/chat.service';
 import { ChatController } from './chat/chat.controller';
 import { ChatModule } from './chat/chat.module';
 import { join } from 'path';
+import { ChatGateway } from './chat/chat.gateway';
+import { JwtModule } from '@nestjs/jwt';
 
 
 @Module({
@@ -23,6 +25,7 @@ import { join } from 'path';
   })],
   controllers: [AppController, ChatController],
   providers: [ AppService, ChatService ]
+
 
 })
 export class AppModule {}

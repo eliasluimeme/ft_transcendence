@@ -4,10 +4,14 @@ import * as fs from 'fs';
 import { Observable, of } from 'rxjs';
 import { CLIENT_RENEG_LIMIT } from 'tls';
 import { settingsDTO } from './dto/settings.dto';
+// import { ChatGateway } from 'src/chat/chat.gateway';
 
 @Injectable()
 export class UserService {
-    constructor(private prisma: PrismaService) {}
+    constructor(
+        private prisma: PrismaService, 
+        // private chatGateway: ChatGateway,
+        ) {}
 
     async createIntraUser(profile: any) {
         try {
@@ -767,11 +771,21 @@ export class UserService {
         }
     }
 
-    // unfriend
-    // sent friend requests to yourself
-    // if blocked nnot found
-    // if already friends unfried
-    // when request accepted 
+    async gameInvite( userId: number, opponentId: number) {
+        try {
+            // const invite = await this.chatGateway.notifications({
+            //     senderId: userId,
+            //     reciverId: opponentId,
+            //     content: 'Game invite',
+            // });
+            // console.log(invite);
+        } catch(error) {
+            console.log('error inviting user: ', error);
+            throw error;
+        }
+    }
+
+    // accept game invite
 
     // async createLocalUser(dto: AuthDto) {
     //     try {

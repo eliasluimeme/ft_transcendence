@@ -219,6 +219,7 @@ function ChatConv(id: string | null) {
           }
         );
         if (response.status === 201) {
+          
         } else {
           console.log("Failed to fetch friendship data");
         }
@@ -321,15 +322,17 @@ function ChatConv(id: string | null) {
   const send_data = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:3001/",
+        "http://localhost:3001/chat/settings/add/member",
         {
-          frdName,
+          roomId: id,
+          userName: frdName,
         },
         {
           withCredentials: true,
         }
       );
       if (response.status === 201) {
+        console.log("success:", response.data);
       } else {
         console.log("Failed to fetch friendship data");
       }

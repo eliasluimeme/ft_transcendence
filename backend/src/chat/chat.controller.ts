@@ -75,11 +75,11 @@ export class ChatController {
     res.json( await this.chatService.muteMember(req.user.id, parseInt(body.roomId.id), parseInt(body.userId)) );
   }
 
-  @Post('/settings/unmute')
-  @UseGuards(Jwt2faAuthGuard)
-  async unmuteMember(@Req() req, @Body() body: any, @Res() res) {
-    res.json( await this.chatService.muteMember(req.user.id, parseInt(body.roomId), parseInt(body.userId)) );
-  }
+  // @Post('/settings/unmute')
+  // @UseGuards(Jwt2faAuthGuard)
+  // async unmuteMember(@Req() req, @Body() body: any, @Res() res) {
+  //   res.json( await this.chatService.unmuteMember(req.user.id, parseInt(body.roomId), parseInt(body.userId)) );
+  // }
 
   @Post('/settings/kick')
   @UseGuards(Jwt2faAuthGuard)
@@ -91,6 +91,38 @@ export class ChatController {
   @UseGuards(Jwt2faAuthGuard)
   async banMember(@Req() req, @Body() body: any, @Res() res) {
     res.json( await this.chatService.banMember(req.user.id, parseInt(body.roomId), parseInt(body.userId)) );
+  }
+
+  @Post('/settings/leave')
+  @UseGuards(Jwt2faAuthGuard)
+  async leaveRoom(@Req() req, @Body() param, @Res() res) {
+    console.log('body', param)
+    res.json( await this.chatService.leaveRoom(req.user.id, parseInt(param.id)) );
+  }
+
+  @Post('/settings/update')
+  @UseGuards(Jwt2faAuthGuard)
+  async changeRoomPw(@Req() req, @Body() body: any, @Res() res) {
+    res.json( await this.chatService.changeRoomPw(req.user.id, parseInt(body.roomId), body.pw) );
+  }
+
+  @Post('/settings/disable')
+  @UseGuards(Jwt2faAuthGuard)
+  async disableRoomPw(@Req() req, @Body() body: any, @Res() res) {
+    res.json( await this.chatService.disableRoomPw(req.user.id, parseInt(body.roomId)) );
+  }
+
+  @Post('/settings/add/admin')
+  @UseGuards(Jwt2faAuthGuard)
+  async setAdmin(@Req() req, @Body() body: any, @Res() res) {
+    res.json( await this.chatService.addAdmin(req.user.id, parseInt(body.roomId), parseInt(body.userId)) );
+  }
+
+  @Post('/settings/add/member')
+  @UseGuards(Jwt2faAuthGuard)
+  async addMember(@Req() req, @Body() body: any, @Res() res) {
+    console.log(body)
+    res.json( await this.chatService.addMember(req.user.id, parseInt(body.roomId.id), body.userName) );
   }
 
 }

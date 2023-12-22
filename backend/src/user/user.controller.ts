@@ -178,4 +178,10 @@ export class UserController {
             throw error;
         }
     }
+
+    @Post('game/invite')
+    @UseGuards(Jwt2faAuthGuard)
+    async gameInvite(@Req() req, @Body() body: any, @Res() res) {
+      res.json( await this.userService.gameInvite(req.user.id, body) );
+    }
 }

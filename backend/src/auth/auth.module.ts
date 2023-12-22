@@ -8,6 +8,7 @@ import { UserService } from "src/user/user.service";
 import { LocalStrategy } from "./strategies/local.strategy";
 import { JwtStrategy } from "./strategies/jwt.strategy";
 import { Jwt2faStrategy } from "./strategies/jwt-2fa.strategy";
+import { UserModule } from "src/user/user.module";
 
 @Module({
   imports: [ 
