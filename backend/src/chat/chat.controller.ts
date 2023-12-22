@@ -64,13 +64,15 @@ export class ChatController {
   @Get('/settings/members/infos')
   @UseGuards(Jwt2faAuthGuard)
   async getMemberInfos(@Req() req, @Query() param, @Res() res) {
+    console.log("params :",param)
     res.json( await this.chatService.getMembersInfos(req.user.id, parseInt(param.id.id), parseInt(param.userId)) );
   }
 
   @Post('/settings/mute')
   @UseGuards(Jwt2faAuthGuard)
   async muteMember(@Req() req, @Body() body: any, @Res() res) {
-    res.json( await this.chatService.muteMember(req.user.id, parseInt(body.roomId), parseInt(body.userId)) );
+    console.log("booody :",body)
+    res.json( await this.chatService.muteMember(req.user.id, parseInt(body.roomId.id), parseInt(body.userId)) );
   }
 
   @Post('/settings/unmute')
@@ -82,7 +84,7 @@ export class ChatController {
   @Post('/settings/kick')
   @UseGuards(Jwt2faAuthGuard)
   async kickMember(@Req() req, @Body() body: any, @Res() res) {
-    res.json( await this.chatService.kickMember(req.user.id, parseInt(body.roomId), parseInt(body.userId)) );
+    res.json( await this.chatService.kickMember(req.user.id, parseInt(body.roomId.id), parseInt(body.userId)) );
   }
 
   @Post('/settings/ban')
