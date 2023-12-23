@@ -13,10 +13,12 @@ import { ChatModule } from './chat/chat.module';
 import { join } from 'path';
 import { ChatGateway } from './chat/chat.gateway';
 import { JwtModule } from '@nestjs/jwt';
+import { ScheduleModule } from '@nestjs/schedule';
 
 
 @Module({
   imports: [AuthModule, UserModule, PrismaModule, MulterModule, ChatModule,
+    ScheduleModule.forRoot(),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'uploads'),
     }),

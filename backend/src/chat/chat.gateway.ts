@@ -37,7 +37,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   userToClient = new Map<number, string>();
 
   extractTokenFromCookies(cookies: any): string | null {
-    const accessToken = cookies.split('=')[1].replace(/"/g, '');
+    const accessToken = cookies?.split('=')[1].replace(/"/g, '');
     if (accessToken)
       return accessToken;
     return null;
