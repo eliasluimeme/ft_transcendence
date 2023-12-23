@@ -301,20 +301,20 @@ function ChatConv(oldeId: any) {
     ////end point need to takke th id os the main user
     const sendleave = async () => {
       try {
-        if (!data) {
-          return;
-        }
+        // if (!data) {
+        //   return;
+        // }
         const response = await axios.post(
           "http://localhost:3001/chat/settings/leave",
           {
             roomId: id,
-            userId: data.id,
           },
           {
             withCredentials: true,
           }
         );
         if (response.status === 201) {
+          router.push('/chat/')
         } else {
           console.log("Failed to fetch friendship data");
         }
@@ -544,7 +544,7 @@ function ChatConv(oldeId: any) {
                       onClick={() => posleave()}
                       className="w-[80px]  border rounded-lg bg-red-500"
                     >
-                      Leave
+                      Block
                     </button>
                   </div>
                 )}
