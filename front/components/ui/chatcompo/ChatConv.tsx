@@ -320,7 +320,7 @@ function ChatConv(id: string | null) {
         );
       }
     };
-    // sendleave();
+    sendleave();
     // setexist(false);
   };
 
