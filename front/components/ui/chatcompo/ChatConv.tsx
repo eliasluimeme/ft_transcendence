@@ -25,6 +25,7 @@ interface Members {
 function ChatConv(id: string | null) {
   console.log("id", id);
   /////////////////end point to get rol/////////////////////////////
+  const [typeofRoom, setTypofRoom] = useState<boolean>(true);
   const [rol, setrol] = useState(true);
   const fetchrol = async () => {
     try {
@@ -219,7 +220,6 @@ function ChatConv(id: string | null) {
           }
         );
         if (response.status === 201) {
-          
         } else {
           console.log("Failed to fetch friendship data");
         }
@@ -260,20 +260,24 @@ function ChatConv(id: string | null) {
     setexist(false);
   };
   /////////endpoint to post adminestatue//////////////
-  const postadmine = (id: number | undefined) => {
+  const postadmine = () => {
     const sendadmine = async () => {
+      if (!data) {
+        return;
+      }
       try {
         const response = await axios.post(
-          "http://localhost:3001/",
+          "http://localhost:3001/chat/settings/add/admin",
           {
-            id,
+            roomId: id,
+            userId: data.id,
           },
           {
             withCredentials: true,
           }
         );
         if (response.status === 201) {
-          setAdmine(response.data);
+          // setAdmine(response.data);
         } else {
           console.log("Failed to fetch friendship data");
         }
@@ -284,16 +288,22 @@ function ChatConv(id: string | null) {
         );
       }
     };
+    sendadmine();
     setexist(false);
   };
   /////////endpoint to post leaving room//////////////
-  const posleave = (id: number | undefined) => {
+  const posleave = () => {
+    ////end point need to takke th id os the main user
     const sendleave = async () => {
       try {
+        if (!data) {
+          return;
+        }
         const response = await axios.post(
-          "http://localhost:3001/",
+          "http://localhost:3001/chat/settings/leave",
           {
-            id,
+            roomId: id,
+            userId: id,
           },
           {
             withCredentials: true,
@@ -310,7 +320,8 @@ function ChatConv(id: string | null) {
         );
       }
     };
-    setexist(false);
+    // sendleave();
+    // setexist(false);
   };
 
   //////////////////ADD Freind//////////////////////////////
@@ -326,6 +337,33 @@ function ChatConv(id: string | null) {
         {
           roomId: id,
           userName: frdName,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+      if (response.status === 201) {
+        console.log("success:", response.data);
+      } else {
+        console.log("Failed to fetch friendship data");
+      }
+    } catch (error) {
+      console.error("An error occurred while fetching friendship data:", error);
+    }
+  };
+  /////////////////////////////change password///////////////////////////////
+  const [newPassword, setNewPassword] = useState("");
+  const handleNewPassword = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setNewPassword(event.target.value);
+  };
+
+  const sendNewPassword = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:3001/chat/settings/update",
+        {
+          roomId: id,
+          newPassword: newPassword,
         },
         {
           withCredentials: true,
@@ -433,7 +471,7 @@ function ChatConv(id: string | null) {
                               <div></div>
                             ) : (
                               <button
-                                onClick={() => postadmine(data?.id)}
+                                onClick={() => postadmine()}
                                 className="w-[80px] bg-[#F87B3F] rounded-lg bg-opacity-50 hover:bg-opacity-100"
                               >
                                 admine
@@ -463,26 +501,30 @@ function ChatConv(id: string | null) {
                         </button>
                       </div>
                     </div>
-                    <div className="flex items-center justify-center space-x-4 border h-[50px] rounded-lg">
-                      <div className="text-[14px]">change password : </div>
-                      <input
-                        type="text"
-                        value={frdName}
-                        onChange={handleFrNme}
-                        className="border-color: rgb(255 255 255) bg-transparent border rounded-full text-[15px]  border-gray-500 text-gray-500"
-                      />
-                      <div className="flex h-[30px] w-[100px] bg-[#F77B3F] bg-opacity-50 hover:bg-opacity-100 rounded-lg ">
-                        <button
-                          onClick={() => send_data()}
-                          className="w-full h-full text-[13px]  "
-                        >
-                          change
-                        </button>
+                    {typeofRoom ? (
+                      <div className="flex items-center justify-center space-x-4 border h-[50px] rounded-lg">
+                        <div className="text-[14px]">change password : </div>
+                        <input
+                          type="text"
+                          value={newPassword}
+                          onChange={handleNewPassword}
+                          className="border-color: rgb(255 255 255) bg-transparent border rounded-full text-[15px]  border-gray-500 text-gray-500"
+                        />
+                        <div className="flex h-[30px] w-[100px] bg-[#F77B3F] bg-opacity-50 hover:bg-opacity-100 rounded-lg ">
+                          <button
+                            onClick={() => sendNewPassword()}
+                            className="w-full h-full text-[13px]  "
+                          >
+                            change
+                          </button>
+                        </div>
                       </div>
-                    </div>
+                    ) : (
+                      <div></div>
+                    )}
                     <div className="flex items-center justify-center">
                       <button
-                        onClick={() => posleave(data?.id)}
+                        onClick={() => posleave()}
                         className="w-[80px]  rounded-lg bg-red-500 bg-opacity-50 hover:bg-opacity-100"
                       >
                         Leave
@@ -492,7 +534,7 @@ function ChatConv(id: string | null) {
                 ) : (
                   <div className="flex items-center justify-center">
                     <button
-                      onClick={() => posleave(data?.id)}
+                      onClick={() => posleave()}
                       className="w-[80px]  border rounded-lg bg-red-500"
                     >
                       Leave

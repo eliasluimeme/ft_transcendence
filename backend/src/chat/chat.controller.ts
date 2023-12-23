@@ -96,7 +96,7 @@ export class ChatController {
   @Post('/settings/leave')
   @UseGuards(Jwt2faAuthGuard)
   async leaveRoom(@Req() req, @Body() param, @Res() res) {
-    console.log('body', param)
+    console.log('aralhna', param)
     res.json( await this.chatService.leaveRoom(req.user.id, parseInt(param.id)) );
   }
 
@@ -115,7 +115,7 @@ export class ChatController {
   @Post('/settings/add/admin')
   @UseGuards(Jwt2faAuthGuard)
   async setAdmin(@Req() req, @Body() body: any, @Res() res) {
-    res.json( await this.chatService.addAdmin(req.user.id, parseInt(body.roomId), parseInt(body.userId)) );
+    res.json( await this.chatService.addAdmin(req.user.id, parseInt(body.roomId), parseInt(body.userId.id)) );
   }
 
   @Post('/settings/add/member')
