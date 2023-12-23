@@ -13,10 +13,11 @@ import {
   OnGatewayConnection,
 } from '@nestjs/websockets';
 // import { MESSAGES } from '@nestjs/core/constants';
+import { JwtService } from '@nestjs/jwt';
 
 @WebSocketGateway({
   cors: {
-    origin: 'http://localhost:3000',
+    origin: '*',
   },
   namespace: 'chat',
 })
@@ -25,6 +26,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly chatService: ChatService,
     private authService: AuthService,
     private userService: UserService,
+    private jwtService: JwtService,
   ) {}
 
   @WebSocketServer()
@@ -32,25 +34,34 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   userToClient = new Map<number, string>();
 
+  private extractTokenFromCookies(cookies: any): string | null {
+    const accessToken = cookies.split('=')[1].replace(/"/g, '');
+    if (accessToken) return accessToken;
+    return null;
+  }
+
   async handleConnection(client: Socket) {
     // Handle connection event
     try {
-      // const decodedToken = await this.authService.verifyJwt(
-      //   client.handshake.headers.cookie,
-      // ); //  TODO : Endpoint to verify JWT
-      // const user: userIdDTO = await this.userService.getOne(
-      //   decodedToken.user.id,
-      // ); // TODO endpoint to get user
-      const user = { id: 1 };
-      if (!user) {
-        return this.disconnect(client);
-      } else {
-        //////////////////////
-        this.userToClient.set(user.id, client.id);
-      }
+      const token = this.extractTokenFromCookies(
+        client.handshake.headers.cookie,
+      );
+      if (!token) return this.disconnect(client);
+
+      const verifiedToken = await this.jwtService.verifyAsync(token, {
+        secret: process.env.JWT_SECRET,
+      });
+      if (!verifiedToken) return this.disconnect(client);
+
+      const user = await this.userService.findUserByIntraId(
+        verifiedToken.userId,
+      );
+      if (!user) return this.disconnect(client);
+
+      this.userToClient.set(user.id, client.id);
       console.log(client.id, 'successfully connected ');
-      // if (!client.handshake.headers.cookie) client.disconnect();
-    } catch {
+    } catch (error) {
+      console.log('erroooor: ', error);
       return this.disconnect(client);
     }
   }
@@ -69,9 +80,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('conversation')
   async handelConversation(@MessageBody() data: any) {
-    console.log('data is ++++++++++++++=');
     const { senderId, reciverId, messageContent, type } = data;
     // console.log('data is ', data);
+    console.log('Here i am');
     if (type === 'DM') {
       // this.server.on('conversation', (messageContent) => {
       // console.log('data is ', reciverId);
@@ -81,8 +92,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         .emit('conversation', messageContent);
       this.server
         .to(this.userToClient[reciverId])
-        .emit('conversation', messageContent);
-      console.log('data is ', messageContent);
+        .emit('recieve', messageContent);
       // });
       // this.server.emit('received', messageContent);
     } else if (type === 'GROUP') {
@@ -90,3 +100,21 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 }
+
+// {
+//   "visibility": "DM",
+//   "users": [
+//       {
+//           "id": 2,
+//           "name": "yjaadoun",
+//           "photo": "https://cdn.intra.42.fr/users/84a3983c8aff058948b6b7a6f613584b/yjaadoun.jpg",
+//           "self": true
+//       },
+//       {
+//           "id": 4,
+//           "name": "ael-hajj",
+//           "photo": "https://cdn.intra.42.fr/users/ae7ac95c539d98e693cb8dc7c15327b3/ael-hajj.jpg",
+//           "self": false
+//       }
+//   ]
+// }

@@ -2,7 +2,8 @@ import {
   Body,
   Controller,
   Get,
-  Param,
+  // Param,
+  // Param,
   Post,
   Query,
   Req,
@@ -20,16 +21,10 @@ import { idDto } from './dto/id.dto';
 export class ChatController {
   constructor(private readonly chatService: ChatService) {}
 
-  // get conversations
-  // get conversations messages
-  // create group chat
-  // join group chat
-
   @Get('conversations')
   @UseGuards(Jwt2faAuthGuard)
   async getConversations(@Req() req, @Res() res) {
     const convos = await this.chatService.getConversations(req.user.id);
-    // console.log("conv:", convos);
     res.json(convos);
   }
 
@@ -37,12 +32,21 @@ export class ChatController {
   @UseGuards(Jwt2faAuthGuard)
   @UsePipes(ValidationPipe)
   async getConversationMessages(@Req() req, @Query() query: idDto, @Res() res) {
-    const messages = await this.chatService.getConversationMessages(
-      req.user.id,
-      parseInt(query.id),
+    res.json(
+      await this.chatService.getConversationMessages(
+        req.user.id,
+        parseInt(query.id),
+      ),
     );
-    console.log(messages[0].messages);
-    res.json(messages);
+  }
+
+  @Get('conversations/members')
+  @UseGuards(Jwt2faAuthGuard)
+  async getConvoMembers(@Req() req, @Query() query, @Res() res) {
+    console.log(query);
+    res.json(
+      await this.chatService.getConvoMembers(req.user.id, parseInt(query.id)),
+    );
   }
 
   @Post('create')
@@ -52,8 +56,7 @@ export class ChatController {
     @Body() body: CreateGroupChatDTO,
     @Res() res,
   ) {
-    const groupChat = await this.chatService.createGroupChat(req.user.id, body);
-    res.json(groupChat);
+    res.json(await this.chatService.createGroupChat(req.user.id, body));
   }
 
   @Post('join')
@@ -63,38 +66,55 @@ export class ChatController {
     @Body() body: CreateGroupChatDTO,
     @Res() res,
   ) {
-    const groupChat = await this.chatService.joinGroupChat(req.user.id, body);
-    res.json(groupChat);
+    res.json(await this.chatService.joinGroupChat(req.user.id, body));
   }
 
   @Post('leave')
   @UseGuards(Jwt2faAuthGuard)
   async leaveGroupChat(@Req() req, @Body() body: any, @Res() res) {
-    const groupChat = await this.chatService.leaveGroupChat(
-      req.user.id,
-      parseInt(body.roomId),
+    res.json(
+      await this.chatService.leaveGroupChat(req.user.id, parseInt(body.roomId)),
     );
-    res.json(groupChat);
   }
 
-  @Get('/settings')
+  @Get('/settings/role')
   @UseGuards(Jwt2faAuthGuard)
   async getRole(@Req() req, @Query() param, @Res() res) {
     console.log('settings', param);
-    const settings = await this.chatService.getChatMembers(
-      req.user.id,
-      parseInt(param.id),
+    // res.json(await this.chatService.getChatMembers(req.user.id, parseInt(param.id)));
+    res.json(
+      await this.chatService.getRole(req.user.id, parseInt(param.id.id)),
     );
-    res.json(settings);
   }
 
-  // Get('/settings/members')
-  // @UseGuards(Jwt2faAuthGuard)
-  // async getChatMembers(@Req() req, @Query() param, @Res() res) {
-  //   console.log('settings', param)
-  //   const settings = await this.chatService.getChatMembers(req.user.id, parseInt(param.id));
-  //   res.json(settings);
-  // }
+  @Get('/settings/staff')
+  @UseGuards(Jwt2faAuthGuard)
+  async getStaff(@Req() req, @Query() param, @Res() res) {
+    console.log('staff', param);
+    res.json(
+      await this.chatService.getStaff(req.user.id, parseInt(param.id.id)),
+    );
+  }
+
+  @Get('/settings/members')
+  @UseGuards(Jwt2faAuthGuard)
+  async getChatMembers(@Req() req, @Query() param, @Res() res) {
+    res.json(
+      await this.chatService.getMembers(req.user.id, parseInt(param.id.id)),
+    );
+  }
+
+  @Get('/settings/members/infos')
+  @UseGuards(Jwt2faAuthGuard)
+  async getMemberInfos(@Req() req, @Query() param, @Res() res) {
+    res.json(
+      await this.chatService.getMembersInfos(
+        req.user.id,
+        parseInt(param.id.id),
+        parseInt(param.userId),
+      ),
+    );
+  }
 
   @Post('/settings/mute')
   @UseGuards(Jwt2faAuthGuard)
@@ -112,7 +132,7 @@ export class ChatController {
   @UseGuards(Jwt2faAuthGuard)
   async unmuteMember(@Req() req, @Body() body: any, @Res() res) {
     res.json(
-      await this.chatService.muteMember(
+      await this.chatService.unmuteMember(
         req.user.id,
         parseInt(body.roomId),
         parseInt(body.userId),
@@ -135,6 +155,32 @@ export class ChatController {
   @Post('/settings/ban')
   @UseGuards(Jwt2faAuthGuard)
   async banMember(@Req() req, @Body() body: any, @Res() res) {
-    // res.json( await this.chatService.banMember(req.user.id, parseInt(body.roomId), parseInt(body.userId)) );
+    res.json(
+      await this.chatService.banMember(
+        req.user.id,
+        parseInt(body.roomId),
+        parseInt(body.userId),
+      ),
+    );
+  }
+
+  @Post('/settings/update')
+  @UseGuards(Jwt2faAuthGuard)
+  async changeRoomPw(@Req() req, @Body() body: any, @Res() res) {
+    res.json(
+      await this.chatService.changeRoomPw(
+        req.user.id,
+        parseInt(body.roomId),
+        body.pw,
+      ),
+    );
+  }
+
+  @Post('/settings/disable')
+  @UseGuards(Jwt2faAuthGuard)
+  async disableRoomPw(@Req() req, @Body() body: any, @Res() res) {
+    res.json(
+      await this.chatService.disableRoomPw(req.user.id, parseInt(body.roomId)),
+    );
   }
 }
