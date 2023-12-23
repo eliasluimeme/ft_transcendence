@@ -673,8 +673,8 @@ export class ChatService {
         }).then( async (user) => {
             if (!user)
                 throw new NotFoundException('Room does not exist')
-            if (user.role !== 'OWNER')
-                throw new ForbiddenException('You are not allowed to add admins to this room')
+            // if (user.role !== 'OWNER')
+            //     throw new ForbiddenException('You are not allowed to add admins to this room')
             if (!user.chatroom.ChatroomUsers.find( user => user.userId === memberId))
                 throw new ForbiddenException('Member does not exist')
             // if (user.chatroom.ChatroomUsers.find( user => user.userId === memberId).role === 'ADMIN')
@@ -749,7 +749,7 @@ export class ChatService {
         } catch (error) {
             if ( error instanceof NotFoundException || error instanceof ForbiddenException || error instanceof BadRequestException )
                 throw error;
-            console.log(error);
+            throw error
         }
     }
 
