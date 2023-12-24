@@ -71,7 +71,9 @@ export class AuthService {
 
     async activate2FA(userId: number) {
         try {
-            await this.userService.updateUser(userId, { isTwoFactorAuthEnabled: true });
+            const update = this.userService.updateUser(userId, { isTwoFactorAuthEnabled: true });
+            if (update)
+                return { success: true }
         } catch (error) {
             console.error('Error enabling 2FA: ', error);
         }
@@ -79,7 +81,9 @@ export class AuthService {
 
     async desactivate2FA(userId: number) {
         try {
-            await this.userService.updateUser(userId, { isTwoFactorAuthEnabled: false });
+            const update = this.userService.updateUser(userId, { isTwoFactorAuthEnabled: false });
+            if (update)
+                return { success: true }
         } catch (error) {
             console.error('Error disabling 2FA: ', error);
         }

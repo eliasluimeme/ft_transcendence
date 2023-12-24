@@ -14,7 +14,7 @@ import { useState, useEffect } from "react";
 import internal from "stream";
 import { StaticRequire } from "next/dist/shared/lib/get-img-props";
 import axios from "axios";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 interface Members {
   id: number;
   nickname: string;
@@ -22,7 +22,9 @@ interface Members {
   isMuted: boolean;
 }
 
-function ChatConv(id: string | null) {
+function ChatConv(oldeId: any) {
+  const router = useRouter();
+  const id = oldeId['id']
   console.log("id", id);
   /////////////////end point to get rol/////////////////////////////
   const [typeofRoom, setTypofRoom] = useState<boolean>(true);
@@ -189,6 +191,7 @@ function ChatConv(id: string | null) {
         );
         if (response.status === 201) {
           setMuteStatu(response.data);
+          router.push('/chat/chatconv?id=' + id)
         } else {
           console.log("Failed to fetch friendship data");
         }
@@ -220,6 +223,8 @@ function ChatConv(id: string | null) {
           }
         );
         if (response.status === 201) {
+          router.refresh();
+          router.push('/chat/chatconv?id=' + id)
         } else {
           console.log("Failed to fetch friendship data");
         }
@@ -296,20 +301,20 @@ function ChatConv(id: string | null) {
     ////end point need to takke th id os the main user
     const sendleave = async () => {
       try {
-        if (!data) {
-          return;
-        }
+        // if (!data) {
+        //   return;
+        // }
         const response = await axios.post(
           "http://localhost:3001/chat/settings/leave",
           {
             roomId: id,
-            userId: id,
           },
           {
             withCredentials: true,
           }
         );
         if (response.status === 201) {
+          router.push('/chat/')
         } else {
           console.log("Failed to fetch friendship data");
         }
@@ -320,8 +325,8 @@ function ChatConv(id: string | null) {
         );
       }
     };
-    // sendleave();
-    // setexist(false);
+    sendleave();
+    setexist(false);
   };
 
   //////////////////ADD Freind//////////////////////////////
@@ -344,6 +349,8 @@ function ChatConv(id: string | null) {
       );
       if (response.status === 201) {
         console.log("success:", response.data);
+        router.refresh();
+        router.push('/chat/chatconv?id=' + id)
       } else {
         console.log("Failed to fetch friendship data");
       }
@@ -537,7 +544,7 @@ function ChatConv(id: string | null) {
                       onClick={() => posleave()}
                       className="w-[80px]  border rounded-lg bg-red-500"
                     >
-                      Leave
+                      Block
                     </button>
                   </div>
                 )}

@@ -162,6 +162,7 @@ export class UserService {
                     country: true,
                     number: true,
                     photo: true,
+                    isTwoFactorAuthEnabled: true
                 }
             });
             if (user)

@@ -29,8 +29,8 @@ export class Jwt2faStrategy extends PassportStrategy(Strategy, 'jwt-2fa') {
     
     if (!user) throw new UnauthorizedException('User not found');
   
-    const { twoFactorAuthSecret, ...userWithoutSecret } = user
+    // const { twoFactorAuthSecret, ...userWithoutSecret } = user
     if (!user.isTwoFactorAuthEnabled || payload.isTwoFactorAuthenticated)
-      return userWithoutSecret;
+      return user;
   }
 }

@@ -9,6 +9,7 @@ import axios from "axios";
 import Image from "next/image";
 
 const Pic = () => {
+
   const [inputValues, setInputValues] = useState({
     photo: "",
     toFAStatu: false,
@@ -80,6 +81,7 @@ const Pic = () => {
       if (response.status === 200) {
         setInputValuesQR({ ImageQR: response.data.qr });
         setIsOpen(true); // Open the modal after fetching QR code
+        router.push('/settings')
       } else {
         console.log("Unexpected response status:", response.status);
       }
@@ -97,6 +99,8 @@ const Pic = () => {
       );
 
       if (response.status === 200) {
+        if (response.data.off === true)
+          router.push('/Login')
       } else {
         console.log("Unexpected response status:", response.status);
       }
@@ -140,8 +144,8 @@ const Pic = () => {
       );
 
       if (response.status === 201) {
-        console.log(code);
-        console.log("Data sent successfully!");
+        if (response.data.on === true)
+          router.refresh();
       } else {
         console.error("Failed to send data.");
       }
@@ -218,7 +222,6 @@ const Pic = () => {
       );
 
       if (response.status === 201) {
-        console.log("zebi");
         setInputValues({
           ...inputValues,
           photo: response.data.photo,
