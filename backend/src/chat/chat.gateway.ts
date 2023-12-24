@@ -14,7 +14,6 @@ import {
 } from '@nestjs/websockets';
 import { JwtService, TokenExpiredError } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { request } from 'http';
 
 @Injectable()
 @WebSocketGateway({
@@ -39,29 +38,30 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   extractTokenFromCookies(cookies: any): string | null {
     const accessToken = cookies?.split('=')[1].replace(/"/g, '');
-    if (accessToken) return accessToken;
+    if (accessToken)
+      return accessToken;
     return null;
   }
 
   async findUserByIntraId(userId: string) {
     try {
-      const user = await this.prisma.user.findUnique({
-        where: {
-          intraId: userId,
-        },
-        include: {
-          level: true,
-        },
-      });
-      if (user) {
-        delete user.hash;
-        return user;
-      } else return user;
+        const user = await this.prisma.user.findUnique({
+            where: {
+                intraId: userId,
+            },
+            include: {
+                level: true,
+            }
+        });
+        if (user) {
+            delete user.hash;
+            return user;
+        } else return user;
     } catch (error) {
-      // check prisma error status code
-      console.error('Error finding user: ', error);
+        // check prisma error status code
+        console.error('Error finding user: ', error);
     }
-  }
+}
 
   async handleConnection(client: Socket) {
     // Handle connection event
@@ -73,13 +73,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       console.log('client connection token: ', client.request);
       if (!token) return this.disconnect(client);
 
-      const verifiedToken = await this.jwtService.verifyAsync(token, {
-        secret: process.env.JWT_SECRET,
-      });
-      if (!verifiedToken) return this.disconnect(client);
-      console.log('');
-      const user = await this.findUserByIntraId(verifiedToken.userId);
-      if (!user) return this.disconnect(client);
+      const verifiedToken = await this.jwtService.verifyAsync(
+        token,
+        { secret: process.env.JWT_SECRET },
+      );
+      if (!verifiedToken)
+        return this.disconnect(client);
+
+      const user = await this.findUserByIntraId(verifiedToken.userId)
+      if (!user)
+        return this.disconnect(client);
 
       this.userToClient.set(user.id, client.id);
       console.log(client.id, 'successfully connected ');
@@ -123,4 +126,5 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const { senderId, reciverId, content } = data;
     this.server.to(this.userToClient[reciverId]).emit('notifications', content);
   }
+
 }

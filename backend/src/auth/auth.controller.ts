@@ -42,7 +42,7 @@ export class AuthController {
     }
 
     @Post('auth/2fa/login')
-    @UseGuards(Jwt2faAuthGuard)
+    @UseGuards(JwtAuthGuard)
     async auth2FA(@Req() req, @Body() body, @Res({ passthrough: true }) res) {
         const is2FACodeValid = this.authService.is2FACodeValid(
             body.number,
@@ -54,7 +54,6 @@ export class AuthController {
 
         const token = await this.authService.generateToken(req.user, true);
         res.cookie( 'access_token', `${token}` , {httpOnly: true, maxAge: 60 * 60 * 24 * 1000} );
-        return { success: true };
     }
     
     @Post('auth/2fa/turn-on')
@@ -70,18 +69,19 @@ export class AuthController {
 
         const token = await this.authService.generateToken(req.user, true);
         res.clearCookie('access_token');
+        const activated = this.authService.activate2FA(req.user.id);
         res.cookie( 'access_token', `${token}` , { httpOnly: true, maxAge: 60 * 60 * 24 * 1000 });
-        return await this.authService.activate2FA(req.user.id);
+        res.status(200).json( {on: true} )
     }
     
     @Get('auth/2fa/turn-off')
 	@UseGuards(Jwt2faAuthGuard)
     async turnOff2FA(@Req() req, @Res() res) {
         const token = await this.authService.generateToken(req.user, false);
-        // generate another token without 2fa auth
         res.clearCookie('access_token');
-        res.cookie( 'access_token', `${token}` , { httpOnly: true, maxAge: 60 * 60 * 24 * 1000 });
-        return await this.authService.desactivate2FA(req.user.id);
+        // res.cookie( 'access_token', `${token}` , { httpOnly: true, maxAge: 60 * 60 * 24 * 1000 });
+        this.authService.desactivate2FA(req.user.id);
+        res.status(200).json({off: true});
     }
 
     @Get('logout')
