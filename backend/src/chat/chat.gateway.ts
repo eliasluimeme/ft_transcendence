@@ -66,6 +66,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handleConnection(client: Socket) {
     // Handle connection event
     try {
+      console.log("tokeeen:", client.handshake.headers.cookie)
       const token = this.extractTokenFromCookies(client.handshake.headers.cookie);
       if (!token)
         return this.disconnect(client);

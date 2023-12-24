@@ -16,13 +16,42 @@ export class ChatService {
 
     async getConversations(userId: number) {
         try {
+
+            const userConvos = await this.prisma.user.findUnique({
+                where: {
+                    id: userId,
+                },
+                include: {
+                    ChatroomUsers: {
+                        include: {
+                            chatroom: {
+                                select: {
+                                    id: true,
+                                    name: true,
+                                    photo: true,
+                                    group: true,
+                                    visibility: true,
+                                }
+                            }
+                        }
+                    },
+                    blocker: true,
+                    blocked: true,
+                }
+            });
+
+            // console.log("userconvos", userConvos);
+            const iblocked = userConvos.blocker.filter(u => u.blockerId === userId);
+            const blockedme = userConvos.blocked.filter(u => u.blockedId === userId);
+            // console.log("blockedme", blockedme);
+            // console.log("iblocked", iblocked);
+
             const convos = await this.prisma.chatroom.findMany({
                 where: {
-                    ChatroomUsers: {
-                        some: {
-                            userId: userId
-                        }
-                    }
+                    OR: [
+                        { ChatroomUsers: { some: { userId: userId } } },
+                        { visibility: 'PUBLIC' },
+                    ],
                 },
                 include: {
                     ChatroomUsers: {
@@ -40,30 +69,34 @@ export class ChatService {
                     },
                 }
             })
-            // Exclude messages of blocked users
-            // if dms check blocks
-            // if group check bans
             // console.log("convos", convos)
             const conv = convos.map(conv => {
-                const { id, name, group, photo } = conv;
+                const { id, name, group, photo, visibility } = conv;
                 if (group) {
-                    if (conv.ChatroomUsers.find(u => u.userId === userId).isBanned === false)
+
+                    if (visibility === 'PRIVATE' && conv.ChatroomUsers.find(u => u.userId === userId).isBanned === false)
                         return { convId: id, name, photo }
+                    else if (visibility === 'PROTECTED' && conv.ChatroomUsers.find(u => u.userId === userId).isBanned === false) 
+                        return { convId: id, name, photo }
+                    // else if (visibility === 'PUBLIC')
+                    //     if (conv.ChatroomUsers.find(u => u.userId === userId)) {
+                    //         if (conv.ChatroomUsers.find(u => u.userId === userId).isBanned === false)
+                    //             return { convId: id, name, photo }
+                    //     } else 
+                    //         return { convId: id, name, photo }
+                    else return null;
                 } else {
-                    // const blocked = conv.ChatroomUsers.find(u => u.userId === userId).user.blocker.find(u => u.blockedId === userId)
-                    // const blocker = conv.ChatroomUsers.find(u => u.userId === userId).user.blocked.find(u => u.blockerId === userId)
-                    // console.log("blocker",blocker)
-                    // console.log("blocked",blocked)
-                    // if (!blocked && !blocker) {
-                        const { userName, photo } = conv.ChatroomUsers.find(user => user.userId !== userId).user;
-                        return { convId: id, name: userName, photo}
-                    // }
+                    const user = conv.ChatroomUsers.find(u => u.userId !== userId).userId;
+
+                    if (iblocked.find(u => u.blockedId === user) || blockedme.find(u => u.blockerId === user))
+                        return null; 
+
+                    const { userName, photo } = conv.ChatroomUsers.find(user => user.userId !== userId).user;
+                    return { convId: id, name: userName, photo}
                 }
-            })
+            }).filter(conv => conv !== null);
             // TODO: check public rooms if included or not
-            // const c = conv.filter(user => user !== null);
-            // console.log("conv", c)
-            return conv.filter(conv => conv !== null);;
+            return conv
         } catch(error) {
             console.log(error);
         }
