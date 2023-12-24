@@ -320,7 +320,7 @@ function ChatConv(id: string | null) {
         );
       }
     };
-    sendleave();
+    // sendleave();
     // setexist(false);
   };
 
@@ -513,7 +513,7 @@ function ChatConv(id: string | null) {
                         <div className="flex h-[30px] w-[100px] bg-[#F77B3F] bg-opacity-50 hover:bg-opacity-100 rounded-lg ">
                           <button
                             onClick={() => sendNewPassword()}
-                            className="w-full h-full text-[13px]  "
+                            className="w-full h-full text-[13px]"
                           >
                             change
                           </button>
