@@ -2,8 +2,6 @@ import {
   Body,
   Controller,
   Get,
-  // Param,
-  // Param,
   Post,
   Query,
   Req,
@@ -28,6 +26,15 @@ export class ChatController {
     res.json(convos);
   }
 
+  @Get('conversations/members')
+  @UseGuards(Jwt2faAuthGuard)
+  async getConvoMembers(@Req() req, @Query() query, @Res() res) {
+    // console.log(query);
+    res.json(
+      await this.chatService.getConvoMembers(req.user.id, parseInt(query.id)),
+    );
+  }
+
   @Get('conversations/messages')
   @UseGuards(Jwt2faAuthGuard)
   @UsePipes(ValidationPipe)
@@ -37,15 +44,6 @@ export class ChatController {
         req.user.id,
         parseInt(query.id),
       ),
-    );
-  }
-
-  @Get('conversations/members')
-  @UseGuards(Jwt2faAuthGuard)
-  async getConvoMembers(@Req() req, @Query() query, @Res() res) {
-    console.log(query);
-    res.json(
-      await this.chatService.getConvoMembers(req.user.id, parseInt(query.id)),
     );
   }
 
@@ -80,7 +78,6 @@ export class ChatController {
   @Get('/settings/role')
   @UseGuards(Jwt2faAuthGuard)
   async getRole(@Req() req, @Query() param, @Res() res) {
-    console.log('settings', param);
     // res.json(await this.chatService.getChatMembers(req.user.id, parseInt(param.id)));
     res.json(await this.chatService.getRole(req.user.id, parseInt(param.id)));
   }
@@ -106,6 +103,7 @@ export class ChatController {
   @Post('/settings/mute')
   @UseGuards(Jwt2faAuthGuard)
   async muteMember(@Req() req, @Body() body: any, @Res() res) {
+    // console.log("booody :",body)
     res.json(
       await this.chatService.muteMember(
         req.user.id,
@@ -143,12 +141,6 @@ export class ChatController {
         parseInt(body.userId),
       ),
     );
-  }
-
-  @Post('/settings/leave')
-  @UseGuards(Jwt2faAuthGuard)
-  async leaveRoom(@Req() req, @Body() param, @Res() res) {
-    res.json( await this.chatService.leaveRoom(req.user.id, parseInt(param.roomId)) );
   }
 
   @Post('/settings/leave')

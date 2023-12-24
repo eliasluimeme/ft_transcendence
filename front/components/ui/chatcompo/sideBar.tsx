@@ -1,6 +1,5 @@
 'use client';
 
-import { Alert } from "reactstrap";
 import Image from "next/image";
 import Style from "./sideBar.module.css";
 import "@/components/ui/CSS/font.css";

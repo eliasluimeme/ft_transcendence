@@ -1,10 +1,8 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadGatewayException, BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import * as fs from 'fs';
+import { Observable, of } from 'rxjs';
+import { CLIENT_RENEG_LIMIT } from 'tls';
 import { settingsDTO } from './dto/settings.dto';
 // import { ChatGateway } from 'src/chat/chat.gateway';
 
@@ -210,128 +208,124 @@ export class UserService {
       },
     });
 
-    if (existingUserName[0] && existingUserName[0].intraId !== id)
-      throw new ForbiddenException('User name already in use');
+        if (existingUserName[0] && existingUserName[0].intraId !== id)
+            throw new ForbiddenException('User name already in use');
+    
+        const existingFullName = await this.prisma.user.findMany({
+            where: {
+                fullName: data.fullName,
+            },
+        });
 
-    const existingFullName = await this.prisma.user.findMany({
-      where: {
-        fullName: data.fullName,
-      },
-    });
+        if (existingFullName[0] && existingFullName[0].intraId !== id)
+            throw new ForbiddenException('Full name already in use');
 
-    if (existingFullName[0] && existingFullName[0].intraId !== id)
-      throw new ForbiddenException('Full name already in use');
+        const existingNumber = await this.prisma.user.findMany({
+            where: {
+                number: data.number,
+            },
+        });
 
-    const existingNumber = await this.prisma.user.findMany({
-      where: {
-        number: data.number,
-      },
-    });
-
-    if (
-      existingNumber[0] &&
-      existingNumber[0].number &&
-      existingNumber[0].intraId !== id
-    )
-      throw new ForbiddenException('Number already in use');
-  }
-
-  async updateProfile(intraId: string, newData: settingsDTO) {
-    await this.checkExistingData(intraId, newData);
-    try {
-      const user = await this.prisma.user.update({
-        where: {
-          intraId: intraId,
-        },
-        data: {
-          fullName: newData.fullName,
-          userName: newData.userName,
-          country: newData.country,
-          number: newData.number,
-        },
-        select: {
-          id: true,
-          fullName: true,
-          userName: true,
-          country: true,
-          number: true,
-          photo: true,
-        },
-      });
-
-      return user;
-    } catch (error) {
-      console.error('Error updating user: ', error);
+        if (existingNumber[0] && existingNumber[0].number && existingNumber[0].intraId !== id)
+            throw new ForbiddenException('Number already in use');
     }
-  }
 
-  async updateUser(id: number, newData: any) {
-    try {
-      const user = await this.prisma.user.update({
-        where: {
-          id: id,
-        },
-        data: newData,
-      });
-      return user;
-    } catch (error) {
-      console.error('Error updating user: ', error);
+    async updateProfile(intraId: string , newData: settingsDTO ) {
+        await this.checkExistingData(intraId, newData);
+        try {
+            const user = await this.prisma.user.update({
+                where: {
+                    intraId: intraId,
+                },
+                data: {
+                    fullName: newData.fullName,
+                    userName: newData.userName,
+                    country: newData.country,
+                    number: newData.number,
+                },
+                select: {
+                    id: true,
+                    fullName: true,
+                    userName: true,
+                    country: true,
+                    number: true,
+                    photo: true,
+                }
+            });
+
+            return user;
+        } catch (error) {
+            console.error('Error updating user: ', error);
+        }
     }
-  }
 
-  async findUserByIntraId(userId: string) {
-    try {
-      const user = await this.prisma.user.findUnique({
-        where: {
-          intraId: userId,
-        },
-        include: {
-          level: true,
-        },
-      });
-      if (user) {
-        delete user.hash;
-        return user;
-      } else return user;
-    } catch (error) {
-      // check prisma error status code
-      console.error('Error finding user: ', error);
+    async updateUser(id: number, newData: any ) {
+        try {
+            const user = await this.prisma.user.update({
+                where: {
+                    id: id,
+                },
+                data: newData,
+            });
+            return user;
+        } catch (error) {
+            console.error('Error updating user: ', error);
+        }
     }
-  }
 
-  async findUserById(userId: number) {
-    try {
-      const user = await this.prisma.user.findUnique({
-        where: {
-          id: userId,
-        },
-      });
-
-      delete user.hash;
-      return user;
-    } catch (error) {
-      // check prisma error status code
-      console.error('Error finding user: ', error);
+    async findUserByIntraId(userId: string) {
+        try {
+            const user = await this.prisma.user.findUnique({
+                where: {
+                    intraId: userId,
+                },
+                include: {
+                    level: true,
+                }
+            });
+            if (user) {
+                delete user.hash;
+                return user;
+            } else return user;
+        } catch (error) {
+            // check prisma error status code
+            console.error('Error finding user: ', error);
+        }
     }
-  }
 
-  async deleteUser(id: number) {
-    try {
-      const user = await this.prisma.user.delete({
-        where: {
-          id: id,
-        },
-      });
-      console.log('User deleted');
-    } catch (error) {
-      console.error('Error deleting user: ', error);
+    async findUserById(userId: number) {
+        try {
+            const user = await this.prisma.user.findUnique({
+                where: {
+                    id: userId,
+                },
+            });
+
+            delete user.hash;
+            return user;
+        } catch (error) {
+            // check prisma error status code
+            console.error('Error finding user: ', error);
+        }
     }
-  }
 
-  isValidQuery(query: string): boolean {
-    const allowedPattern = /^[a-zA-Z0-9  -]+$/;
-    return allowedPattern.test(query);
-  }
+    async deleteUser(id: number) {
+        try {
+            const user = await this.prisma.user.delete({
+                where: {
+                    id: id,
+                }
+            });
+            console.log('User deleted');
+        } catch (error) {
+            console.error('Error deleting user: ', error);
+        }
+    }
+
+    isValidQuery(query: string): boolean {
+        const allowedPattern = /^[a-zA-Z0-9  -]+$/;
+        return allowedPattern.test(query);
+    }
 
   async checkUser(userId: number, query: string) {
     try {
@@ -482,7 +476,7 @@ export class UserService {
     }
   }
 
-  async searchUserMatchHistory(userName: string) {
+  async searchUserMatchHistory(me: any, userName: string) {
     try {
       const user = await this.prisma.user.findUnique({
         where: { userName: userName },
@@ -503,7 +497,7 @@ export class UserService {
             const { id, userName, photo } = user;
 
             const user2 = await this.prisma.user.findUnique({
-              where: { userName: userName },
+              where: { userName: match.player2.userName },
               select: {
                 id: true,
                 userName: true,
@@ -523,7 +517,7 @@ export class UserService {
             const { id, userName, photo } = user;
 
             const user2 = await this.prisma.user.findUnique({
-              where: { userName: userName },
+              where: { userName: match.player1.userName },
               select: {
                 id: true,
                 userName: true,

@@ -56,7 +56,7 @@ function ChatConv(oldeId: any) {
 
   useEffect(() => {
     fetchrol();
-  }, [props.id]);
+  }, [id]);
 
   /////////////////end point to get owner image/////////////////////////////
   const [Owner, OwnerImage] = useState<string>();
@@ -89,7 +89,7 @@ function ChatConv(oldeId: any) {
   };
   useEffect(() => {
     fetchownerimage();
-  }, [props.id]);
+  }, [id]);
 
   const [muteStatue, setMuteStatu] = useState<boolean | undefined>(false);
   const [admine, setAdmine] = useState<boolean>(false);
@@ -127,7 +127,7 @@ function ChatConv(oldeId: any) {
   };
   useEffect(() => {
     fetchmemberdata();
-  }, [exist, props.id]);
+  }, [exist, id]);
   ///////////////////////////////////////////////////////////////////////////
 
   //////////end point to get mutestatue and adminestatus//////////////

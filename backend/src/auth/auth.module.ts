@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module } from "@nestjs/common";
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { PassportModule } from "@nestjs/passport";
@@ -11,7 +11,7 @@ import { Jwt2faStrategy } from "./strategies/jwt-2fa.strategy";
 import { UserModule } from "src/user/user.module";
 
 @Module({
-  imports: [
+  imports: [ 
     PassportModule,
     JwtModule.register({
       signOptions: { expiresIn: '1d' },
