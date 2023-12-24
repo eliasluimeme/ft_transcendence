@@ -19,13 +19,12 @@ type Data = {
 
 const getInitialData = (): Data => {
   const [profileInfo, setProfileInfo] = useState<Data>({
-      image:"",
-      statu:"",
-      nickNane:"",
-      fullName:"",
-      rank:"",
-    }
-  )
+    image: "",
+    statu: "",
+    nickNane: "",
+    fullName: "",
+    rank: "",
+  });
   const fetchData = async () => {
     try {
       const response = await axios.get("http://localhost:3001/profile", {
@@ -100,8 +99,7 @@ const InfoProfil = () => {
       </div>
       <div className="w-full h-full col-start-12">
         <div className="w-full h-full grid grid-rows-6">
-          <div className="w-full h-full row-start-2 flex items-center ">
-          </div>
+          <div className="w-full h-full row-start-2 flex items-center "></div>
         </div>
       </div>
     </div>

@@ -35,16 +35,17 @@ export class ChatController {
     );
   }
 
+  @Get('conversations/infos')
+  @UseGuards(Jwt2faAuthGuard)
+  async getRoomInfos(@Req() req, @Query() query, @Res() res) {
+    res.json( await this.chatService.getRoomInfos(parseInt(query.id)) );
+  }
+
   @Get('conversations/messages')
   @UseGuards(Jwt2faAuthGuard)
   @UsePipes(ValidationPipe)
   async getConversationMessages(@Req() req, @Query() query: idDto, @Res() res) {
-    res.json(
-      await this.chatService.getConversationMessages(
-        req.user.id,
-        parseInt(query.id),
-      ),
-    );
+    res.json( await this.chatService.getConversationMessages( req.user.id, parseInt(query.id) ) );
   }
 
   @Post('create')

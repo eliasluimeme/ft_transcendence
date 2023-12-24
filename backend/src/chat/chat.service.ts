@@ -154,6 +154,26 @@ export class ChatService {
         }
     }
 
+    async getRoomInfos(roomId: number) {
+        try {
+            const room = await this.prisma.chatroom.findUnique({
+                where: {
+                    id: roomId,
+                },
+            })
+
+            if (!room)
+                throw new NotFoundException('Room does not exist')
+
+
+            return { visibility: room.visibility };
+        } catch(error) {
+            if (error instanceof NotFoundException)
+                throw error;
+            console.log(error);
+        }
+    }
+
     async joinGroupChat(userId: number, infos: JoinGroupChatDTO) {
         try {
             const groupChat = await this.prisma.chatroom.findFirst({

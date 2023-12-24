@@ -497,7 +497,7 @@ export class UserService {
             const { id, userName, photo } = user;
 
             const user2 = await this.prisma.user.findUnique({
-              where: { userName: match.player2.userName },
+              where: { id: match.player2Id },
               select: {
                 id: true,
                 userName: true,
@@ -517,7 +517,7 @@ export class UserService {
             const { id, userName, photo } = user;
 
             const user2 = await this.prisma.user.findUnique({
-              where: { userName: match.player1.userName },
+              where: { id : match.player1Id },
               select: {
                 id: true,
                 userName: true,
