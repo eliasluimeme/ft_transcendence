@@ -23,8 +23,9 @@ interface Members {
 }
 
 function ChatConv(oldeId: any) {
+  const [update, toupdate] = useState<number>(0);
   const router = useRouter();
-  const id = oldeId['id']
+  const id = oldeId["id"];
   console.log("id", id);
   /////////////////end point to get rol/////////////////////////////
   const [typeofRoom, setTypofRoom] = useState<boolean>(true);
@@ -53,7 +54,7 @@ function ChatConv(oldeId: any) {
   };
   useEffect(() => {
     fetchrol();
-  }, [id]);
+  }, [id, update]);
 
   /////////////////end point to get owner image/////////////////////////////
   const [Owner, OwnerImage] = useState<string>();
@@ -86,7 +87,7 @@ function ChatConv(oldeId: any) {
   };
   useEffect(() => {
     fetchownerimage();
-  }, [id]);
+  }, [id, update]);
 
   const [muteStatue, setMuteStatu] = useState<boolean | undefined>(false);
   const [admine, setAdmine] = useState<boolean>(false);
@@ -124,7 +125,11 @@ function ChatConv(oldeId: any) {
   };
   useEffect(() => {
     fetchmemberdata();
-  }, [exist, id]);
+  }, [id]);
+
+  useEffect(() => {
+    fetchmemberdata();
+  }, [update]);
   ///////////////////////////////////////////////////////////////////////////
 
   //////////end point to get mutestatue and adminestatus//////////////
@@ -191,7 +196,7 @@ function ChatConv(oldeId: any) {
         );
         if (response.status === 201) {
           setMuteStatu(response.data);
-          router.push('/chat/chatconv?id=' + id)
+          router.push("/chat/chatconv?id=" + id);
         } else {
           console.log("Failed to fetch friendship data");
         }
@@ -203,6 +208,7 @@ function ChatConv(oldeId: any) {
       }
     };
     sendmute();
+    toupdate(update + 1);
     setexist(false);
   };
   /////////endpoint to post kick//////////////
@@ -224,7 +230,7 @@ function ChatConv(oldeId: any) {
         );
         if (response.status === 201) {
           router.refresh();
-          router.push('/chat/chatconv?id=' + id)
+          router.push("/chat/chatconv?id=" + id);
         } else {
           console.log("Failed to fetch friendship data");
         }
@@ -236,6 +242,7 @@ function ChatConv(oldeId: any) {
       }
     };
     sendkick();
+    toupdate(update + 1);
     setexist(false);
   };
   /////////endpoint to post  ban//////////////
@@ -262,6 +269,8 @@ function ChatConv(oldeId: any) {
         );
       }
     };
+    sendban();
+    toupdate(update + 1);
     setexist(false);
   };
   /////////endpoint to post adminestatue//////////////
@@ -294,6 +303,7 @@ function ChatConv(oldeId: any) {
       }
     };
     sendadmine();
+    toupdate(update + 1);
     setexist(false);
   };
   /////////endpoint to post leaving room//////////////
@@ -301,9 +311,6 @@ function ChatConv(oldeId: any) {
     ////end point need to takke th id os the main user
     const sendleave = async () => {
       try {
-        // if (!data) {
-        //   return;
-        // }
         const response = await axios.post(
           "http://localhost:3001/chat/settings/leave",
           {
@@ -314,7 +321,7 @@ function ChatConv(oldeId: any) {
           }
         );
         if (response.status === 201) {
-          router.push('/chat/')
+          router.push("/chat/");
         } else {
           console.log("Failed to fetch friendship data");
         }
@@ -326,6 +333,7 @@ function ChatConv(oldeId: any) {
       }
     };
     sendleave();
+    toupdate(update + 1);
     setexist(false);
   };
 
@@ -350,13 +358,14 @@ function ChatConv(oldeId: any) {
       if (response.status === 201) {
         console.log("success:", response.data);
         router.refresh();
-        router.push('/chat/chatconv?id=' + id)
+        router.push("/chat/chatconv?id=" + id);
       } else {
         console.log("Failed to fetch friendship data");
       }
     } catch (error) {
       console.error("An error occurred while fetching friendship data:", error);
     }
+    toupdate(update + 1);
   };
   /////////////////////////////change password///////////////////////////////
   const [newPassword, setNewPassword] = useState("");
@@ -371,6 +380,27 @@ function ChatConv(oldeId: any) {
         {
           roomId: id,
           newPassword: newPassword,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+      if (response.status === 201) {
+        console.log("success:", response.data);
+      } else {
+        console.log("Failed to fetch friendship data");
+      }
+    } catch (error) {
+      console.error("An error occurred while fetching friendship data:", error);
+    }
+  };
+
+  const deleatPassword = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:3001/chat/settings/delete",
+        {
+          roomId: id,
         },
         {
           withCredentials: true,
@@ -509,8 +539,8 @@ function ChatConv(oldeId: any) {
                       </div>
                     </div>
                     {typeofRoom ? (
-                      <div className="flex items-center justify-center space-x-4 border h-[50px] rounded-lg">
-                        <div className="text-[14px]">change password : </div>
+                      <div className="flex items-center justify-center space-x-4 border h-[50px] rounded-lg p-2px">
+                        <div className="text-[10px]">change password : </div>
                         <input
                           type="text"
                           value={newPassword}
@@ -520,9 +550,17 @@ function ChatConv(oldeId: any) {
                         <div className="flex h-[30px] w-[100px] bg-[#F77B3F] bg-opacity-50 hover:bg-opacity-100 rounded-lg ">
                           <button
                             onClick={() => sendNewPassword()}
-                            className="w-full h-full text-[13px]"
+                            className="w-full h-full text-[9px]"
                           >
                             change
+                          </button>
+                        </div>
+                        <div className="flex h-[30px] w-[100px] bg-[#F77B3F] bg-opacity-50 hover:bg-opacity-100 rounded-lg ">
+                          <button
+                            onClick={() => deleatPassword()}
+                            className="w-full h-full text-[9px]"
+                          >
+                            deleat password
                           </button>
                         </div>
                       </div>
@@ -544,7 +582,7 @@ function ChatConv(oldeId: any) {
                       onClick={() => posleave()}
                       className="w-[80px]  border rounded-lg bg-red-500"
                     >
-                      Block
+                      Leave
                     </button>
                   </div>
                 )}

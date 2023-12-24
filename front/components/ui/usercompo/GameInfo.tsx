@@ -1,6 +1,6 @@
-'use client'
+"use client";
 import React, { useState, useEffect } from "react";
-import WinLose from "./WinLose";
+import WinLose from "@/components/ui/profilecompo/WinLose";
 import axios from "axios";
 import {
   HoverCard,
@@ -15,7 +15,7 @@ type Achievement = {
   description: string;
   achieved: boolean;
 };
-const getAchivment = (indice : string) => {
+const getAchivment = (indice: string) => {
   console.log("indice achivements : ====> ", indice);
   // const [achievements, setAchievements] = useState<Achievement[]>([
   //   { description: "", achieved: true },
@@ -29,24 +29,41 @@ const getAchivment = (indice : string) => {
     { description: "", achieved: true },
     { description: "", achieved: true },
   ];
-  const [achievements, setAchievements] = useState<Achievement[]>(achievementsInitialState);
+  const [achievements, setAchievements] = useState<Achievement[]>(
+    achievementsInitialState
+  );
   // Fetch data using useEffect only once when the component mounts
   useEffect(() => {
     const fetchData = async () => {
       console.log("Fetching data...");
       try {
-        const response = await axios.get("http://localhost:3001/users/achievement", {
-          withCredentials: true,
-          params: {
-            user: indice,
-          },
-        });
+        const response = await axios.get(
+          "http://localhost:3001/users/achievement",
+          {
+            withCredentials: true,
+            params: {
+              user: indice,
+            },
+          }
+        );
         if (response.status === 200) {
           const newAchievements: Achievement[] = [
-            { description: "First achievement", achieved: response.data.achievements[0] },
-            { description: "Second achievement", achieved: response.data.achievements[1] },
-            { description: "Third achievement", achieved: response.data.achievements[2] },
-            { description: "Fourth achievement", achieved: response.data.achievements[3] },
+            {
+              description: "First achievement",
+              achieved: response.data.achievements[0],
+            },
+            {
+              description: "Second achievement",
+              achieved: response.data.achievements[1],
+            },
+            {
+              description: "Third achievement",
+              achieved: response.data.achievements[2],
+            },
+            {
+              description: "Fourth achievement",
+              achieved: response.data.achievements[3],
+            },
           ];
           setAchievements(newAchievements);
         } else {
@@ -130,9 +147,9 @@ const Informations: React.FC<{ achievement: Achievement[] }> = ({
 type MatchHistory = {
   opo1: string;
   result: string;
-  opo2 : string;
-  opo1image : string
-  opo2image : string
+  opo2: string;
+  opo1image: string;
+  opo2image: string;
 };
 
 const getMatchHistory = (indice: string): MatchHistory[] => {
@@ -172,15 +189,14 @@ const getMatchHistory = (indice: string): MatchHistory[] => {
   useEffect(() => {
     fetchData();
   }, []);
-  console.log(matchHistory)
+  console.log(matchHistory);
 
   return matchHistory;
 };
 
-const GameInfo = (id : any) => {
-
+const GameInfo = (id: any) => {
   // console.log("l9laoui")
-  const indice : string = id.id;
+  const indice: string = id.id;
   // console.log("test allah allah",indice);
   const achievements = getAchivment(indice);
   const matchHistory = getMatchHistory(indice);
@@ -198,14 +214,17 @@ const GameInfo = (id : any) => {
               <div className="w-[2px] h-[80%] bg-[#445E86] rounded-full"></div>
             </div>
             {matchHistory.map((historyItem, index) => (
-               <WinLose
-                 key={index}
-                 className={`w-full h-full row-start-${
-                   index + 1
-                 } col-start-2 col-span-9`}
-                 wl={historyItem.result}
-                 opo={historyItem.opo1}
-               />
+              <WinLose
+                key={index}
+                className={`w-full h-full row-start-${
+                  index + 1
+                } col-start-2 col-span-9 `}
+                opo1={historyItem.opo1}
+                opo2={historyItem.opo2}
+                result={historyItem.result}
+                opo1image={historyItem.opo1image}
+                opo2image={historyItem.opo2image}
+              />
             ))}
           </div>
         </div>

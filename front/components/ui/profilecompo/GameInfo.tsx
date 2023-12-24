@@ -1,6 +1,6 @@
-'use client'
+"use client";
 import React, { useState, useEffect } from "react";
-import WinLose from "./WinLose";
+import WinLose from "@/components/ui/profilecompo/WinLose";
 import axios from "axios";
 import {
   HoverCard,
@@ -29,10 +29,22 @@ const getAchivment = () => {
       });
       if (response.status === 200) {
         const newAchievements: Achievement[] = [
-          { description: "First achievement", achieved: response.data.achievements[0]},
-          { description: "Second achievement", achieved: response.data.achievements[1]},
-          { description: "Third achievement", achieved: response.data.achievements[2] },
-          { description: "Fourth achievement", achieved: response.data.achievements[3]},
+          {
+            description: "First achievement",
+            achieved: response.data.achievements[0],
+          },
+          {
+            description: "Second achievement",
+            achieved: response.data.achievements[1],
+          },
+          {
+            description: "Third achievement",
+            achieved: response.data.achievements[2],
+          },
+          {
+            description: "Fourth achievement",
+            achieved: response.data.achievements[3],
+          },
         ];
         console.log(newAchievements);
         setAchievements(newAchievements);
@@ -115,23 +127,21 @@ const Informations: React.FC<{ achievement: Achievement[] }> = ({
 //////////////////////////////////////////////////////////////
 type MatchHistory = {
   opo1: string;
+  opo2: string;
   result: string;
-  opo2 : string;
-  opo1image : string
-  opo2image : string
+  opo1image: string;
+  opo2image: string;
 };
 
-const getMatchHistory = () : MatchHistory[] => {
-  const [matchHistory, setmatchHistory] = useState<MatchHistory[]>([
-  ]);
+const getMatchHistory = (): MatchHistory[] => {
+  const [matchHistory, setmatchHistory] = useState<MatchHistory[]>([]);
   const fetchData = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/profile", 
-      {
+      const response = await axios.get("http://localhost:3001/profile", {
         withCredentials: true,
       });
       if (response.status === 200) {
-        console.log(response.data.match)
+        console.log(response.data.match);
         const newMatchHistory: MatchHistory[] = response.data.match.map(
           (match: any) => ({
             opo1: match.player1.userName,
@@ -178,9 +188,12 @@ const GameInfo: React.FC = () => {
                 key={index}
                 className={`w-full h-full row-start-${
                   index + 1
-                } col-start-2 col-span-9`}
-                wl={historyItem.result}
-                opo={historyItem.opo1}
+                } col-start-2 col-span-9 `}
+                opo1={historyItem.opo1}
+                opo2={historyItem.opo2}
+                result={historyItem.result}
+                opo1image={historyItem.opo1image}
+                opo2image={historyItem.opo2image}
               />
             ))}
           </div>

@@ -1,10 +1,27 @@
 import React from "react";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
-function WinLose(props: { wl: string; opo: string; className: string }) {
-  const textColorClass = props.wl ? "text-[#DBCE26]" : "text-[#FF8A70]";
-
+function WinLose(props: {
+  opo1: string;
+  opo2: string;
+  result: string;
+  opo1image: string;
+  opo2image: string;
+  className: string;
+}) {
   return (
-    <div className={`${textColorClass} ${props.className} p-4 text-[13px]`}>
+    <div className={`${props.className} p-4 text-[13px] w-full h-full`}>
+      <div className="w-full h-full space-x-7 flex items-center justify-center">
+        <Avatar className="w-[40px] h-[40px] border-[4px]">
+          <AvatarImage src={props.opo1image} alt="User Avatar" />
+          <AvatarFallback>profile</AvatarFallback>
+        </Avatar>
+        <div>{props.result}</div>
+        <Avatar className="w-[40px] h-[40px] border-[4px]">
+          <AvatarImage src={props.opo2image} alt="User Avatar" />
+          <AvatarFallback>profile</AvatarFallback>
+        </Avatar>
+      </div>
       {/* {props.wl ? (
         <div className="flex space-x-1">
           <p>
@@ -22,13 +39,6 @@ function WinLose(props: { wl: string; opo: string; className: string }) {
           <p className="text-white">{props.opo}</p>
         </div>
       )} */}
-      <div className="border flex space-x-1">
-          <p>
-            Congratulations! You emerged victorious in a thrilling ping pong
-            match against
-          </p>
-          <p className="text-white">{props.wl}</p>
-        </div>
     </div>
   );
 }
