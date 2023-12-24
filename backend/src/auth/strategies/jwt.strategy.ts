@@ -10,7 +10,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     private userService: UserService,
     private configService: ConfigService,
-  ) {
+    ) {
     super({
       jwtFromRequest: (req: Request) => {
         let token = null;
@@ -28,7 +28,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     console.log(payload);
     const user = await this.userService.findUserByIntraId(payload.userId);
 
-    if (!user) throw new UnauthorizedException();
+    if (!user)
+      throw new UnauthorizedException();
 
     return user;
   }

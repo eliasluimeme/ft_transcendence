@@ -1,16 +1,17 @@
-import { Module } from '@nestjs/common';
+import { Module } from "@nestjs/common";
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { PassportModule } from '@nestjs/passport';
-import { IntraStrategy } from './strategies/intra.strategy';
-import { JwtModule } from '@nestjs/jwt';
-import { UserService } from 'src/user/user.service';
-import { LocalStrategy } from './strategies/local.strategy';
-import { JwtStrategy } from './strategies/jwt.strategy';
-import { Jwt2faStrategy } from './strategies/jwt-2fa.strategy';
+import { PassportModule } from "@nestjs/passport";
+import { IntraStrategy } from "./strategies/intra.strategy";
+import { JwtModule } from "@nestjs/jwt";
+import { UserService } from "src/user/user.service";
+import { LocalStrategy } from "./strategies/local.strategy";
+import { JwtStrategy } from "./strategies/jwt.strategy";
+import { Jwt2faStrategy } from "./strategies/jwt-2fa.strategy";
+import { UserModule } from "src/user/user.module";
 
 @Module({
-  imports: [
+  imports: [ 
     PassportModule,
     JwtModule.register({
       signOptions: { expiresIn: '1d' },

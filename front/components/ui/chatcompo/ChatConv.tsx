@@ -494,7 +494,7 @@ const ChatConv = (props: ChatConvProps) =>{
       </div>
       <div className="w-full h-full row-start-2 row-span-6 flex items-center justify-center">
         <div className="rounded-lg w-[90%] h-[20%]">
-          <ChatInput id={props.id}/>
+         <ChatInput id={props.id}/>
         </div>
       </div>
     </div>

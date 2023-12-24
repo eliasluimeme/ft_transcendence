@@ -2,8 +2,6 @@ import {
   Body,
   Controller,
   Get,
-  // Param,
-  // Param,
   Post,
   Query,
   Req,
@@ -28,6 +26,15 @@ export class ChatController {
     res.json(convos);
   }
 
+  @Get('conversations/members')
+  @UseGuards(Jwt2faAuthGuard)
+  async getConvoMembers(@Req() req, @Query() query, @Res() res) {
+    // console.log(query);
+    res.json(
+      await this.chatService.getConvoMembers(req.user.id, parseInt(query.id)),
+    );
+  }
+
   @Get('conversations/messages')
   @UseGuards(Jwt2faAuthGuard)
   @UsePipes(ValidationPipe)
@@ -37,15 +44,6 @@ export class ChatController {
         req.user.id,
         parseInt(query.id),
       ),
-    );
-  }
-
-  @Get('conversations/members')
-  @UseGuards(Jwt2faAuthGuard)
-  async getConvoMembers(@Req() req, @Query() query, @Res() res) {
-    console.log(query);
-    res.json(
-      await this.chatService.getConvoMembers(req.user.id, parseInt(query.id)),
     );
   }
 
@@ -80,37 +78,34 @@ export class ChatController {
   @Get('/settings/role')
   @UseGuards(Jwt2faAuthGuard)
   async getRole(@Req() req, @Query() param, @Res() res) {
-    console.log('settings', param);
+    // console.log('settings', param)
     // res.json(await this.chatService.getChatMembers(req.user.id, parseInt(param.id)));
-    res.json(
-      await this.chatService.getRole(req.user.id, parseInt(param.id.id)),
-    );
+    res.json(await this.chatService.getRole(req.user.id, parseInt(param.id)));
   }
 
   @Get('/settings/staff')
   @UseGuards(Jwt2faAuthGuard)
   async getStaff(@Req() req, @Query() param, @Res() res) {
-    console.log('staff', param);
-    res.json(
-      await this.chatService.getStaff(req.user.id, parseInt(param.id.id)),
-    );
+    // console.log("staff", param)
+    res.json(await this.chatService.getStaff(req.user.id, parseInt(param.id)));
   }
 
   @Get('/settings/members')
   @UseGuards(Jwt2faAuthGuard)
   async getChatMembers(@Req() req, @Query() param, @Res() res) {
     res.json(
-      await this.chatService.getMembers(req.user.id, parseInt(param.id.id)),
+      await this.chatService.getMembers(req.user.id, parseInt(param.id)),
     );
   }
 
   @Get('/settings/members/infos')
   @UseGuards(Jwt2faAuthGuard)
   async getMemberInfos(@Req() req, @Query() param, @Res() res) {
+    // console.log("params :",param)
     res.json(
       await this.chatService.getMembersInfos(
         req.user.id,
-        parseInt(param.id.id),
+        parseInt(param.id),
         parseInt(param.userId),
       ),
     );
@@ -119,6 +114,7 @@ export class ChatController {
   @Post('/settings/mute')
   @UseGuards(Jwt2faAuthGuard)
   async muteMember(@Req() req, @Body() body: any, @Res() res) {
+    // console.log("booody :",body)
     res.json(
       await this.chatService.muteMember(
         req.user.id,
@@ -128,17 +124,11 @@ export class ChatController {
     );
   }
 
-  @Post('/settings/unmute')
-  @UseGuards(Jwt2faAuthGuard)
-  async unmuteMember(@Req() req, @Body() body: any, @Res() res) {
-    res.json(
-      await this.chatService.unmuteMember(
-        req.user.id,
-        parseInt(body.roomId),
-        parseInt(body.userId),
-      ),
-    );
-  }
+  // @Post('/settings/unmute')
+  // @UseGuards(Jwt2faAuthGuard)
+  // async unmuteMember(@Req() req, @Body() body: any, @Res() res) {
+  //   res.json( await this.chatService.unmuteMember(req.user.id, parseInt(body.roomId), parseInt(body.userId)) );
+  // }
 
   @Post('/settings/kick')
   @UseGuards(Jwt2faAuthGuard)
@@ -164,14 +154,22 @@ export class ChatController {
     );
   }
 
+  @Post('/settings/leave')
+  @UseGuards(Jwt2faAuthGuard)
+  async leaveRoom(@Req() req, @Body() param, @Res() res) {
+    // console.log('aralhna', param)
+    res.json(await this.chatService.leaveRoom(req.user.id, parseInt(param.id)));
+  }
+
   @Post('/settings/update')
   @UseGuards(Jwt2faAuthGuard)
   async changeRoomPw(@Req() req, @Body() body: any, @Res() res) {
+    // console.log('changeRoomPw', body)
     res.json(
       await this.chatService.changeRoomPw(
         req.user.id,
         parseInt(body.roomId),
-        body.pw,
+        body.newPassword,
       ),
     );
   }
@@ -181,6 +179,32 @@ export class ChatController {
   async disableRoomPw(@Req() req, @Body() body: any, @Res() res) {
     res.json(
       await this.chatService.disableRoomPw(req.user.id, parseInt(body.roomId)),
+    );
+  }
+
+  @Post('/settings/add/admin')
+  @UseGuards(Jwt2faAuthGuard)
+  async setAdmin(@Req() req, @Body() body: any, @Res() res) {
+    // console.log("booody" ,body)
+    res.json(
+      await this.chatService.addAdmin(
+        req.user.id,
+        parseInt(body.roomId),
+        parseInt(body.userId),
+      ),
+    );
+  }
+
+  @Post('/settings/add/member')
+  @UseGuards(Jwt2faAuthGuard)
+  async addMember(@Req() req, @Body() body: any, @Res() res) {
+    // console.log(body)
+    res.json(
+      await this.chatService.addMember(
+        req.user.id,
+        parseInt(body.roomId),
+        body.userName,
+      ),
     );
   }
 }

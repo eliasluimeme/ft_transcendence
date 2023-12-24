@@ -1,9 +1,9 @@
 import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
 import { AuthService } from 'src/auth/auth.service';
-// import { userIdDTO } from 'src/user/dto/userId.dto';
+import { userIdDTO } from 'src/user/dto/userId.dto';
 import { UserService } from 'src/user/user.service';
-import { UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import {
   WebSocketGateway,
   SubscribeMessage,
@@ -12,20 +12,23 @@ import {
   OnGatewayDisconnect,
   OnGatewayConnection,
 } from '@nestjs/websockets';
-// import { MESSAGES } from '@nestjs/core/constants';
-import { JwtService } from '@nestjs/jwt';
+import { JwtService, TokenExpiredError } from '@nestjs/jwt';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { request } from 'http';
 
+@Injectable()
 @WebSocketGateway({
   cors: {
-    origin: '*',
+    origin: 'http://localhost:3000',
   },
   namespace: 'chat',
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
-    private readonly chatService: ChatService,
-    private authService: AuthService,
-    private userService: UserService,
+    // private readonly chatService: ChatService,
+    // private authService: AuthService,
+    private prisma: PrismaService,
+    // private userService: UserService,
     private jwtService: JwtService,
   ) {}
 
@@ -34,28 +37,48 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   userToClient = new Map<number, string>();
 
-  private extractTokenFromCookies(cookies: any): string | null {
-    const accessToken = cookies.split('=')[1].replace(/"/g, '');
+  extractTokenFromCookies(cookies: any): string | null {
+    const accessToken = cookies?.split('=')[1].replace(/"/g, '');
     if (accessToken) return accessToken;
     return null;
   }
 
+  async findUserByIntraId(userId: string) {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: {
+          intraId: userId,
+        },
+        include: {
+          level: true,
+        },
+      });
+      if (user) {
+        delete user.hash;
+        return user;
+      } else return user;
+    } catch (error) {
+      // check prisma error status code
+      console.error('Error finding user: ', error);
+    }
+  }
+
   async handleConnection(client: Socket) {
     // Handle connection event
+    console.log('connected', client.id);
     try {
       const token = this.extractTokenFromCookies(
         client.handshake.headers.cookie,
       );
+      console.log('client connection token: ', client.request);
       if (!token) return this.disconnect(client);
 
       const verifiedToken = await this.jwtService.verifyAsync(token, {
         secret: process.env.JWT_SECRET,
       });
       if (!verifiedToken) return this.disconnect(client);
-
-      const user = await this.userService.findUserByIntraId(
-        verifiedToken.userId,
-      );
+      console.log('');
+      const user = await this.findUserByIntraId(verifiedToken.userId);
       if (!user) return this.disconnect(client);
 
       this.userToClient.set(user.id, client.id);
@@ -81,40 +104,23 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('conversation')
   async handelConversation(@MessageBody() data: any) {
     const { senderId, reciverId, messageContent, type } = data;
-    // console.log('data is ', data);
-    console.log('Here i am');
+    console.log('data is ', data);
     if (type === 'DM') {
-      // this.server.on('conversation', (messageContent) => {
-      // console.log('data is ', reciverId);
-      // console.log('data is ', senderId);
       this.server
         .to(this.userToClient[senderId])
         .emit('conversation', messageContent);
       this.server
         .to(this.userToClient[reciverId])
-        .emit('recieve', messageContent);
-      // });
-      // this.server.emit('received', messageContent);
+        .emit('conversation', messageContent);
+      console.log('data is ', data);
     } else if (type === 'GROUP') {
       this.server.emit('conversation', messageContent);
     }
   }
-}
 
-// {
-//   "visibility": "DM",
-//   "users": [
-//       {
-//           "id": 2,
-//           "name": "yjaadoun",
-//           "photo": "https://cdn.intra.42.fr/users/84a3983c8aff058948b6b7a6f613584b/yjaadoun.jpg",
-//           "self": true
-//       },
-//       {
-//           "id": 4,
-//           "name": "ael-hajj",
-//           "photo": "https://cdn.intra.42.fr/users/ae7ac95c539d98e693cb8dc7c15327b3/ael-hajj.jpg",
-//           "self": false
-//       }
-//   ]
-// }
+  @SubscribeMessage('notifications')
+  async notifications(@MessageBody() data: any) {
+    const { senderId, reciverId, content } = data;
+    this.server.to(this.userToClient[reciverId]).emit('notifications', content);
+  }
+}
