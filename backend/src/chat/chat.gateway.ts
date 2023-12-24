@@ -67,11 +67,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // Handle connection event
     console.log('connected', client.id);
     try {
-      const token = this.extractTokenFromCookies(
-        client.handshake.headers.cookie,
-      );
-      console.log('client connection token: ', client.request);
-      if (!token) return this.disconnect(client);
+      console.log("tokeeen:", client.handshake.headers.cookie)
+      const token = this.extractTokenFromCookies(client.handshake.headers.cookie);
+      if (!token)
+        return this.disconnect(client);
 
       const verifiedToken = await this.jwtService.verifyAsync(
         token,
