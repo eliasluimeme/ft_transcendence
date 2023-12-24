@@ -1,7 +1,7 @@
 import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
 import { AuthService } from 'src/auth/auth.service';
-import { userIdDTO } from 'src/user/dto/userId.dto';
+// import { userIdDTO } from 'src/user/dto/userId.dto';
 import { UserService } from 'src/user/user.service';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import {
@@ -71,12 +71,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (!token)
         return this.disconnect(client);
 
-      const verifiedToken = await this.jwtService.verifyAsync(
-        token,
-        { secret: process.env.JWT_SECRET },
-      );
-      if (!verifiedToken)
-        return this.disconnect(client);
+      const verifiedToken = await this.jwtService.verifyAsync(token, {
+        secret: process.env.JWT_SECRET,
+      });
+      if (!verifiedToken) return this.disconnect(client);
 
       const user = await this.findUserByIntraId(verifiedToken.userId)
       if (!user)
@@ -85,7 +83,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.userToClient.set(user.id, client.id);
       console.log(client.id, 'successfully connected ');
     } catch (error) {
-      console.log("erroooor: ", error);
+      console.log('erroooor: ', error);
       return this.disconnect(client);
     }
   }
@@ -105,24 +103,22 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('conversation')
   async handelConversation(@MessageBody() data: any) {
     const { senderId, reciverId, messageContent, type } = data;
-    console.log('data is ', data);
+    // console.log('data is ', data);
+    console.log('Here i am');
     if (type === 'DM') {
+      // this.server.on('conversation', (messageContent) => {
+      // console.log('data is ', reciverId);
+      // console.log('data is ', senderId);
       this.server
         .to(this.userToClient[senderId])
         .emit('conversation', messageContent);
       this.server
         .to(this.userToClient[reciverId])
-        .emit('conversation', messageContent);
-      console.log('data is ', data);
+        .emit('recieve', messageContent);
+      // });
+      // this.server.emit('received', messageContent);
     } else if (type === 'GROUP') {
       this.server.emit('conversation', messageContent);
     }
   }
-
-  @SubscribeMessage('notifications')
-  async notifications(@MessageBody() data: any) {
-    const { senderId, reciverId, content } = data;
-    this.server.to(this.userToClient[reciverId]).emit('notifications', content);
-  }
-
 }

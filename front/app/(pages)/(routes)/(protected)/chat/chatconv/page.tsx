@@ -132,7 +132,7 @@ import "@/app/(pages)/(routes)/(protected)/game/style.css";
 import ChatConv from "@/components/ui/chatcompo/ChatConv";
 import { useSearchParams } from "next/navigation";
 
-const page = () => {
+const Page = () => {
 const search = useSearchParams();
 const id = search.get('id');
 console.log(id);
@@ -143,4 +143,4 @@ console.log(id);
   );
 };
 
-export default page;
+export default Page;

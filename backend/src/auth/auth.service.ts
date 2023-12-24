@@ -1,4 +1,9 @@
-import { ForbiddenException, Injectable, Res, UnauthorizedException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  Res,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as argon from 'argon2';
 import { AuthDto } from './dto';
@@ -11,63 +16,71 @@ import { toDataURL } from 'qrcode';
 
 @Injectable()
 export class AuthService {
-    constructor(
-        private prisma: PrismaService, 
-        private userService: UserService,
-        private jwt: JwtService, 
-        private config: ConfigService,
-    ) {}
+  constructor(
+    private prisma: PrismaService,
+    private userService: UserService,
+    private jwt: JwtService,
+    private config: ConfigService,
+  ) {}
 
-    private blacklistToken: string[] = [];
+  private blacklistToken: string[] = [];
 
-    async getToken( payload: any ) {
-        const accessToken = this.jwt.sign({ 
-            payload,
-        }, { 
-            secret: this.config.get('JWT_SECRET'), 
-            expiresIn: '1d',
-        });
-        
-        return accessToken;
+  async getToken(payload: any) {
+    const accessToken = this.jwt.sign(
+      {
+        payload,
+      },
+      {
+        secret: this.config.get('JWT_SECRET'),
+        expiresIn: '1d',
+      },
+    );
+
+    return accessToken;
+  }
+
+  async generateToken(user: any, is2FAAuthenticated: boolean) {
+    return await this.jwt.signAsync(
+      {
+        userId: user.intraId,
+        email: user.email,
+        isTwoFactorAuthEnabled: !!user.isTwoFactorAuthEnabled,
+        isTwoFactorAuthenticated: is2FAAuthenticated,
+      },
+      {
+        secret: this.config.get('JWT_SECRET'),
+        expiresIn: '1d',
+      },
+    );
+  }
+
+  async set2FASecret(userId: number, secret: string) {
+    try {
+      await this.userService.updateUser(userId, {
+        twoFactorAuthSecret: secret,
+      });
+    } catch (error) {
+      console.error('Error setting 2FA secret: ', error);
     }
+  }
 
-    async generateToken( user: any, is2FAAuthenticated: boolean ) {
-        return await this.jwt.signAsync({ 
-            userId: user.intraId,
-            email: user.email,
-            isTwoFactorAuthEnabled: !!user.isTwoFactorAuthEnabled,
-            isTwoFactorAuthenticated: is2FAAuthenticated,
-          }, { 
-            secret: this.config.get('JWT_SECRET'), 
-            expiresIn: '1d',
-        });
-    }
+  async generate2FASecret(user: any) {
+    let secret: any;
 
-    async set2FASecret(userId: number, secret: string) {
-        try {
-            await this.userService.updateUser(userId, { twoFactorAuthSecret: secret });
-        } catch (error) {
-            console.error('Error setting 2FA secret: ', error);
-        }
-    }
+    if (!user.twoFactorAuthSecret) {
+      secret = authenticator.generateSecret();
+      await this.set2FASecret(user.id, secret);
+    } else secret = user.twoFactorAuthSecret;
 
-    async generate2FASecret(user: any) {
-        let secret: any;
+    const otpauthUrl = authenticator.keyuri(user.email, 'TRENDENDEN', secret);
 
-        if (!user.twoFactorAuthSecret) {
-           secret = authenticator.generateSecret();
-           await this.set2FASecret(user.id, secret);
-        } else secret = user.twoFactorAuthSecret;
+    return { secret, otpauthUrl };
+  }
 
-        const otpauthUrl = authenticator.keyuri(user.email, 'TRENDENDEN', secret);
-
-        return { secret, otpauthUrl };
-    }
-
-    async generateQrCode( user: any ) {
-        const otp = await this.generate2FASecret(user);
-        return await toDataURL(otp.otpauthUrl);
-    }
+  async generateQrCode(user: any) {
+    const otp = await this.generate2FASecret(user);
+    return await toDataURL(otp.otpauthUrl);
+  }
 
     async activate2FA(userId: number) {
         try {
@@ -89,84 +102,81 @@ export class AuthService {
         }
     }
 
-    is2FACodeValid(code: string, secret: string): boolean {
-        return authenticator.verify({ token: code, secret: secret });
+  is2FACodeValid(code: string, secret: string): boolean {
+    return authenticator.verify({ token: code, secret: secret });
+  }
+
+  async updateProfile(userId: number, data: any) {
+    return await this.userService.updateUser(userId, data);
+  }
+
+  async validateIntraUser(profile: any): Promise<any> {
+    try {
+      const user = await this.userService.findUserByIntraId(profile.id);
+
+      if (!user) {
+        const newUser = await this.userService.createIntraUser(profile);
+        return newUser;
+      }
+
+      return user;
+    } catch (err) {
+      throw err;
     }
+  }
 
-    async updateProfile(userId: number, data: any) {
-        return await this.userService.updateUser(userId, data);
-    }
+  async validateLocalUser(email: string, password: string) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+    });
 
-    
-    async validateIntraUser(profile: any): Promise<any> {
-        try {
-            const user = await this.userService.findUserByIntraId(profile.id);
-    
-            if (!user) {
-                const newUser = await this.userService.createIntraUser(profile);
-                return newUser;
-            }
+    if (!user) return null;
 
-            return user;
-        } catch (err) {
-            throw err;
-        }
-    }
-    
-    async validateLocalUser(email: string, password: string) {
-        const user = await this.prisma.user.findUnique({
-            where: {
-                email: email
-            }
-        });
-        
-        if (!user)
-            return null;
-    
-        const pwMatch = await argon.verify(user.hash, password);
-        if (!pwMatch)
-            return null;
+    const pwMatch = await argon.verify(user.hash, password);
+    if (!pwMatch) return null;
 
-        return user;
-    }
+    return user;
+  }
 
-    async logout(token: string) {
-        this.blacklistToken.push(token);
-    }
+  async logout(token: string) {
+    this.blacklistToken.push(token);
+  }
 
-// async signup(dto: AuthDto) {
-//     try {
-//         dto.password = await argon.hash(dto.password);
-        
-//         const user = await this.userService.createLocalUser(dto);
+  // async signup(dto: AuthDto) {
+  //     try {
+  //         dto.password = await argon.hash(dto.password);
 
-//         const {hash: _, ...newUser} = user;
+  //         const user = await this.userService.createLocalUser(dto);
 
-//         const token = await this.getToken( newUser.id, newUser.email )
+  //         const {hash: _, ...newUser} = user;
 
-//         return { user: newUser, token: token };
-//     } catch(error) {
-//         if (error instanceof PrismaClientKnownRequestError) {
-//             if (error.code === 'P2002')
-//                 throw new UnauthorizedException("Email or username is already taken");
-//         }
-//         throw error;
-//     }
-// }
+  //         const token = await this.getToken( newUser.id, newUser.email )
 
-// async signin(dto: AuthDto) {
-//     const user = await this.userService.findUserByEmail(dto.email);
+  //         return { user: newUser, token: token };
+  //     } catch(error) {
+  //         if (error instanceof PrismaClientKnownRequestError) {
+  //             if (error.code === 'P2002')
+  //                 throw new UnauthorizedException("Email or username is already taken");
+  //         }
+  //         throw error;
+  //     }
+  // }
 
-//     if (!user)
-//         throw new UnauthorizedException("Invalid credentials");
-    
-//     const pwMatch = await argon.verify(user.hash, dto.password);
-//     if (!pwMatch)
-//         throw new UnauthorizedException("Invalid credentials");
+  // async signin(dto: AuthDto) {
+  //     const user = await this.userService.findUserByEmail(dto.email);
 
-//     delete user.hash;
+  //     if (!user)
+  //         throw new UnauthorizedException("Invalid credentials");
 
-//     const token = await this.getToken(user.id, user.email);
-//     return { success: true, user: user, token: token };
-// }
+  //     const pwMatch = await argon.verify(user.hash, dto.password);
+  //     if (!pwMatch)
+  //         throw new UnauthorizedException("Invalid credentials");
+
+  //     delete user.hash;
+
+  //     const token = await this.getToken(user.id, user.email);
+  //     return { success: true, user: user, token: token };
+  // }
 }

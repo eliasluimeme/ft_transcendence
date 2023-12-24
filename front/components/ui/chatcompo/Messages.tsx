@@ -3,7 +3,7 @@
 import { FC, useEffect, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
-import { format } from 'date-fns'
+// import { format } from 'date-fns'
 import ChatInput from './ChatInput'
 
 
@@ -32,9 +32,9 @@ interface MessagesProps {
   
     const scrollDownRef = useRef<HTMLDivElement | null>(null)
   
-    const formatTimestamp = (timestamp: number) => {
-      return format(timestamp, 'HH:mm')
-    }
+    // const formatTimestamp = (timestamp: number) => {
+    //   return format(timestamp, 'HH:mm')
+    // }
   
     return (
       <div

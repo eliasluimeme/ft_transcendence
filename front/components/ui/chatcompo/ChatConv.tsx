@@ -15,6 +15,8 @@ import internal from "stream";
 import { StaticRequire } from "next/dist/shared/lib/get-img-props";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import  Messages  from './Messages'
+
 interface Members {
   id: number;
   nickname: string;
@@ -51,9 +53,10 @@ function ChatConv(oldeId: any) {
       console.error("An error occurred while fetching member data:", error);
     }
   };
+
   useEffect(() => {
     fetchrol();
-  }, [id]);
+  }, [props.id]);
 
   /////////////////end point to get owner image/////////////////////////////
   const [Owner, OwnerImage] = useState<string>();
@@ -86,7 +89,7 @@ function ChatConv(oldeId: any) {
   };
   useEffect(() => {
     fetchownerimage();
-  }, [id]);
+  }, [props.id]);
 
   const [muteStatue, setMuteStatu] = useState<boolean | undefined>(false);
   const [admine, setAdmine] = useState<boolean>(false);
@@ -124,7 +127,7 @@ function ChatConv(oldeId: any) {
   };
   useEffect(() => {
     fetchmemberdata();
-  }, [exist, id]);
+  }, [exist, props.id]);
   ///////////////////////////////////////////////////////////////////////////
 
   //////////end point to get mutestatue and adminestatus//////////////
@@ -553,89 +556,9 @@ function ChatConv(oldeId: any) {
           </div>
         </div>
       </div>
-      <div className="w-full h-full ow-start-2 row-span-4 flex items-center justify-center">
-        <div className="overflow-y-auto space-y-4 r w-[90%] h-full">
-          <div className="flex items-end space-x-2">
-            {/* <Avatar className="w-10 h-10">
-          </Avatar> */}
-            <div className="max-w-xs border rounded-lg shadow p-4">
-              <p className="text-sm">
-                Hello! I am your assistant. How can I assist you today?
-              </p>
-            </div>
-          </div>
-          <div className="flex items-end justify-end space-x-2">
-            <div className="max-w-xs bg-blue-100 text-blue-700 rounded-lg shadow p-4">
-              <p className="text-sm">I need help with a contract dispute.</p>
-            </div>
-            {/* <Avatar className="w-10 h-10">
-          </Avatar> */}
-          </div>
-          <div className="flex items-end space-x-2">
-            {/* <Avatar className="w-10 h-10">
-          </Avatar> */}
-            <div className="max-w-xs border rounded-lg shadow p-4">
-              <p className="text-sm">
-                I can certainly assist with that. Could you provide some more
-                detail about the dispute? I can certainly assist with that.
-                Could you provide some more detail about the dispute? I can
-                certainly assist with that. Could you provide some more detail
-                about the dispute? I can certainly assist with that. Could you
-                provide some more detail about the dispute? I can certainly
-                assist with that. Could you provide some more detail about the
-                dispute? I can certainly assist with that. Could you provide
-                some more detail about the dispute? I can certainly assist with
-                that. Could you provide some more detail about the dispute? I
-                can certainly assist with that. Could you provide some more
-                detail about the dispute?
-              </p>
-            </div>
-          </div>
-          <div className="flex items-end space-x-2">
-            {/* <Avatar className="w-10 h-10">
-          </Avatar> */}
-            <div className="max-w-xs border rounded-lg shadow p-4">
-              <p className="text-sm">
-                I can certainly assist with that. Could you provide some more
-                detail about the dispute? I can certainly assist with that.
-                Could you provide some more detail about the dispute? I can
-                certainly assist with that. Could you provide some more detail
-                about the dispute? I can certainly assist with that. Could you
-                provide some more detail about the dispute? I can certainly
-                assist with that. Could you provide some more detail about the
-                dispute? I can certainly assist with that. Could you provide
-                some more detail about the dispute? I can certainly assist with
-                that. Could you provide some more detail about the dispute? I
-                can certainly assist with that. Could you provide some more
-                detail about the dispute?
-              </p>
-            </div>
-          </div>
-          <div className="flex items-end space-x-2">
-            {/* <Avatar className="w-10 h-10">
-          </Avatar> */}
-            <div className="max-w-xs border rounded-lg shadow p-4">
-              <p className="text-sm">
-                I can certainly assist with that. Could you provide some more
-                detail about the dispute? I can certainly assist with that.
-                Could you provide some more detail about the dispute? I can
-                certainly assist with that. Could you provide some more detail
-                about the dispute? I can certainly assist with that. Could you
-                provide some more detail about the dispute? I can certainly
-                assist with that. Could you provide some more detail about the
-                dispute? I can certainly assist with that. Could you provide
-                some more detail about the dispute? I can certainly assist with
-                that. Could you provide some more detail about the dispute? I
-                can certainly assist with that. Could you provide some more
-                detail about the dispute?
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="w-full h-full row-start-6 row-span-1 flex items-center justify-center">
+      <div className="w-full h-full row-start-2 row-span-6 flex items-center justify-center">
         <div className="rounded-lg w-[90%] h-[20%]">
-          <ChatInput />
+          <ChatInput id={id}/>
         </div>
       </div>
     </div>
@@ -643,3 +566,52 @@ function ChatConv(oldeId: any) {
 }
 
 export default ChatConv;
+
+
+{/* <div className="w-full h-full ow-start-2 row-span-4 flex items-center justify-center">
+<div className="overflow-y-auto space-y-4 r w-[90%] h-full">
+  <div className="flex items-end space-x-2">
+    <Avatar className="w-10 h-10">
+  </Avatar>
+    <div className="max-w-xs border rounded-lg shadow p-4">
+      <p className="text-sm">
+        Hello! I am your assistant. How can I assist you today?
+      </p>
+    </div>
+  </div>
+  <div className="flex items-end justify-end space-x-2">
+    <div className="max-w-xs bg-blue-100 text-blue-700 rounded-lg shadow p-4">
+      <p className="text-sm">I need help with a contract dispute.</p>
+    </div>
+    <Avatar className="w-10 h-10">
+  </Avatar>
+  </div>
+  <div className="flex items-end space-x-2">
+    <Avatar className="w-10 h-10">
+  </Avatar>
+    <div className="max-w-xs border rounded-lg shadow p-4">
+      <p className="text-sm">
+
+      </p>
+    </div>
+  </div>
+  <div className="flex items-end space-x-2">
+    <Avatar className="w-10 h-10">
+  </Avatar>
+    <div className="max-w-xs border rounded-lg shadow p-4">
+      <p className="text-sm">
+
+      </p>
+    </div>
+  </div>
+  <div className="flex items-end space-x-2">
+    <Avatar className="w-10 h-10">
+  </Avatar>
+    <div className="max-w-xs border rounded-lg shadow p-4">
+      <p className="text-sm">
+
+      </p>
+    </div>
+  </div>
+</div>
+</div> */}

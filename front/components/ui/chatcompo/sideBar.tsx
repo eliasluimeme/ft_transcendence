@@ -1,5 +1,6 @@
-"use client";
+'use client';
 
+import { Alert } from "reactstrap";
 import Image from "next/image";
 import Style from "./sideBar.module.css";
 import "@/components/ui/CSS/font.css";
@@ -23,7 +24,7 @@ type freind = {
   name: string;
 };
 
-const getFriends = () => {
+const GetFriends = () => {
   const router = useRouter();
   const [freind, setfreind] = useState<freind[]>([]);
   const takefreind = async () => {
@@ -49,69 +50,31 @@ const getFriends = () => {
     takefreind();
   }, []);
 
-  const redirectConvo = async (id: string) =>  {
-    try {
-      const resp = await axios.get(`http://localhost:3000/chat/${id}`, {
-        withCredentials: true,
-      });
-      if (resp.status === 200) {
-        console.log("success");
-      } else {
-        console.log("Failed to fetch group data");
-      }
-    } catch (error) {
-
-    }
-  };
-
   return Object.values(freind).map((friend, index) => (
     <button
       className="bg-[#D9D9D9] w-[90%] h-[50px] hover:text-[#F77B3F] text-opacity-[70%] bg-opacity-[10%] hover:bg-opacity-[100%] flex items-center justify-center space-x-8 rounded-lg"
       key={index}
-
-      onClick={() => 
-      router.push('/chat/chatconv?id=' + `${friend.id}`)}
+      onClick={() =>
+        router.push(`/chat/chatconv?id=${friend.id}`)
+    }
     >
       <Avatar className="w-[30px] h-[30px]">
         <AvatarImage src={friend.image} alt="User Avatar" />
         <AvatarFallback></AvatarFallback>
       </Avatar>
       <div className="text-[15px] w-[100px]">{friend.name}</div>
-      {/* <button className="border rounded-lg w-[40%] bg-[#F77B3F] bg-opacity-[70%] hover:bg-opacity-[100%]">
-        Send
-      </button> */}
     </button>
   ));
 };
 
+
 function SideBar() {
-  const friends: string[] = ["Achraf", "Ilyass", "Youssef", "Yjaadoun"]; // Dattabase
-
-  const [searchValue, setSearchValue] = useState("");
-
-  const handleChat = (friend: string) => {
-    // Implementation to open a chat with the friend.
-    console.log(`Opening chat with ${friend}`);
-    return (
-      <div>
-        <h1>Chat with {friend}</h1>
-        <Link href={`/chat/${friend}`} />
-      </div>
-    );
-    // render <Conversation /> component.
-  };
-
-  const handleSearch = (value: string) => {
-    setSearchValue(value);
-    console.log("from handelSearch", value);
-  };
-
   return (
     <div className="w-full h-full rounded-lg border">
       <div className="w-full h-full ">
         <div className="w-full h-full grid grid-col-12">
           <div className="mt-[20px] col-start-1 col-span-10 overflow-y-auto w-[98%] h-full flex flex-col items-center  space-y-3">
-            {getFriends()}
+            {GetFriends()}
           </div>
           <div className="w-full justify-center h-[500px] col-start-11 col-span-2 mt-[20px]">
             <div className="">
