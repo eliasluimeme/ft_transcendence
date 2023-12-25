@@ -15,7 +15,7 @@ import internal from "stream";
 import { StaticRequire } from "next/dist/shared/lib/get-img-props";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import  Messages  from './Messages'
+import Messages from "./Messages";
 
 interface Members {
   id: number;
@@ -29,6 +29,7 @@ function ChatConv(oldeId: any) {
   const router = useRouter();
   const id = oldeId["id"];
   console.log("id", id);
+  ///////////////////////////end point to get room type///////////////////////////////
   /////////////////end point to get rol/////////////////////////////
   const [typeofRoom, setTypofRoom] = useState<boolean>(true);
   const [rol, setrol] = useState(true);
@@ -401,7 +402,7 @@ function ChatConv(oldeId: any) {
   const deleatPassword = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:3001/chat/settings/delete",
+        "http://localhost:3001/chat/settings/disable",
         {
           roomId: id,
         },
@@ -596,7 +597,7 @@ function ChatConv(oldeId: any) {
       </div>
       <div className="w-full h-full row-start-2 row-span-6 flex items-center justify-center">
         <div className="rounded-lg w-[90%] h-[20%]">
-          <ChatInput id={id}/>
+          <ChatInput id={id} />
         </div>
       </div>
     </div>
@@ -605,8 +606,8 @@ function ChatConv(oldeId: any) {
 
 export default ChatConv;
 
-
-{/* <div className="w-full h-full ow-start-2 row-span-4 flex items-center justify-center">
+{
+  /* <div className="w-full h-full ow-start-2 row-span-4 flex items-center justify-center">
 <div className="overflow-y-auto space-y-4 r w-[90%] h-full">
   <div className="flex items-end space-x-2">
     <Avatar className="w-10 h-10">
@@ -652,4 +653,5 @@ export default ChatConv;
     </div>
   </div>
 </div>
-</div> */}
+</div> */
+}
