@@ -19,6 +19,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 @WebSocketGateway({
   cors: {
     origin: 'http://localhost:3000',
+    credentials: true,
   },
   namespace: 'chat',
 })
@@ -69,6 +70,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     try {
       console.log("tokeeen:", client.handshake.headers.cookie)
       const token = this.extractTokenFromCookies(client.handshake.headers.cookie);
+      console.log("extracted token:", token)
       if (!token)
         return this.disconnect(client);
 
