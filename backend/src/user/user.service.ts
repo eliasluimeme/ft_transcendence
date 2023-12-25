@@ -8,12 +8,9 @@ import { settingsDTO } from './dto/settings.dto';
 
 @Injectable()
 export class UserService {
-    constructor(
-        private prisma: PrismaService, 
-        // private chatGateway: ChatGateway,
-        ) {}
+    constructor( private prisma: PrismaService ) {}
 
-  async createIntraUser(profile: any) {
+  async createIntraUser(profile: any): Promise<any> {
     try {
       const user = await this.prisma.user.create({
         data: {
@@ -77,7 +74,7 @@ export class UserService {
     }
   }
 
-  async getProfile(user: any) {
+  async getProfile(user: any): Promise<any> {
     try {
       const userLevel = await this.getUserLevel(user.id);
       const userRank = await this.getUserRank(userLevel);
@@ -159,7 +156,7 @@ export class UserService {
     }
   }
 
-  async getRank(userlevel: number) {
+  async getRank(userlevel: number): Promise<any> {
     try {
       const rank = await this.getUserRank(userlevel);
       return { rank: rank };
@@ -168,7 +165,7 @@ export class UserService {
     }
   }
 
-    async getSettings( intraId: string ) {
+    async getSettings( intraId: string ): Promise<any> {
         try {
             const user = await this.prisma.user.findUnique({
                 where: {
@@ -193,20 +190,12 @@ export class UserService {
         }
     }
 
-  async checkExistingData(
-    id: string,
-    data: {
-      fullName: string;
-      userName: string;
-      country: string;
-      number: string;
-    },
-  ) {
-    const existingUserName = await this.prisma.user.findMany({
-      where: {
-        userName: data.userName,
-      },
-    });
+  async checkExistingData (id: string,data: { fullName: string;  userName: string;  country: string;  number: string;} ): Promise<any> {
+        const existingUserName = await this.prisma.user.findMany({
+          where: {
+            userName: data.userName,
+          },
+        });
 
         if (existingUserName[0] && existingUserName[0].intraId !== id)
             throw new ForbiddenException('User name already in use');
@@ -230,7 +219,7 @@ export class UserService {
             throw new ForbiddenException('Number already in use');
     }
 
-    async updateProfile(intraId: string , newData: settingsDTO ) {
+    async updateProfile(intraId: string , newData: settingsDTO ): Promise<any> {
         await this.checkExistingData(intraId, newData);
         try {
             const user = await this.prisma.user.update({
@@ -259,7 +248,26 @@ export class UserService {
         }
     }
 
-    async updateUser(id: number, newData: any ) {
+    async updateAvatar(userId: number, photo: string): Promise<any> {
+        try {
+            const user = await this.prisma.user.update({
+                where: {
+                    id: userId,
+                },
+                data: {
+                    photo: photo,
+                },
+                select: {
+                    photo: true,
+                }
+            });
+            return user;
+        } catch (error) {
+            console.error('Error updating user avatar: ', error);
+        }
+    }
+
+    async updateUser(id: number, newData: any ): Promise<any> {
         try {
             const user = await this.prisma.user.update({
                 where: {
@@ -273,7 +281,7 @@ export class UserService {
         }
     }
 
-    async findUserByIntraId(userId: string) {
+    async findUserByIntraId(userId: string): Promise<any> {
         try {
             const user = await this.prisma.user.findUnique({
                 where: {
@@ -293,7 +301,7 @@ export class UserService {
         }
     }
 
-    async findUserById(userId: number) {
+    async findUserById(userId: number): Promise<any> {
         try {
             const user = await this.prisma.user.findUnique({
                 where: {
@@ -309,7 +317,7 @@ export class UserService {
         }
     }
 
-    async deleteUser(id: number) {
+    async deleteUser(id: number): Promise<any> {
         try {
             const user = await this.prisma.user.delete({
                 where: {
@@ -327,7 +335,7 @@ export class UserService {
         return allowedPattern.test(query);
     }
 
-  async checkUser(userId: number, query: string) {
+  async checkUser(userId: number, query: string): Promise<any> {
     try {
       // check query
       const user = await this.prisma.user.findUnique({
@@ -355,7 +363,7 @@ export class UserService {
     }
   }
 
-  async searchUser(user: any, query: string) {
+  async searchUser(user: any, query: string): Promise<any> {
     if (this.isValidQuery(query)) {
       try {
         const foundUser = await this.prisma.user.findUnique({
@@ -459,7 +467,7 @@ export class UserService {
     } else throw new BadRequestException('Invalid input');
   }
 
-  async searchUserAchievements(userName: string) {
+  async searchUserAchievements(userName: string): Promise<any> {
     try {
       const userAchievements = await this.prisma.user.findUnique({
         where: {
@@ -476,7 +484,7 @@ export class UserService {
     }
   }
 
-  async searchUserMatchHistory(me: any, userName: string) {
+  async searchUserMatchHistory(me: any, userName: string): Promise<any> {
     try {
       const user = await this.prisma.user.findUnique({
         where: { userName: userName },
@@ -545,7 +553,7 @@ export class UserService {
     }
   }
 
-  async getFriends(userId: number) {
+  async getFriends(userId: number): Promise<any> {
     try {
       const friendShip = await this.prisma.friends.findMany({
         where: {
@@ -585,7 +593,7 @@ export class UserService {
     }
   }
 
-  async getFriendship(userId: number, friendId: number) {
+  async getFriendship(userId: number, friendId: number): Promise<any> {
     if (!friendId)
       throw new BadRequestException('Bad request no friendShip found');
 
@@ -613,7 +621,7 @@ export class UserService {
     }
   }
 
-  async addFriend(senderId: number, receiverId: number) {
+  async addFriend(senderId: number, receiverId: number): Promise<any> {
     if (senderId === receiverId)
       throw new BadRequestException(
         'You cannot send a friend request to yourself',
@@ -675,7 +683,7 @@ export class UserService {
     }
   }
 
-  async acceptFriend(receiverId: number, senderId: number) {
+  async acceptFriend(receiverId: number, senderId: number): Promise<any> {
     if (senderId === receiverId)
       throw new BadRequestException(
         'You cannot accept a friend request you sent to yourself',
@@ -770,7 +778,7 @@ export class UserService {
     }
   }
 
-  async getBlockStatus(userId: number, friendId: number) {
+  async getBlockStatus(userId: number, friendId: number): Promise<any> {
     try {
       const block = await this.prisma.blocks.findMany({
         where: {
@@ -795,7 +803,7 @@ export class UserService {
     }
   }
 
-  async blockUser(userId: number, blockedId: number) {
+  async blockUser(userId: number, blockedId: number): Promise<any> {
     if (userId === blockedId)
       throw new BadRequestException('You cannot block yourself');
     try {
@@ -829,7 +837,7 @@ export class UserService {
     }
   }
 
-  async unblockUser(userId: number, blockedId: number) {
+  async unblockUser(userId: number, blockedId: number): Promise<any> {
     if (userId === blockedId)
       throw new BadRequestException('You cannot block yourself');
     try {
@@ -847,7 +855,7 @@ export class UserService {
     }
   }
 
-    async gameInvite( userId: number, opponentId: number) {
+    async gameInvite( userId: number, opponentId: number): Promise<any> {
         try {
             // const invite = await this.chatGateway.notifications({
             //     senderId: userId,
@@ -863,7 +871,7 @@ export class UserService {
 
     // accept game invite
 
-  // async createLocalUser(dto: AuthDto) {
+  // async createLocalUser(dto: AuthDto): Promise<any> {
   //     try {
   //         const user = await this.prisma.user.create({
   //             data: {

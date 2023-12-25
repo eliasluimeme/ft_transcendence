@@ -40,18 +40,12 @@ export class ChatService {
                 }
             });
 
-            // console.log("userconvos", userConvos);
             const iblocked = userConvos.blocker.filter(u => u.blockerId === userId);
             const blockedme = userConvos.blocked.filter(u => u.blockedId === userId);
-            // console.log("blockedme", blockedme);
-            // console.log("iblocked", iblocked);
 
             const convos = await this.prisma.chatroom.findMany({
                 where: {
-                    OR: [
-                        { ChatroomUsers: { some: { userId: userId } } },
-                        { visibility: 'PUBLIC' },
-                    ],
+                    ChatroomUsers: { some: { userId: userId } } ,
                 },
                 include: {
                     ChatroomUsers: {
@@ -69,15 +63,14 @@ export class ChatService {
                     },
                 }
             })
-            // console.log("convos", convos)
             const conv = convos.map(conv => {
                 const { id, name, group, photo, visibility } = conv;
                 if (group) {
 
-                    if (visibility === 'PRIVATE' && conv.ChatroomUsers.find(u => u.userId === userId).isBanned === false)
+                    if (conv.ChatroomUsers.find(u => u.userId === userId) && conv.ChatroomUsers.find(u => u.userId === userId).isBanned === false)
                         return { convId: id, name, photo }
-                    else if (visibility === 'PROTECTED' && conv.ChatroomUsers.find(u => u.userId === userId).isBanned === false) 
-                        return { convId: id, name, photo }
+                    // else if (visibility === 'PROTECTED' && conv.ChatroomUsers.find(u => u.userId === userId).isBanned === false) 
+                    //     return { convId: id, name, photo }
                     // else if (visibility === 'PUBLIC')
                     //     if (conv.ChatroomUsers.find(u => u.userId === userId)) {
                     //         if (conv.ChatroomUsers.find(u => u.userId === userId).isBanned === false)
@@ -95,7 +88,6 @@ export class ChatService {
                     return { convId: id, name: userName, photo}
                 }
             }).filter(conv => conv !== null);
-            // TODO: check public rooms if included or not
             return conv
         } catch(error) {
             console.log(error);
@@ -277,13 +269,15 @@ export class ChatService {
 
     async getConvoMembers(userId: number, roomId: number) {
         try {
-            // console.log('getConvoMembers   ', userId, roomId);
           const room = await this.prisma.chatroom.findUnique({
             where: {
               id: roomId,
             },
             include: {
               ChatroomUsers: {
+                where: {
+                    chatroomId: roomId
+                },
                 include: {
                   user: {
                     select: {
@@ -296,6 +290,7 @@ export class ChatService {
               },
             },
           });
+          console.log("room:", room)
           if (!room) throw new NotFoundException('Room does not exist');
     
           const userss = room.ChatroomUsers.map((user) => {
@@ -305,7 +300,7 @@ export class ChatService {
               photo: user.user.photo,
             };
           });
-    
+          console.log("users:", userss)
           if (!userss.find((user) => user.id === userId))
             throw new ForbiddenException('You are not in this room');
     
@@ -326,9 +321,10 @@ export class ChatService {
               };
             }
           });
-        //   console.log("==========> " , users, room.visibility);
           return { visibility: room.visibility, users };
         } catch (error) {
+            if (error instanceof NotFoundException || error instanceof ForbiddenException)
+                throw error;
           console.log(error);
         }
       }
@@ -743,7 +739,7 @@ export class ChatService {
 
             const chatRoomUserId = user.chatroom.ChatroomUsers.find( user => user.userId === memberId).id;
 
-            await this.prisma.chatroomUsers.update({
+            return await this.prisma.chatroomUsers.update({
                 where: {
                     id: chatRoomUserId,
                 },
@@ -834,9 +830,10 @@ export class ChatService {
             //     throw new ForbiddenException('You are not allowed to add admins to this room')
             if (!user.chatroom.ChatroomUsers.find( user => user.userId === memberId))
                 throw new ForbiddenException('Member does not exist')
-            // if (user.chatroom.ChatroomUsers.find( user => user.userId === memberId).role === 'ADMIN')
-            //     throw new ForbiddenException('Member already admin')
 
+            // if (user.chatroom.ChatroomUsers.find( user => user.userId === memberId).role === 'ADMIN') {
+
+            // }
             const chatRoomUserId = user.chatroom.ChatroomUsers.find( user => user.userId === memberId).id;
             const role = user.chatroom.ChatroomUsers.find( user => user.userId === memberId).role;
 
@@ -1009,9 +1006,20 @@ export class ChatService {
             const member = await this.prisma.user.findUnique({
                 where: {
                     userName: memberName,
+                },
+                include: {
+                    sentRequests: true,
+                    receivedRequests: true,
+                    blocker: true,
+                    blocked: true
                 }
             })
+
             if (!member) throw new BadRequestException('User does not exist');
+            if (member.id === userId) throw new ForbiddenException('You cannot add yourself');
+            if (member.blocker.find(user => user.blockedId === userId)) throw new ForbiddenException('You are blocked by this user');
+            if (member.blocked.find(user => user.blockerId === userId)) throw new ForbiddenException('You blocked this user');
+            if (!member.sentRequests.find(user => user.receiverId === userId) && !member.receivedRequests.find(user => user.senderId === userId)) throw new ForbiddenException('User does not exist in your friend list');
 
             const memberInRoom = await this.prisma.chatroomUsers.findFirst({
                 where: {
@@ -1023,16 +1031,55 @@ export class ChatService {
 
             const newMember = await this.prisma.chatroomUsers.create({
                 data: {
-                    // userId: { connect: { id: member.id }},
                     userId: member.id,
                     chatroomId: roomId,
                 }
             })
-            console.log('new member', newMember)
             return newMember
         } catch (error) {
             if (error instanceof BadRequestException || error instanceof ForbiddenException)
                 throw error
+            console.log(error)
+        }
+    }
+
+    async addMessage( userId: number, roomId: number, message: string) {
+        try {
+            const userInChatroom = await this.prisma.chatroomUsers.findFirst({
+                where: {
+                    userId: userId,
+                    chatroomId: roomId,
+                },
+              });
+
+              if (!userInChatroom)
+                throw new Error('User not found in the chat room.');
+          
+              const newMessage = await this.prisma.message.create({
+                data: {
+                    content: message,
+                    senderId: userInChatroom.id,
+                    chatroomId: roomId,
+                },
+              });
+          
+              await this.prisma.chatroomUsers.update({
+                where: { id: userInChatroom.id },
+                data: {
+                  messages: {
+                    connect: {
+                      id: newMessage.id,
+                    },
+                  },
+                },
+              });
+          
+            if (newMessage)
+                return { success: true, message: 'Message sent' }
+            else throw new BadRequestException('Something went wrong. Please try again');
+        } catch (error) {
+            if (error instanceof BadRequestException)
+                throw error;
             console.log(error)
         }
     }

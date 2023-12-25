@@ -58,6 +58,7 @@ function ChatConv(oldeId: any) {
   useEffect(() => {
     fetchrol();
   }, [id, update]);
+  
 
   /////////////////end point to get owner image/////////////////////////////
   const [Owner, OwnerImage] = useState<string>();
@@ -79,7 +80,6 @@ function ChatConv(oldeId: any) {
         const adminPhotos: string[] = response.data.admins.map(
           (admin: any) => admin.photo
         );
-        console.log("test allah allah", adminPhotos);
         setAdmines(adminPhotos);
       } else {
         console.log("Failed to fetch member data");
@@ -90,8 +90,10 @@ function ChatConv(oldeId: any) {
   };
   useEffect(() => {
     fetchownerimage();
-  }, [id, update]);
-
+  }, [id]);
+  useEffect(() => {
+    fetchownerimage();
+  }, [update]);
   const [muteStatue, setMuteStatu] = useState<boolean | undefined>(false);
   const [admine, setAdmine] = useState<boolean>(false);
 
@@ -248,6 +250,7 @@ function ChatConv(oldeId: any) {
     toupdate(update + 1);
     setexist(false);
   };
+
   /////////endpoint to post  ban//////////////
   const postban = () => {
     const sendban = async () => {
@@ -256,6 +259,7 @@ function ChatConv(oldeId: any) {
           "http://localhost:3001/chat/settings/ban",
           {
             id,
+            userId: data?.id,
           },
           {
             withCredentials: true,
@@ -563,7 +567,7 @@ function ChatConv(oldeId: any) {
                             onClick={() => deleatPassword()}
                             className="w-full h-full text-[9px]"
                           >
-                            deleat password
+                            delete password
                           </button>
                         </div>
                       </div>

@@ -12,4 +12,6 @@ export class settingsDTO {
     country: string;
 
     number: string;
+
+    photo: string;
 }

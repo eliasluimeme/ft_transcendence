@@ -9,7 +9,9 @@ import Image from "next/image";
 import axios from "axios";
 import Messages from "./Messages";
 
-const socket = io("http://localhost:3001/chat");
+const socket = io("http://localhost:3001/chat", {
+  withCredentials: true,
+});
 
 type Message = {
   id: string
