@@ -59,12 +59,11 @@ function ChatConv(oldeId: any) {
   useEffect(() => {
     fetchrol();
   }, [id, update]);
-  
 
   /////////////////end point to get owner image/////////////////////////////
   const [Owner, OwnerImage] = useState<string>();
 
-  const [admins, setAdmines] = useState<string[]>([]);
+  const [admins, setAdmines] = useState<string[] | null>([]);
   const fetchownerimage = async () => {
     try {
       const response = await axios.get(
@@ -78,10 +77,14 @@ function ChatConv(oldeId: any) {
       );
       if (response.status === 200) {
         OwnerImage(response.data.owner.photo);
-        const adminPhotos: string[] = response.data.admins.map(
-          (admin: any) => admin.photo
-        );
-        setAdmines(adminPhotos);
+        if (response.data.admins !== null) {
+          const adminPhotos: string[] = response.data.admins.map(
+            (admin: any) => admin.photo
+          );
+          setAdmines(adminPhotos);
+        } else {
+          setAdmines(null);
+        }
       } else {
         console.log("Failed to fetch member data");
       }
@@ -178,6 +181,7 @@ function ChatConv(oldeId: any) {
       memberImage: memberdata.memberImage,
       isMuted: memberdata.isMuted,
     });
+    toupdate(update + 1);
     setexist(true);
   }
 
@@ -456,7 +460,7 @@ function ChatConv(oldeId: any) {
                     {/* ///////////////room Admines////////////////////////////// */}
                     <div className="flex justify-center items-center space-x-3  border-b h-[80px]">
                       <div>Admins :</div>
-                      {admins.map((adminImageUrl, index) => (
+                      {admins?.map((adminImageUrl, index) => (
                         <div key={index}>
                           <Avatar className="">
                             <AvatarImage src={adminImageUrl} />
