@@ -888,4 +888,22 @@ export class UserService {
   //         throw error;
   //     }
   // }
+
+  async addToGameHistory(room: any) {
+    try {
+        // const game = await this.prisma.gameHistory.create({
+        //     data: {
+        //         winner: {connect: { id: room.winnerId } },
+        //         winnerScore: room.winnerScore,
+        //         looser: {connect: { id: room.looserId } },
+        //         looserScore: room.winnerScore,
+        //         disconnect: room.disconnect,
+        //     }
+        // });
+        // if (game)
+        //     return game;
+    } catch (error) {
+        console.error('Error adding game to the games history: ', error);
+    }
+}
 }
