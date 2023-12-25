@@ -25,10 +25,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
-    // private readonly chatService: ChatService,
-    // private authService: AuthService,
     private prisma: PrismaService,
-    // private userService: UserService,
     private jwtService: JwtService,
   ) {}
 
@@ -68,7 +65,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // Handle connection event
     console.log('connected', client.id);
     try {
-      console.log("tokeeen:", client.handshake.headers.cookie)
       const token = this.extractTokenFromCookies(client.handshake.headers.cookie);
       console.log("extracted token:", token)
       if (!token)
@@ -84,6 +80,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         return this.disconnect(client);
 
       this.userToClient.set(user.id, client.id);
+      // set online
       console.log(client.id, 'successfully connected ');
     } catch (error) {
       console.log('erroooor: ', error);

@@ -10,10 +10,6 @@ import { LessThan } from 'typeorm';
 export class ChatService {
     constructor(private prisma: PrismaService) {}
 
-    // chat owner should be able to change and remove password
-    // The user should be able to invite other users to play a Pong game through the chat interface.
-    // The user should be able to access other players profiles through the chat interface.
-
     async getConversations(userId: number) {
         try {
 
@@ -157,7 +153,6 @@ export class ChatService {
             if (!room)
                 throw new NotFoundException('Room does not exist')
 
-
             return { visibility: room.visibility };
         } catch(error) {
             if (error instanceof NotFoundException)
@@ -290,7 +285,7 @@ export class ChatService {
               },
             },
           });
-          console.log("room:", room)
+
           if (!room) throw new NotFoundException('Room does not exist');
     
           const userss = room.ChatroomUsers.map((user) => {
@@ -300,7 +295,7 @@ export class ChatService {
               photo: user.user.photo,
             };
           });
-          console.log("users:", userss)
+
           if (!userss.find((user) => user.id === userId))
             throw new ForbiddenException('You are not in this room');
     
@@ -831,9 +826,6 @@ export class ChatService {
             if (!user.chatroom.ChatroomUsers.find( user => user.userId === memberId))
                 throw new ForbiddenException('Member does not exist')
 
-            // if (user.chatroom.ChatroomUsers.find( user => user.userId === memberId).role === 'ADMIN') {
-
-            // }
             const chatRoomUserId = user.chatroom.ChatroomUsers.find( user => user.userId === memberId).id;
             const role = user.chatroom.ChatroomUsers.find( user => user.userId === memberId).role;
 
@@ -1076,6 +1068,26 @@ export class ChatService {
           
             if (newMessage)
                 return { success: true, message: 'Message sent' }
+            else throw new BadRequestException('Something went wrong. Please try again');
+        } catch (error) {
+            if (error instanceof BadRequestException)
+                throw error;
+            console.log(error)
+        }
+    }
+
+    async setOnlineStatus( userId: number ) {
+        try {
+            const user = await this.prisma.user.update({
+                where: {
+                    id: userId,
+                },
+                data: {
+                    status: 'ONLINE',
+                }
+            })
+            if (user)
+                return { success: true, message: 'User online' }
             else throw new BadRequestException('Something went wrong. Please try again');
         } catch (error) {
             if (error instanceof BadRequestException)
