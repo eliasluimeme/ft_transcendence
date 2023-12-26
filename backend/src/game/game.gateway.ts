@@ -77,7 +77,7 @@ export class GameGateway implements OnGatewayInit{
   removeRoom(roomid: string, disconnect: boolean) {
     
     const rslts = this.rooms.get(roomid).roomRslts();
-    this.logger.error("room is removed.");
+    // this.logger.error("room is removed.");
     if (rslts.winner.id)
     {
       this.players.delete(rslts.winner.id);
@@ -117,7 +117,7 @@ export class GameGateway implements OnGatewayInit{
   @SubscribeMessage('newGameBot')
   async newGameBot(@ConnectedSocket() client: Socket, @MessageBody() mode: string)
   {
-    this.logger.warn("hello");
+    // this.logger.warn("hello");
     const player = {id: client.data, sock: client.id, roomid: client.data};
     if (this.players.has(player.id))
     {

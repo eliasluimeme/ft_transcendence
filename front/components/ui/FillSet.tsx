@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { toast } from 'react-hot-toast';
+
 const FillSet: React.FC = () => {
   const [inputValues, setInputValues] = useState({
     fullName: "",
@@ -62,12 +64,16 @@ const FillSet: React.FC = () => {
           );
           if (response.status === 201) {
             console.log("Data sent successfully!");
-          } else {
-            console.error("Failed to send data.");
+            toast.success('Data sent successfully!');
+          } else if (response.status === 403) {
+            toast.error(response.data.message || 'An error occurred');
           }
-    }
-
-    } catch (error) {
+        }
+        
+      } catch (error: any) {
+        if (error.response && error.response.status === 403) {
+          toast.error(error.response.data.message || 'An error occurred');
+        }
       console.error("An error occurred while sending data:", error);
     }
   };

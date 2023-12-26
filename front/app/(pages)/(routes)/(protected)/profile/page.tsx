@@ -3,6 +3,7 @@ import "@/app/(pages)/(routes)/(protected)/game/style.css";
 import InfoProfil from "@/components/ui/profilecompo/InfoProfil";
 import Image from "next/image";
 import GameInfo from "@/components/ui/profilecompo/GameInfo";
+import { Toaster } from "react-hot-toast";
 const page = () => {
   return (
     <div className="w-full h-full bg-[#36393E] rounded-lg font-Goldman">
@@ -29,6 +30,7 @@ const page = () => {
           </div>
         </div>
       </div>
+      <Toaster />
     </div>
   );
 };

@@ -1,6 +1,7 @@
 import React from "react";
 import Pic from "@/components/ui/Profile";
 import FillSet from "@/components/ui/FillSet";
+import { Toaster } from "react-hot-toast";
 const settings = () => {
   const image =
     "https://mir-s3-cdn-cf.behance.net/project_modules/1400/3b8ebd170865619.6465111bd6e80.png";
@@ -20,6 +21,7 @@ const settings = () => {
       <div className="w-[60%]">
         <FillSet />
       </div>
+      <Toaster />
     </div>
   );
 };

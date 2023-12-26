@@ -85,7 +85,7 @@ export class GameService {
   resetBoard()
   {
     const angle = this.getRandomNumber(-45, 45);
-    this.logger.error(angle);
+    // this.logger.error(angle);
     this.calculVecs(angle);
     this.ball.speed = 2;
     this.ball.cords = {x: 500, y: 250};
@@ -231,7 +231,7 @@ export class GameService {
     setTimeout(() => {
       this.colTimers.padel = setInterval(this.padelCollusion.bind(this), this.ball.repete);
     }, 50);
-    this.logger.warn(angle);
+    // this.logger.warn(angle);
   }
 //update and send data to player function
   updateBoard(id: string, y: number): Board{
