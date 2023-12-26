@@ -72,7 +72,7 @@ export class AuthController {
         res.clearCookie('access_token');
         const activated = this.authService.activate2FA(req.user.id);
         res.cookie( 'access_token', `${token}` , { httpOnly: true, maxAge: 60 * 60 * 24 * 1000 });
-        res.status(200).json( {on: true} )
+        res.status(201).json( {on: true} )
     }
     
     @Get('auth/2fa/turn-off')

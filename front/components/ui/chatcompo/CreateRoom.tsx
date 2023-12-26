@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/popover";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import toast, { Toaster } from "react-hot-toast";
 
 const CreateRoom = () => {
   const router = useRouter();
@@ -36,10 +37,14 @@ const CreateRoom = () => {
       });
       if (response.status === 201) {
         console.log("success");
+        toast.success("Room Created Successfuly");
       } else {
         console.log("Failed to fetch group data");
       }
-    } catch (error) {
+    } catch (error: any) {
+      if (error.response) {
+        toast.error(error.response.data.message || 'An error occurred');
+      }
       console.error("An error occurred while fetching group data:", error);
     }
   };
@@ -87,6 +92,7 @@ const CreateRoom = () => {
           Save
         </button>
       </div>
+      {/* <Toaster /> */}
     </div>
   );
 };
