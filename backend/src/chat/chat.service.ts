@@ -66,7 +66,6 @@ export class ChatService {
             const conv = convos.map(conv => {
                 const { id, name, group, photo } = conv;
                 if (group) {
-
                     if (conv.ChatroomUsers.find(u => u.userId === userId) && conv.ChatroomUsers.find(u => u.userId === userId).isBanned === false)
                         return { convId: id, name, photo }
                     else return null;
@@ -429,7 +428,16 @@ export class ChatService {
               };
             }
           });
-          return { visibility: room.visibility, users };
+
+          if (room.visibility === 'DM') {
+            const uname = users.map(u => {
+                if(!u.self)
+                    return u.name
+            }).filter(u => u !== undefined);
+            return { visibility: room.visibility, roomName: uname[0], users };
+          } else 
+            return { visibility: room.visibility, roomName: room.name, users };
+            
         } catch (error) {
             if (error instanceof NotFoundException || error instanceof ForbiddenException)
                 throw error;
