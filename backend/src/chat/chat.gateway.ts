@@ -18,7 +18,6 @@ import { idMessageDto } from './dto/id.dto';
   cors: {
     origin: 'http://localhost:3000',
     credentials: true,
-    credentials: true,
   },
   namespace: 'chat',
 })

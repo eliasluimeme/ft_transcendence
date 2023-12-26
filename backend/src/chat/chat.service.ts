@@ -64,19 +64,11 @@ export class ChatService {
                 }
             })
             const conv = convos.map(conv => {
-                const { id, name, group, photo, visibility } = conv;
+                const { id, name, group, photo } = conv;
                 if (group) {
 
                     if (conv.ChatroomUsers.find(u => u.userId === userId) && conv.ChatroomUsers.find(u => u.userId === userId).isBanned === false)
                         return { convId: id, name, photo }
-                    // else if (visibility === 'PROTECTED' && conv.ChatroomUsers.find(u => u.userId === userId).isBanned === false) 
-                    //     return { convId: id, name, photo }
-                    // else if (visibility === 'PUBLIC')
-                    //     if (conv.ChatroomUsers.find(u => u.userId === userId)) {
-                    //         if (conv.ChatroomUsers.find(u => u.userId === userId).isBanned === false)
-                    //             return { convId: id, name, photo }
-                    //     } else 
-                    //         return { convId: id, name, photo }
                     else return null;
                 } else {
                     const user = conv.ChatroomUsers.find(u => u.userId !== userId).userId;
@@ -1179,9 +1171,6 @@ export class ChatService {
             where: {
                 id: roomId,
             },
-            // include: {
-            //     user: true,
-            // },
         });
         if (room_user)
             return room_user
@@ -1252,28 +1241,6 @@ export class ChatService {
         }
     }
 
-}
-
-    async setOnlineStatus( userId: number ) {
-        try {
-            const user = await this.prisma.user.update({
-                where: {
-                    id: userId,
-                },
-                data: {
-                    status: 'ONLINE',
-                }
-            })
-            if (user)
-                return { success: true, message: 'User online' }
-            else throw new BadRequestException('Something went wrong. Please try again');
-        } catch (error) {
-            if (error instanceof BadRequestException)
-                throw error;
-            console.log(error)
-        }
-    }
-
     async get_room_user(roomId: number, userId: number) {
         try {
             const user = await this.prisma.chatroomUsers.findFirst({
@@ -1294,5 +1261,4 @@ export class ChatService {
             console.log(error)
         }
     }
-
 }
