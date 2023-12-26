@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/hover-card";
 import Link from "next/link";
 import axios from "axios";
+import { Toaster, toast } from "react-hot-toast";
 
 type Data = {
   image: string;
@@ -115,6 +116,7 @@ const InfoProfil = (id: any) => {
           },
         });
         if (response.status === 200) {
+          toast.success("Friend added successfully");
           setFr("Unfriend");
         } else {
           console.log("Failed to add friend");
@@ -132,10 +134,14 @@ const InfoProfil = (id: any) => {
         });
         if (response.status === 200) {
           setFr("Add friend");
+          toast.success("Friend removed successfully");
         } else {
           console.log("Failed to reject friend");
         }
-      } catch (error) {
+      } catch (error: any) {
+        if (error.response) {
+          toast.error(error.response.data.message || 'An error occurred');
+        }
         console.error("An error occurred while rejecting friend:", error);
       }
     }
@@ -152,10 +158,14 @@ const InfoProfil = (id: any) => {
         });
         if (response.status === 200) {
           setblock("unblock")
+          toast.success("Friend blocked successfully");
         } else {
           console.log("Failed to add friend");
         }
-      } catch (error) {
+      } catch (error: any) {
+        if (error.response) {
+          toast.error(error.response.data.message || 'An error occurred');
+        }
         console.error("An error occurred while adding friend:", error);
       }
     } else if (block === "unblock") {
@@ -168,10 +178,14 @@ const InfoProfil = (id: any) => {
         });
         if (response.status === 200) {
           setblock("block");
+          toast.success("Friend blocked successfully");
         } else {
           console.log("Failed to reject friend");
         }
-      } catch (error) {
+      } catch (error: any) {
+        if (error.response) {
+          toast.error(error.response.data.message || 'An error occurred');
+        }
         console.error("An error occurred while rejecting friend:", error);
       }
     }
@@ -249,6 +263,7 @@ const InfoProfil = (id: any) => {
               </div>
           </div>
         </div>
+        <Toaster />
       </div>
   );
 };

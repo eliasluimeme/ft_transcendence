@@ -3,6 +3,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 const JoinRoom = () => {
   const router = useRouter();
@@ -29,12 +30,15 @@ const JoinRoom = () => {
       });
       if (response.status === 201) {
         setRoomId(response.data.id);
-        console.log("success:", response.data.id);
         router.push('/chat/chatconv?id=' + response.data.id);
+        toast.success("Room Joined Successfuly");
       } else {
         console.log("Failed to fetch group data");
       }
-    } catch (error) {
+    } catch (error: any) {
+      if (error.response) {
+        toast.error(error.response.data.message || 'An error occurred');
+      }
       console.error("An error occurred while fetching group data:", error);
     }
   };

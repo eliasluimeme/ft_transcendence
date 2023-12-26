@@ -7,6 +7,7 @@ import { Button } from "./button";
 import Modal from "react-modal";
 import axios from "axios";
 import Image from "next/image";
+import toast from "react-hot-toast";
 
 const Pic = () => {
 
@@ -99,12 +100,16 @@ const Pic = () => {
       );
 
       if (response.status === 200) {
+        toast.success("2FA Desactivated")
         if (response.data.off === true)
           router.push('/Login')
       } else {
         console.log("Unexpected response status:", response.status);
       }
-    } catch (error) {
+    } catch (error: any) {
+      if (error.response) {
+        toast.error(error.response.data.message || 'An error occurred');
+      }
       console.error("An error occurred while fetching QR code:", error);
     }
   };
@@ -144,12 +149,16 @@ const Pic = () => {
       );
 
       if (response.status === 201) {
+        toast.success("2FA Activated")
         if (response.data.on === true)
           router.refresh();
       } else {
         console.error("Failed to send data.");
       }
-    } catch (error) {
+    } catch (error: any) {
+      if (error.response) {
+        toast.error(error.response.data.message || 'An error occurred');
+      }
       console.error("An error occurred while sending data:", error);
     }
   };
@@ -180,7 +189,7 @@ const Pic = () => {
         );
 
         if (response.status === 201) {
-          console.log(response.data);
+          toast.success("Photo Uploaded Successfuly")
           setInputValues({
             ...inputValues,
             photo: response.data.photo,

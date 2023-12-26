@@ -931,6 +931,8 @@ export class ChatService {
                 return { success: true, message: 'Password disabled' }
             else throw new BadRequestException('Something went wrong. Please try again');
         } catch (error) {
+            if (error instanceof BadRequestException || error instanceof ForbiddenException || error instanceof NotFoundException)
+                throw error
             console.log(error)
         }
     }

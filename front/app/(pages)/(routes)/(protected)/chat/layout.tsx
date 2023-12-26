@@ -5,6 +5,7 @@ import Conversation from "../../../../../components/ui/chatcompo/conversation";
 import ChatInput from "@/components/ui/chatcompo/ChatInput";
 import ChatConv from "../../../../../components/ui/chatcompo/ChatConv";
 import "@/app/(pages)/(routes)/(protected)/game/style.css";
+import { Toaster } from "react-hot-toast";
 
 export default function Chat({ children }: { children: React.ReactNode }) {
   return (
@@ -21,6 +22,7 @@ export default function Chat({ children }: { children: React.ReactNode }) {
           <main className="h-full w-full">{children}</main>
         </div>
       </div>
+      <Toaster />
     </div>
     //     </div>
     //   </div>

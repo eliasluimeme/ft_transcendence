@@ -16,6 +16,7 @@ import { StaticRequire } from "next/dist/shared/lib/get-img-props";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import Messages from "./Messages";
+import toast from "react-hot-toast";
 
 interface Members {
   id: number;
@@ -205,12 +206,19 @@ function ChatConv(oldeId: any) {
           }
         );
         if (response.status === 201) {
+          if (response.data.isMuted === true)
+            toast.success("Member Muted Successfuly");
+          else if (response.data.isMuted === false)
+            toast.success("Member Unmuted Successfuly");
           setMuteStatu(response.data);
           router.push("/chat/chatconv?id=" + id);
         } else {
           console.log("Failed to fetch friendship data");
         }
-      } catch (error) {
+      } catch (error: any) {
+        if (error.response) {
+          toast.error(error.response.data.message || 'An error occurred');
+        }
         console.error(
           "An error occurred while fetching friendship data:",
           error
@@ -241,10 +249,14 @@ function ChatConv(oldeId: any) {
         if (response.status === 201) {
           router.refresh();
           router.push("/chat/chatconv?id=" + id);
+          toast.success("Admin Kicked Successfuly");
         } else {
           console.log("Failed to fetch friendship data");
         }
-      } catch (error) {
+      } catch (error: any) {
+        if (error.response) {
+          toast.error(error.response.data.message || 'An error occurred');
+        }
         console.error(
           "An error occurred while fetching friendship data:",
           error
@@ -271,10 +283,14 @@ function ChatConv(oldeId: any) {
           }
         );
         if (response.status === 201) {
+          toast.success("Admin Banned Successfuly");
         } else {
           console.log("Failed to fetch friendship data");
         }
-      } catch (error) {
+      } catch (error: any) {
+        if (error.response) {
+          toast.error(error.response.data.message || 'An error occurred');
+        }
         console.error(
           "An error occurred while fetching friendship data:",
           error
@@ -304,10 +320,17 @@ function ChatConv(oldeId: any) {
         );
         if (response.status === 201) {
           // setAdmine(response.data);
+          if (response.data.role === "ADMIN")
+            toast.success("Admin Added Successfuly");
+          else if (response.data.role === "USER")
+            toast.success("Admin Removed Successfuly");
         } else {
           console.log("Failed to fetch friendship data");
         }
-      } catch (error) {
+      } catch (error: any) {
+        if (error.response) {
+          toast.error(error.response.data.message || 'An error occurred');
+        }
         console.error(
           "An error occurred while fetching friendship data:",
           error
@@ -334,10 +357,14 @@ function ChatConv(oldeId: any) {
         );
         if (response.status === 201) {
           router.push("/chat/");
+          toast.success("Room Left");
         } else {
           console.log("Failed to fetch friendship data");
         }
-      } catch (error) {
+      } catch (error: any) {
+        if (error.response) {
+          toast.error(error.response.data.message || 'An error occurred');
+        }
         console.error(
           "An error occurred while fetching friendship data:",
           error
@@ -368,13 +395,16 @@ function ChatConv(oldeId: any) {
         }
       );
       if (response.status === 201) {
-        console.log("success:", response.data);
         router.refresh();
         router.push("/chat/chatconv?id=" + id);
+        toast.success("Member Added Successfuly");
       } else {
         console.log("Failed to fetch friendship data");
       }
-    } catch (error) {
+    } catch (error: any) {
+      if (error.response) {
+        toast.error(error.response.data.message || 'An error occurred');
+      }
       console.error("An error occurred while fetching friendship data:", error);
     }
     toupdate(update + 1);
@@ -398,11 +428,14 @@ function ChatConv(oldeId: any) {
         }
       );
       if (response.status === 201) {
-        console.log("success:", response.data);
+        toast.success("Password Changed Successfuly");
       } else {
         console.log("Failed to fetch friendship data");
       }
-    } catch (error) {
+    } catch (error: any) {
+      if (error.response) {
+        toast.error(error.response.data.message || 'An error occurred');
+      }
       console.error("An error occurred while fetching friendship data:", error);
     }
   };
@@ -410,7 +443,7 @@ function ChatConv(oldeId: any) {
   const deleatPassword = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:3001/chat/settings/disable",
+        "http://localhost:3001/chat/settings/delete",
         {
           roomId: id,
         },
@@ -419,11 +452,14 @@ function ChatConv(oldeId: any) {
         }
       );
       if (response.status === 201) {
-        console.log("success:", response.data);
+        toast.success("Password Deleted Successfuly");
       } else {
         console.log("Failed to fetch friendship data");
       }
-    } catch (error) {
+    } catch (error: any) {
+      if (error.response) {
+        toast.error(error.response.data.message || 'An error occurred');
+      }
       console.error("An error occurred while fetching friendship data:", error);
     }
   };

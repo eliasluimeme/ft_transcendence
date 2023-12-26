@@ -770,11 +770,39 @@ export class UserService {
           ],
         },
       });
-      if (friendShip.count) return { unfriend: true };
+      if (friendShip.count) {
+        const conv = await this.prisma.chatroom.deleteMany({
+          where: {
+            AND: [
+              {
+                name: 'DM',
+              },
+              {
+                ChatroomUsers: {
+                  some: {
+                    OR: [
+                      {
+                        userId: senderId,
+                      },
+                      {
+                        userId: receiverId,
+                      },
+                    ],
+                  },
+                },
+                // messages: { roomId: senderId} // delete messages
+              },
+            ],
+          },
+        });
+        if (conv.count)
+          return { unfriend: true };
+        else throw new BadRequestException('An error occured');
+      }
       else throw new BadRequestException('No friendShip found');
     } catch (error) {
+      if (error instanceof BadRequestException) throw error;
       console.log('error accepting friend: ', error);
-      throw error;
     }
   }
 
