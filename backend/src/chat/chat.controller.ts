@@ -165,6 +165,4 @@ export class ChatController {
     res.json( await this.chatService.addMessage( req.user.id, parseInt(body.roomId), body.message,) );
   }
 
-  
-
 }

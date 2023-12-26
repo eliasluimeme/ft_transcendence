@@ -1193,7 +1193,7 @@ export class ChatService {
         const roomUser = await this.prisma.chatroomUsers.findMany({
             
         })
-        console.log(roomId, roomUser)
+        console.log(roomId, roomUser, senderId)
         throw new Error('Method not implemented.');
       }
 
