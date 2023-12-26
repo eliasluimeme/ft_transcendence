@@ -1161,7 +1161,7 @@ export class ChatService {
         
         const all_rooms = await this.prisma.chatroomUsers.findMany({
             where: {
-                id: user_id
+                userId: user_id
             },
             select:{
                 chatroom: {
@@ -1190,14 +1190,6 @@ export class ChatService {
             return null;
         }
     }
-
-    async  get_room_user(roomId: number, senderId: number) {
-        const roomUser = await this.prisma.chatroomUsers.findMany({
-            
-        })
-        console.log(roomId, roomUser, senderId)
-        throw new Error('Method not implemented.');
-      }
 
       async setOnlineStatus( userId: number ) {
         try {

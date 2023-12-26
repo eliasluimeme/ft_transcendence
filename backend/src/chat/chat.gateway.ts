@@ -117,10 +117,10 @@ async handleConnection(client: Socket) {
     if (!room)
       socket.emit('error', "chat room does not exist");
     const roomUser = await this.chatService.get_room_user(roomId, data.senderId) // for checking if user is banned && muted && blocked
-    if (roomUser.isBlocked){
-      socket.emit("Error", "You have been blocked")
-      return ;
-    }
+    // if (roomUser.isBlocked){
+    //   socket.emit("Error", "You have been blocked")
+    //   return ;
+    // }
     if (roomUser.isMuted){
       socket.emit("Error", "You have been muted")
       return ;

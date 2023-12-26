@@ -125,6 +125,7 @@ const ChatInput = (id: any) => {
     socket.on('message', (newMessage) => {
       console.log("Message from server: ", newMessage);
       // setOldMessages[...prevmsg, newMessage];
+      // check if sender not blockeed 
       oldMessages?.push(newMessage);
 
     });
