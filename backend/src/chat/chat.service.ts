@@ -40,18 +40,12 @@ export class ChatService {
                 }
             });
 
-            // console.log("userconvos", userConvos);
             const iblocked = userConvos.blocker.filter(u => u.blockerId === userId);
             const blockedme = userConvos.blocked.filter(u => u.blockedId === userId);
-            // console.log("blockedme", blockedme);
-            // console.log("iblocked", iblocked);
 
             const convos = await this.prisma.chatroom.findMany({
                 where: {
-                    OR: [
-                        { ChatroomUsers: { some: { userId: userId } } },
-                        { visibility: 'PUBLIC' },
-                    ],
+                    ChatroomUsers: { some: { userId: userId } } ,
                 },
                 include: {
                     ChatroomUsers: {
@@ -69,15 +63,14 @@ export class ChatService {
                     },
                 }
             })
-            // console.log("convos", convos)
             const conv = convos.map(conv => {
                 const { id, name, group, photo, visibility } = conv;
                 if (group) {
 
-                    if (visibility === 'PRIVATE' && conv.ChatroomUsers.find(u => u.userId === userId).isBanned === false)
+                    if (conv.ChatroomUsers.find(u => u.userId === userId) && conv.ChatroomUsers.find(u => u.userId === userId).isBanned === false)
                         return { convId: id, name, photo }
-                    else if (visibility === 'PROTECTED' && conv.ChatroomUsers.find(u => u.userId === userId).isBanned === false) 
-                        return { convId: id, name, photo }
+                    // else if (visibility === 'PROTECTED' && conv.ChatroomUsers.find(u => u.userId === userId).isBanned === false) 
+                    //     return { convId: id, name, photo }
                     // else if (visibility === 'PUBLIC')
                     //     if (conv.ChatroomUsers.find(u => u.userId === userId)) {
                     //         if (conv.ChatroomUsers.find(u => u.userId === userId).isBanned === false)
@@ -95,7 +88,6 @@ export class ChatService {
                     return { convId: id, name: userName, photo}
                 }
             }).filter(conv => conv !== null);
-            // TODO: check public rooms if included or not
             return conv
         } catch(error) {
             console.log(error);
@@ -160,63 +152,63 @@ export class ChatService {
     //     }
     //   }
 
-    async getConvoMembers(userId: number, roomId: number) {
-        try {
-            // console.log('getConvoMembers   ', userId, roomId);
-            const room = await this.prisma.chatroom.findUnique({
-                where: {
-              id: roomId,
-            },
-            include: {
-              ChatroomUsers: {
-                include: {
-                    user: {
-                    select: {
-                        id: true,
-                      userName: true,
-                      photo: true,
-                    },
-                  },
-                },
-              },
-            },
-          });
-          if (!room) throw new NotFoundException('Room does not exist');
+    // async getConvoMembers(userId: number, roomId: number) {
+    //     try {
+    //         // console.log('getConvoMembers   ', userId, roomId);
+    //         const room = await this.prisma.chatroom.findUnique({
+    //             where: {
+    //           id: roomId,
+    //         },
+    //         include: {
+    //           ChatroomUsers: {
+    //             include: {
+    //                 user: {
+    //                 select: {
+    //                     id: true,
+    //                   userName: true,
+    //                   photo: true,
+    //                 },
+    //               },
+    //             },
+    //           },
+    //         },
+    //       });
+    //       if (!room) throw new NotFoundException('Room does not exist');
     
-          const userss = room.ChatroomUsers.map((user) => {
-            return {
-              id: user.user.id,
-              userName: user.user.userName,
-              photo: user.user.photo,
-            };
-        });
+    //       const userss = room.ChatroomUsers.map((user) => {
+    //         return {
+    //           id: user.user.id,
+    //           userName: user.user.userName,
+    //           photo: user.user.photo,
+    //         };
+    //     });
     
-          if (!userss.find((user) => user.id === userId))
-          throw new ForbiddenException('You are not in this room');
+    //       if (!userss.find((user) => user.id === userId))
+    //       throw new ForbiddenException('You are not in this room');
     
-          const users = userss.map((user) => {
-            if (user.id === userId) {
-              return {
-                id: user.id,
-                name: user.userName,
-                photo: user.photo,
-                self: true,
-              };
-            } else {
-              return {
-                id: user.id,
-                name: user.userName,
-                photo: user.photo,
-                self: false,
-              };
-            }
-          });
-        //   console.log("==========> " , users, room.visibility);
-          return { visibility: room.visibility, users };
-        } catch (error) {
-          console.log(error);
-        }
-      }
+    //       const users = userss.map((user) => {
+    //         if (user.id === userId) {
+    //           return {
+    //             id: user.id,
+    //             name: user.userName,
+    //             photo: user.photo,
+    //             self: true,
+    //           };
+    //         } else {
+    //           return {
+    //             id: user.id,
+    //             name: user.userName,
+    //             photo: user.photo,
+    //             self: false,
+    //           };
+    //         }
+    //       });
+    //     //   console.log("==========> " , users, room.visibility);
+    //       return { visibility: room.visibility, users };
+    //     } catch (error) {
+    //       console.log(error);
+    //     }
+    //   }
 
       getVisibility(visibility: string): VISIBILITY {
         switch (visibility) {
@@ -265,6 +257,25 @@ export class ChatService {
             return { id, name, photo }
         } catch(error) {
             if (error instanceof ForbiddenException)
+                throw error;
+            console.log(error);
+        }
+    }
+
+    async getRoomInfos(roomId: number) {
+        try {
+            const room = await this.prisma.chatroom.findUnique({
+                where: {
+                    id: roomId,
+                },
+            })
+
+            if (!room)
+                throw new NotFoundException('Room does not exist')
+
+            return { visibility: room.visibility };
+        } catch(error) {
+            if (error instanceof NotFoundException)
                 throw error;
             console.log(error);
         }
@@ -371,6 +382,68 @@ export class ChatService {
             console.log(error);
         }
     }
+
+    async getConvoMembers(userId: number, roomId: number) {
+        try {
+          const room = await this.prisma.chatroom.findUnique({
+            where: {
+              id: roomId,
+            },
+            include: {
+              ChatroomUsers: {
+                where: {
+                    chatroomId: roomId
+                },
+                include: {
+                  user: {
+                    select: {
+                      id: true,
+                      userName: true,
+                      photo: true,
+                    },
+                  },
+                },
+              },
+            },
+          });
+
+          if (!room) throw new NotFoundException('Room does not exist');
+    
+          const userss = room.ChatroomUsers.map((user) => {
+            return {
+              id: user.user.id,
+              userName: user.user.userName,
+              photo: user.user.photo,
+            };
+          });
+
+          if (!userss.find((user) => user.id === userId))
+            throw new ForbiddenException('You are not in this room');
+    
+          const users = userss.map((user) => {
+            if (user.id === userId) {
+              return {
+                id: user.id,
+                name: user.userName,
+                photo: user.photo,
+                self: true,
+              };
+            } else {
+              return {
+                id: user.id,
+                name: user.userName,
+                photo: user.photo,
+                self: false,
+              };
+            }
+          });
+          return { visibility: room.visibility, users };
+        } catch (error) {
+            if (error instanceof NotFoundException || error instanceof ForbiddenException)
+                throw error;
+          console.log(error);
+        }
+      }
 
     async leaveGroupChat(userId: number, roomId: number) {
         try {
@@ -782,7 +855,7 @@ export class ChatService {
 
             const chatRoomUserId = user.chatroom.ChatroomUsers.find( user => user.userId === memberId).id;
 
-            await this.prisma.chatroomUsers.update({
+            return await this.prisma.chatroomUsers.update({
                 where: {
                     id: chatRoomUserId,
                 },
@@ -873,8 +946,6 @@ export class ChatService {
             //     throw new ForbiddenException('You are not allowed to add admins to this room')
             if (!user.chatroom.ChatroomUsers.find( user => user.userId === memberId))
                 throw new ForbiddenException('Member does not exist')
-            // if (user.chatroom.ChatroomUsers.find( user => user.userId === memberId).role === 'ADMIN')
-            //     throw new ForbiddenException('Member already admin')
 
             const chatRoomUserId = user.chatroom.ChatroomUsers.find( user => user.userId === memberId).id;
             const role = user.chatroom.ChatroomUsers.find( user => user.userId === memberId).role;
@@ -1048,10 +1119,21 @@ export class ChatService {
             const member = await this.prisma.user.findUnique({
                 where: {
                     userName: memberName,
+                },
+                include: {
+                    sentRequests: true,
+                    receivedRequests: true,
+                    blocker: true,
+                    blocked: true
                 }
             })
+
             if (!member) throw new BadRequestException('User does not exist');
-            
+            if (member.id === userId) throw new ForbiddenException('You cannot add yourself');
+            if (member.blocker.find(user => user.blockedId === userId)) throw new ForbiddenException('You are blocked by this user');
+            if (member.blocked.find(user => user.blockerId === userId)) throw new ForbiddenException('You blocked this user');
+            if (!member.sentRequests.find(user => user.receiverId === userId) && !member.receivedRequests.find(user => user.senderId === userId)) throw new ForbiddenException('User does not exist in your friend list');
+
             const memberInRoom = await this.prisma.chatroomUsers.findFirst({
                 where: {
                     userId: member.id,
@@ -1062,12 +1144,10 @@ export class ChatService {
 
             const newMember = await this.prisma.chatroomUsers.create({
                 data: {
-                    // userId: { connect: { id: member.id }},
                     userId: member.id,
                     chatroomId: roomId,
                 }
             })
-            console.log('new member', newMember)
             return newMember
         } catch (error) {
             if (error instanceof BadRequestException || error instanceof ForbiddenException)
@@ -1117,7 +1197,25 @@ export class ChatService {
         throw new Error('Method not implemented.');
       }
 
-
+      async setOnlineStatus( userId: number ) {
+        try {
+            const user = await this.prisma.user.update({
+                where: {
+                    id: userId,
+                },
+                data: {
+                    status: 'ONLINE',
+                }
+            })
+            if (user)
+                return { success: true, message: 'User online' }
+            else throw new BadRequestException('Something went wrong. Please try again');
+        } catch (error) {
+            if (error instanceof BadRequestException)
+                throw error;
+            console.log(error)
+        }
+    }
 
       async addMessage( userId: number, roomId: number, message: string) {
         try {
@@ -1173,19 +1271,67 @@ export class ChatService {
     // }
 
 
-//   async  saveMessageToDatabase(content: string, roomId: number): Promise<void> {
-//     try {
-//         await this.prisma.message.create({
-//             data: {
-//                 chatroomId: roomId,
-//                 content: content,
-//             },
-//         });
-//         return; // Add this line
-//     } catch (error) {
-//         // Handle the error appropriately
-//         throw new Error('Failed to save message to the database.');
-//     }
-// }
+// async addMessage( userId: number, roomId: number, message: string) 
+// {
+//         try {
+//             const userInChatroom = await this.prisma.chatroomUsers.findFirst({
+//                 where: {
+//                     userId: userId,
+//                     chatroomId: roomId,
+//                 },
+//               });
 
-}
+//               if (!userInChatroom)
+//                 throw new Error('User not found in the chat room.');
+          
+//               const newMessage = await this.prisma.message.create({
+//                 data: {
+//                     content: message,
+//                     senderId: userInChatroom.id,
+//                     chatroomId: roomId,
+//                 },
+//               });
+          
+//               await this.prisma.chatroomUsers.update({
+//                 where: { id: userInChatroom.id },
+//                 data: {
+//                   messages: {
+//                     connect: {
+//                       id: newMessage.id,
+//                     },
+//                   },
+//                 },
+//               });
+          
+//             if (newMessage)
+//                 return { success: true, message: 'Message sent' }
+//             else throw new BadRequestException('Something went wrong. Please try again');
+//         } catch (error) {
+//             if (error instanceof BadRequestException)
+//                 throw error;
+//             console.log(error)
+//         }
+    
+//     }
+
+//     async setOnlineStatus( userId: number ) {
+//         try {
+//             const user = await this.prisma.user.update({
+//                 where: {
+//                     id: userId,
+//                 },
+//                 data: {
+//                     status: 'ONLINE',
+//                 }
+//             })
+//             if (user)
+//                 return { success: true, message: 'User online' }
+//             else throw new BadRequestException('Something went wrong. Please try again');
+//         } catch (error) {
+//             if (error instanceof BadRequestException)
+//                 throw error;
+//             console.log(error)
+//         }
+//     }
+
+// }

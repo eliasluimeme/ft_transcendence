@@ -20,7 +20,7 @@ export class AuthService {
 
     private blacklistToken: string[] = [];
 
-    async getToken( payload: any ) {
+    async getToken( payload: any ): Promise<any> {
         const accessToken = this.jwt.sign({ 
             payload,
         }, { 
@@ -31,7 +31,7 @@ export class AuthService {
         return accessToken;
     }
 
-    async generateToken( user: any, is2FAAuthenticated: boolean ) {
+    async generateToken( user: any, is2FAAuthenticated: boolean ): Promise<any> {
         return await this.jwt.signAsync({ 
             userId: user.intraId,
             email: user.email,
@@ -43,7 +43,7 @@ export class AuthService {
         });
     }
 
-    async set2FASecret(userId: number, secret: string) {
+    async set2FASecret(userId: number, secret: string): Promise<any> {
         try {
             await this.userService.updateUser(userId, { twoFactorAuthSecret: secret });
         } catch (error) {
@@ -51,7 +51,7 @@ export class AuthService {
         }
     }
 
-    async generate2FASecret(user: any) {
+    async generate2FASecret(user: any): Promise<any> {
         let secret: any;
 
         if (!user.twoFactorAuthSecret) {
@@ -64,12 +64,12 @@ export class AuthService {
         return { secret, otpauthUrl };
     }
 
-    async generateQrCode( user: any ) {
+    async generateQrCode( user: any ): Promise<any> {
         const otp = await this.generate2FASecret(user);
         return await toDataURL(otp.otpauthUrl);
     }
 
-    async activate2FA(userId: number) {
+    async activate2FA(userId: number): Promise<any> {
         try {
             const update = this.userService.updateUser(userId, { isTwoFactorAuthEnabled: true });
             if (update)
@@ -79,7 +79,7 @@ export class AuthService {
         }
     }
 
-    async desactivate2FA(userId: number) {
+    async desactivate2FA(userId: number): Promise<any> {
         try {
             const update = this.userService.updateUser(userId, { isTwoFactorAuthEnabled: false });
             if (update)
@@ -104,28 +104,28 @@ export class AuthService {
     
             if (!user) {
                 const newUser = await this.userService.createIntraUser(profile);
-                return newUser;
+                const user = { ...newUser, new: true };
+                return user;
             }
 
-            return user;
-        } catch (err) {
-            throw err;
-        }
+            const newUser = { ...user, new: false}
+      return newUser;
+    } catch (err) {
+      throw err;
     }
-    
-    async validateLocalUser(email: string, password: string) {
-        const user = await this.prisma.user.findUnique({
-            where: {
-                email: email
-            }
-        });
-        
-        if (!user)
-            return null;
-    
-        const pwMatch = await argon.verify(user.hash, password);
-        if (!pwMatch)
-            return null;
+  }
+
+  async validateLocalUser(email: string, password: string): Promise<any> {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+    });
+
+    if (!user) return null;
+
+    const pwMatch = await argon.verify(user.hash, password);
+    if (!pwMatch) return null;
 
         return user;
     }

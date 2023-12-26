@@ -15,16 +15,18 @@ const socket = io('http://localhost:3001/chat', {
 });
 
 type Message = {
-  senderId: number
-  content: string
-  timestamp: number
-}
-  type User = { 
-    id: number
-    nickname: string
-    memberImage: string
-    self: boolean
-  } 
+  id: string;
+  senderId: number;
+  content: string;
+  timestamp: number;
+};
+
+type User = {
+  id: number;
+  nickname: string;
+  memberImage: string;
+  self: boolean;
+};
 
 type Participant = {
   type: string

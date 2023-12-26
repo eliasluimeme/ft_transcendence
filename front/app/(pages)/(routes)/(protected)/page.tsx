@@ -2,6 +2,7 @@
 import React from "react";
 import Image from "next/image";
 import Redirect from "@/components/ui/homeComp/Redirect";
+import { Toaster } from "react-hot-toast";
 
 const Page = () => {
   return (
@@ -57,6 +58,7 @@ const Page = () => {
           description="Your Progression"
         />
       </div>
+      <Toaster />
     </div>
   );
 };

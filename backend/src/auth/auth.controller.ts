@@ -23,34 +23,36 @@ export class AuthController {
     
     @Get('auth/42/callback')
     @UseGuards(IntraAuthGuard)
-    async authCallBack(@Req() req, @Res({ passthrough: true }) res) {
+    async authCallBack(@Req() req, @Res({ passthrough: true }) res): Promise<any> {
         // handle dont authorize 42 auth
         const token = await this.authService.generateToken(req.user, false);
         res.cookie( 'access_token', `${token}`, { httpOnly: true, maxAge: 60 * 60 * 24 * 1000 });
 
         if (req.user.isTwoFactorAuthEnabled)
-            res.redirect(this.configService.get('FRONTEND_URL') + 'Login/2fa');
-        res.redirect(this.configService.get('FRONTEND_URL'));
+            return res.redirect(this.configService.get('FRONTEND_URL') + 'Login/2fa');
+        else if (req.user.new)
+            return res.redirect(this.configService.get('FRONTEND_URL') + 'settings');
+        else
+            return res.redirect(this.configService.get('FRONTEND_URL'));
     }
 
-    @Get('auth/2fa/generate')
-    @UseGuards(Jwt2faAuthGuard)
-    async generate2FAQrCode(@Req() req, @Res() res) {
-        const qr = await this.authService.generateQrCode(req.user);
-        res.set('Content-Type', 'image/png');
-        return res.send({ qr: qr });
-    }
+  @Get('auth/2fa/generate')
+  @UseGuards(Jwt2faAuthGuard)
+  async generate2FAQrCode(@Req() req, @Res() res): Promise<any> {
+    const qr = await this.authService.generateQrCode(req.user);
+    res.set('Content-Type', 'image/png');
+    return res.send({ qr: qr });
+  }
 
     @Post('auth/2fa/login')
     @UseGuards(JwtAuthGuard)
-    async auth2FA(@Req() req, @Body() body, @Res({ passthrough: true }) res) {
+    async auth2FA(@Req() req, @Body() body, @Res({ passthrough: true }) res): Promise<any> {
         const is2FACodeValid = this.authService.is2FACodeValid(
             body.number,
             req.user.twoFactorAuthSecret,
         );
 
-        if (!is2FACodeValid)
-            throw new UnauthorizedException('Invalid 2FA code');
+    if (!is2FACodeValid) throw new UnauthorizedException('Invalid 2FA code');
 
         const token = await this.authService.generateToken(req.user, true);
         res.cookie( 'access_token', `${token}` , {httpOnly: true, maxAge: 60 * 60 * 24 * 1000} );
@@ -58,14 +60,13 @@ export class AuthController {
     
     @Post('auth/2fa/turn-on')
 	@UseGuards(Jwt2faAuthGuard)
-    async turnOn2FA(@Req() req: any, @Res({ passthrough: true }) res: any, @Body() body: any) {
+    async turnOn2FA(@Req() req: any, @Res({ passthrough: true }) res: any, @Body() body: any): Promise<any> {
         const is2FACodeValid = this.authService.is2FACodeValid(
             body.number,
             req.user.twoFactorAuthSecret
         );
 
-        if (!is2FACodeValid)
-            throw new UnauthorizedException('Invalid 2FA code');
+    if (!is2FACodeValid) throw new UnauthorizedException('Invalid 2FA code');
 
         const token = await this.authService.generateToken(req.user, true);
         res.clearCookie('access_token');
@@ -76,7 +77,7 @@ export class AuthController {
     
     @Get('auth/2fa/turn-off')
 	@UseGuards(Jwt2faAuthGuard)
-    async turnOff2FA(@Req() req, @Res() res) {
+    async turnOff2FA(@Req() req, @Res() res): Promise<any> {
         const token = await this.authService.generateToken(req.user, false);
         res.clearCookie('access_token');
         // res.cookie( 'access_token', `${token}` , { httpOnly: true, maxAge: 60 * 60 * 24 * 1000 });

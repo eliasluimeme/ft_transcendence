@@ -1,35 +1,34 @@
 "use client";
-import "@/app/(pages)/(routes)/(protected)/game/style.css";
-import Freinds from "@/components/ui/gamecompo/Freinds";
 
-import React from "react";
-import Image from "next/image";
-import "@/components/ui/CSS/game.css";
-import { useState, useMemo } from "react";
-import Random from "@/components/ui/gamecompo/Random";
-import Bot from "@/components/ui/gamecompo/Bot";
-import Map from "@/components/ui/gamecompo/Map";
+import {MyContext} from '@/components/game/tools/ModeContext';
+import { MyContextProvider } from '@/components/game/tools/MyContextProvider';
+import React, { useContext } from 'react'
+import { useRouter } from 'next/navigation'
+import Tab  from '@/components/game/elements/Tab'
+
 export default function page() {
+  const router = useRouter();
+  const mode = useContext(MyContext);
+  const text = "Welcome to the classic game of Ping Pong! In this version, you'll be facing off against \
+  a computer-controlled bot. The objective is simple: score as many points as possible by keeping the ball in play.";
+  const findRoom = (t: string, m: string) => {
+    if (t == "player" || t == "bot") {
+      const { contextValue, updateContextValue} = mode;
+      updateContextValue({modeChoosed:true, type:t, mode:m})
+      router.push(`/game/board`); 
+    }
+  };
+
   return (
-    <div className="w-full h-full font-Goldman game-background rounded-lg">
-      <div className="w-full h-full rounded-lg grid grid-container place-items-center">
-        <div className=" w-[98%] h-[98%] border rounded-lg take">
-          <div className="w-full h-full grid grid-cols-6 grid-rows-6 place-items-center">
-            <div className="row-start-1 col-span-2 col-start-1 row-span-6 rounded-lg border w-[94%] h-[94%] ">
-              <Freinds />
-            </div>
-            <div className="w-[98%] h-[82%] border rounded-lg col-start-3 col-span-4 row-start-1 row-span-2">
-              <Random></Random>
-            </div>
-            <div className="w-[97%] h-[91%] border rounded-lg col-start-3 col-span-3 row-start-3 row-span-4">
-              <Bot></Bot>
-            </div>
-            <div className="w-[94%] h-[91%] border rounded-lg col-start-6  row-start-3 row-span-4">
-              <Map></Map>
-            </div>
-          </div>
+    <div className='py-16 font-custom w-full h-full bg-[#16304b] grid sm:grid-cols-1 lg:grid-cols-1 md:p-5 lg:p-10'>
+      <div className="container m-auto px-6 text-gray-500 md:px-12 xl:px-0">
+        <div className="mx-auto grid gap-6 md:w-3/4 lg:w-full lg:grid-cols-2">
+          <Tab typ e= "Bot" mode= "Easy" text= {text} bfunction= {() => findRoom('bot', '3')} />
+          <Tab type= "Bot" mode= "Medium" text= {text} bfunction= {() => findRoom('bot', '2')} />
+          <Tab type= "Bot" mode= "Hard" text= {text} bfunction= {() => findRoom('bot', '1')} />
+          <Tab type= "Player" mode= "None" text= {text} bfunction={() => findRoom('player', '')} />
         </div>
-      </div>
+      </div>                     
     </div>
-  );
+  )
 }

@@ -35,6 +35,12 @@ enum VISIBILITY {
   PROTECTED
 }
 
+enum STATUS {
+  ONLINE
+  OFFLINE
+  INGAME
+}
+
 model User {
   id Int @id @default(autoincrement())
 
@@ -52,6 +58,8 @@ model User {
   isTwoFactorAuthEnabled Boolean @default(false)
 
   photo String?
+
+  status STATUS @default(OFFLINE)
 
   // Ladder level
   level LadderLevel?

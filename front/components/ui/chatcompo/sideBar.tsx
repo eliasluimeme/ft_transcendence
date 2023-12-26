@@ -1,6 +1,5 @@
 'use client';
 
-import { Alert } from "reactstrap";
 import Image from "next/image";
 import Style from "./sideBar.module.css";
 import "@/components/ui/CSS/font.css";
@@ -17,58 +16,72 @@ import {
 } from "@/components/ui/popover";
 import CreateRoom from "./CreateRoom";
 import { useRouter } from "next/navigation";
+import Freinds from "../gamecompo/Freinds";
 
-type freind = {
+type Freind = {
   id: string;
   image: string;
   name: string;
 };
 
-const GetFriends = () => {
-  const router = useRouter();
-  const [freind, setfreind] = useState<freind[]>([]);
-  const takefreind = async () => {
-    try {
-      const response = await axios.get("http://localhost:3001/chat/conversations", {
-        withCredentials: true,
-      });
-      if (response.status === 200) {
-        const newfreind: freind[] = response.data.map((l: any) => ({
-          id: l.convId,
-          image: l.photo ?? "https://t4.ftcdn.net/jpg/03/78/40/51/360_F_378405187_PyVLw51NVo3KltNlhUOpKfULdkUOUn7j.jpg",
-          name: l.name,
-        }));
-        setfreind(newfreind);
-      } else {
-        console.log("Failed to fetch friendship data");
-      }
-    } catch (error) {
-      console.error("An error occurred while fetching friendship data:", error);
-    }
-  };
-  useEffect(() => {
-    takefreind();
-  }, []);
-
-  return Object.values(freind).map((friend, index) => (
-    <button
-      className="bg-[#D9D9D9] w-[90%] h-[50px] hover:text-[#F77B3F] text-opacity-[70%] bg-opacity-[10%] hover:bg-opacity-[100%] flex items-center justify-center space-x-8 rounded-lg"
-      key={index}
-      onClick={() =>
-        router.push(`/chat/chatconv?id=${friend.id}`) // parse image and name to url
-    }
-    >
-      <Avatar className="w-[30px] h-[30px]">
-        <AvatarImage src={friend.image} alt="User Avatar" />
-        <AvatarFallback></AvatarFallback>
-      </Avatar>
-      <div className="text-[15px] w-[100px]">{friend.name}</div>
-    </button>
-  ));
-};
-
-
 function SideBar() {
+  const [update, setupdate] = useState<number>(0);
+  const GetFriends = () => {
+    const router = useRouter();
+    const [friend, setFriends] = useState<Freind[]>([]);
+
+    useEffect(() => {
+      const fetchFriends = async () => {
+        try {
+          const response = await axios.get(
+            "http://localhost:3001/chat/conversations",
+            {
+              withCredentials: true,
+            }
+          );
+          if (response.status === 200) {
+            const newFriends: Freind[] = response.data.map((l: any) => ({
+              id: l.convId,
+              image:
+                l.photo ??
+                "https://t4.ftcdn.net/jpg/03/78/40/51/360_F_378405187_PyVLw51NVo3KltNlhUOpKfULdkUOUn7j.jpg",
+              name: l.name,
+            }));
+            setFriends(newFriends);
+          } else {
+            console.log("Failed to fetch friendship data");
+          }
+        } catch (error) {
+          console.error(
+            "An error occurred while fetching friendship data:",
+            error
+          );
+        }
+      };
+
+      fetchFriends();
+    }, [update]);
+
+    const handleFriendClick = (friendId: string) => {
+      setupdate(update + 1);
+      router.push("/chat/chatconv?id=" + friendId);
+    };
+
+    return Object.values(friend).map((friend, index) => (
+      <button
+        className="bg-[#D9D9D9] w-[90%] h-[50px] hover:text-[#F77B3F] text-opacity-[70%] bg-opacity-[10%] hover:bg-opacity-[100%] flex items-center justify-center space-x-8 rounded-lg"
+        key={index}
+        onClick={() => handleFriendClick(friend.id)}
+      >
+        <Avatar className="w-[30px] h-[30px]">
+          <AvatarImage src={friend.image} alt="User Avatar" />
+          <AvatarFallback></AvatarFallback>
+        </Avatar>
+        <div className="text-[15px] w-[100px]">{friend.name}</div>
+      </button>
+    ));
+  };
+
   return (
     <div className="w-full h-full rounded-lg border">
       <div className="w-full h-full ">
