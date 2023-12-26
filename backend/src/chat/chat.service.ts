@@ -1098,4 +1098,25 @@ export class ChatService {
         }
     }
 
+    async get_room_user(roomId: number, userId: number) {
+        try {
+            const user = await this.prisma.chatroomUsers.findFirst({
+                where: {
+                    userId: userId,
+                    chatroomId: roomId,
+                },
+            })
+            console.log(user)
+            if (user) {
+                const { isMuted, isBanned } = user
+                return { isMuted, isBanned }
+            }
+            else throw new NotFoundException('User not found');
+        } catch (error) {
+            if (error instanceof NotFoundException)
+                throw error;
+            console.log(error)
+        }
+    }
+
 }
