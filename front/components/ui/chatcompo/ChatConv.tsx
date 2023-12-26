@@ -27,7 +27,7 @@ interface Members {
 function ChatConv(oldeId: any) {
   const router = useRouter();
   const id = oldeId['id']
-  console.log("id", id);
+  // console.log("id", id);
   /////////////////end point to get rol/////////////////////////////
   const [typeofRoom, setTypofRoom] = useState<boolean>(true);
   const [rol, setrol] = useState(true);
@@ -56,7 +56,7 @@ function ChatConv(oldeId: any) {
 
   useEffect(() => {
     fetchrol();
-  }, [props.id]);
+  }, [id]);
 
   /////////////////end point to get owner image/////////////////////////////
   const [Owner, OwnerImage] = useState<string>();
@@ -78,7 +78,7 @@ function ChatConv(oldeId: any) {
         const adminPhotos: string[] = response.data.admins.map(
           (admin: any) => admin.photo
         );
-        console.log("test allah allah", adminPhotos);
+        // console.log("test allah allah", adminPhotos);
         setAdmines(adminPhotos);
       } else {
         console.log("Failed to fetch member data");
@@ -110,7 +110,7 @@ function ChatConv(oldeId: any) {
         }
       );
       if (response.status === 200) {
-        console.log("to test :", response.data);
+        // console.log("to test :", response.data);
         const newMembers: Members[] = response.data.map((member: any) => ({
           id: member.id,
           nickname: member.userName, // Assuming userName is mapped to nickname
@@ -127,7 +127,7 @@ function ChatConv(oldeId: any) {
   };
   useEffect(() => {
     fetchmemberdata();
-  }, [exist, props.id]);
+  }, [exist, id]);
   ///////////////////////////////////////////////////////////////////////////
 
   //////////end point to get mutestatue and adminestatus//////////////
@@ -144,7 +144,7 @@ function ChatConv(oldeId: any) {
         }
       );
       if (response.status === 200) {
-        console.log(response.data);
+        // console.log(response.data);
         setMuteStatu(response.data.isMuted);
         if (rol === true && response.data.role === "USER") setAdmine(false);
       } else {
@@ -181,7 +181,7 @@ function ChatConv(oldeId: any) {
         if (!data) {
           return;
         }
-        console.log("this is the id befor", id);
+        // console.log("this is the id befor", id);
         const response = await axios.post(
           "http://localhost:3001/chat/settings/mute",
           {
@@ -389,14 +389,22 @@ function ChatConv(oldeId: any) {
     }
   };
 
+
   return (
     <div className="h-full w-full  grid grid-rows-6 ">
       <div className="w-full h-full row-start-1 row-span-1 flex items-center justify-center space-x-4  ">
         <div className=" w-[90%] h-[30%] bg-[#F87B3F] rounded-lg grid grid-cols-3">
           <div className="text-xl text-[12px] col-start-1 col-span-1 flex items-center">
-            <button className="ml-[5px] text-opacity-[30%] hover:text-opacity-[100%]">
-              Achraf El kouch
-            </button>
+            {/* {typeofRoom ? (
+                <button className="ml-[5px] text-opacity-[30%] hover:text-opacity-[100%]" // TODO fetch data 
+                onClick={ () => 
+                  router.push('/users?search=' + nickName) }
+                  >
+                {nickName}
+                </button>
+            ):(
+              <div> GroupName </div>
+            )} */}
           </div>
           <div className="col-start-3 col-span-1 flex justify-end space-x-5 items-center mr-[8px]">
             <button className="w-[50px] border flex items-center justify-center rounded-lg bg-[#36393E] bg-opacity-25 hover:bg-opacity-60">
@@ -558,7 +566,7 @@ function ChatConv(oldeId: any) {
       </div>
       <div className="w-full h-full row-start-2 row-span-6 flex items-center justify-center">
         <div className="rounded-lg w-[90%] h-[20%]">
-         <ChatInput id={props.id}/>
+         <ChatInput id={id}/>
         </div>
       </div>
     </div>
@@ -566,52 +574,3 @@ function ChatConv(oldeId: any) {
 }
 
 export default ChatConv;
-
-
-{/* <div className="w-full h-full ow-start-2 row-span-4 flex items-center justify-center">
-<div className="overflow-y-auto space-y-4 r w-[90%] h-full">
-  <div className="flex items-end space-x-2">
-    <Avatar className="w-10 h-10">
-  </Avatar>
-    <div className="max-w-xs border rounded-lg shadow p-4">
-      <p className="text-sm">
-        Hello! I am your assistant. How can I assist you today?
-      </p>
-    </div>
-  </div>
-  <div className="flex items-end justify-end space-x-2">
-    <div className="max-w-xs bg-blue-100 text-blue-700 rounded-lg shadow p-4">
-      <p className="text-sm">I need help with a contract dispute.</p>
-    </div>
-    <Avatar className="w-10 h-10">
-  </Avatar>
-  </div>
-  <div className="flex items-end space-x-2">
-    <Avatar className="w-10 h-10">
-  </Avatar>
-    <div className="max-w-xs border rounded-lg shadow p-4">
-      <p className="text-sm">
-
-      </p>
-    </div>
-  </div>
-  <div className="flex items-end space-x-2">
-    <Avatar className="w-10 h-10">
-  </Avatar>
-    <div className="max-w-xs border rounded-lg shadow p-4">
-      <p className="text-sm">
-
-      </p>
-    </div>
-  </div>
-  <div className="flex items-end space-x-2">
-    <Avatar className="w-10 h-10">
-  </Avatar>
-    <div className="max-w-xs border rounded-lg shadow p-4">
-      <p className="text-sm">
-
-      </p>
-    </div>
-  </div>
-</div>
-</div> */}

@@ -55,7 +55,7 @@ const GetFriends = () => {
       className="bg-[#D9D9D9] w-[90%] h-[50px] hover:text-[#F77B3F] text-opacity-[70%] bg-opacity-[10%] hover:bg-opacity-[100%] flex items-center justify-center space-x-8 rounded-lg"
       key={index}
       onClick={() =>
-        router.push(`/chat/chatconv?id=${friend.id}`)
+        router.push(`/chat/chatconv?id=${friend.id}`) // parse image and name to url
     }
     >
       <Avatar className="w-[30px] h-[30px]">

@@ -8,13 +8,10 @@ import ChatInput from './ChatInput'
 import { format } from 'date-fns';
 
 type Message = {
-  id: string
   senderId: number
   content: string
   timestamp: number
 }
-
-
 
 type  user = { 
     id: number
@@ -23,27 +20,25 @@ type  user = {
     self: boolean
   }
 
-
 interface MessagesProps {
-    initialMessages: Message[]
-    me: user
-    partner: user
-    chatId: number | string
+    initialMessages: Message[] | undefined
+    me: user | undefined
+    roomId: any
   }
 
   const Messages: FC<MessagesProps> = ({
     initialMessages,
     me,
-    partner,
-    chatId,
+    roomId,
   }) => {
-    const [messages, setMessages] = useState<Message[]>(initialMessages)
+ 
+    const [messages, setMessages] = useState<Message[] | undefined>(initialMessages)
   
-    useEffect(() => {  
-      const messageHandler = (message: Message) => {
-        setMessages((prev) => [message, ...prev])
-      }
-    }, [chatId])
+    // useEffect(() => {  
+    //   const messageHandler = (message: Message) => {
+    //     setMessages((prev) => [message, ...prev])
+    //   }
+    // }, [roomId])
   
     const scrollDownRef = useRef<HTMLDivElement | null>(null)
   
@@ -53,16 +48,15 @@ interface MessagesProps {
   
     if(!Array.isArray(messages))
       return null;
-    return messages.map((message, index) => {
-      const isCurrentUser = 4;
-        // message.senderId === me?.id;
-      const fromSameSender =
-        messages[index - 1]?.senderId === me?.id;
+    return messages.map((message) => {
+      const isCurrentUser = message.senderId === me?.id;
+      // const fromSameSender =
+      //   messages[index - 1]?.senderId === me?.id;
   
       return (
         <div
           className="chat-message"
-          key={`${message.id}-${message.timestamp}`}
+          key={`${message.timestamp}`}
         >
           <div
             className={cn("flex items-end", {
@@ -82,8 +76,8 @@ interface MessagesProps {
                 className={cn("px-4 py-2 rounded-lg inline-block", {
                   "bg-[#F87B3F] text-white": !isCurrentUser,
                   "border text-white": isCurrentUser,
-                  "rounded-br-none": !fromSameSender && isCurrentUser,
-                  "rounded-bl-none": !fromSameSender && !isCurrentUser,
+                  "rounded-br-none":  isCurrentUser,
+                  "rounded-bl-none":  !isCurrentUser,
                 })}
               >
                 {message.content}{" "}
@@ -97,7 +91,7 @@ interface MessagesProps {
               className={cn("relative w-6 h-6", {
                 "order-2": isCurrentUser,
                 "order-1": !isCurrentUser,
-                invisible: fromSameSender,
+                // invisible: fromSameSender,
               })}
             >
               {/* <Image

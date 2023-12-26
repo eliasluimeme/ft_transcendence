@@ -135,10 +135,14 @@ import { useSearchParams } from "next/navigation";
 const Page = () => {
 const search = useSearchParams();
 const id = search.get('id');
-console.log(id);
+// const name = search.get('name');
+// const image = search.get('image');
+// console.log('id ======= ',id);
+// console.log('name ======= ',name);
+// console.log('image ======= ',image);
   return (
     <div className="w-full h-full">
-      <ChatConv id ={id} />
+      <ChatConv id={id}/>
     </div>
   );
 };

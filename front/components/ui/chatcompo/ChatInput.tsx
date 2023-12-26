@@ -8,17 +8,17 @@ import { Button } from "../button";
 import Image from "next/image";
 import axios from "axios";
 import Messages from "./Messages";
+import { User } from "lucide-react";
 
-const socket = io("http://localhost:3001/chat");
+const socket = io('http://localhost:3001/chat', {
+  withCredentials: true,
+});
 
 type Message = {
-  id: string
   senderId: number
   content: string
   timestamp: number
 }
-
-
   type User = { 
     id: number
     nickname: string
@@ -31,25 +31,6 @@ type Participant = {
   users: User[]
 }
 
-const fetchParticipants = async (id :any) => {
-  try { 
-    const response = await axios.get('http://localhost:3001/chat/conversations/members',
-    {
-      withCredentials: true,
-      params :  id
-    });
-    if (response.status === 200) {
-      console.log("From Axios ====> ", response.data);
-      return response.data;
-    } else {
-      return undefined;
-    }
-  } catch (error) {
-    console.error(error);
-    return undefined;
-  }
-}
-
 const fetHistoric = async (id :any) => {
   try { 
     const response = await axios.get('http://localhost:3001/chat/conversations/messages',
@@ -58,7 +39,7 @@ const fetHistoric = async (id :any) => {
       params :  id
     });
     if (response.status === 200) {
-      console.log("From Axios ====> ", response.data);
+      console.log('data ========> ', response.data);
       return response.data;
     } else {
       return undefined;
@@ -70,68 +51,88 @@ const fetHistoric = async (id :any) => {
 }
 
 
-const ChatInput = (id: string | number) => {
+const ChatInput = (id: any) => {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const [message, setMessage] = useState<string>("");
   const [historic, setHistoric] = useState<Message[]>([]);
-  const messages : Message[] = historic;
-  const me = useRef({id: 0, nickname: '', memberImage:'', self: true})
-  const partner = useRef({id: 0, nickname: '', memberImage:'', self: true})
+  const [newMessage, setNewMessage] = useState<Message[]>();
+  const [ oldMessages, setOldMessages]= useState<Message[]>();
+  const me = useRef<User>()
+  const partners = useRef<User[] | undefined>()
   const type  = useRef<string>('DM');
-  
 
-
-
-  useEffect(() => {
-  fetchParticipants(id).then((data) => {
-    type.current = data.visibility;
-    if (data && data.users[0].self) {
-        me.current.id = data.users[0].id;
-        me.current.nickname = data.users[0].name;
-        me.current.memberImage = data.users[0].photo,
-        me.current.self = data.users[0].self;
-        partner.current.id = data.users[1].id;
-        partner.current.nickname = data.users[1].name;
-        partner.current.memberImage = data.users[1].photo,
-        partner.current.self = data.users[1].self;
+  const fetHistoric = async () => {
+    try { 
+      const response = await axios.get('http://localhost:3001/chat/conversations/messages',
+      {
+        withCredentials: true,
+        params :  id
+      });
+      if (response.status === 200) {
+        setOldMessages(response.data[0].messages)
+        console.log(oldMessages)
+        // return response.data;
+      } else {
+        return undefined;
       }
-      else {
-       me.current.id = data.users[1].id;
-       me.current.nickname = data.users[1].name;
-       me.current.memberImage = data.users[1].photo,
-       me.current.self = data.users[1].self;
-       partner.current.id = data.users[0].id;
-       partner.current.nickname = data.users[0].name;
-       partner.current.memberImage = data.users[0].photo,
-       partner.current.self = data.users[0].self;
+    } catch (error) {
+      console.error(error);
+      return undefined;
     }
-  });
-  }, [id]);
-  
-  const handleSubmit = (senderId: number, reciverId: number, messageContent: string, type: string) => {
-    socket.connect();
-    socket.emit('conversation', {messageContent, senderId, reciverId, type});
+  }
+  useEffect(() =>{
+    fetHistoric();
+  },[id])
+  const fetchParticipants = async () => {
+    try {
+      const response = await axios.get('http://localhost:3001/chat/conversations/members',
+      {
+        withCredentials: true,
+        params :  id      
+      });
+      if (response.status === 200) {
+        const size = Object.keys(response.data.users).length;
+        if (size >= 1){
+          response.data.users.forEach((user : User) => {
+            if (user.self === true){
+              me.current = user
+            }
+          }
+          )
+          partners.current = response.data.users;
+          // console.log("this is partner ==== > " , partners.current);
+        }
+      } else {
+        return undefined;
+      }
+    } catch (error) {
+      console.error(error);
+      return undefined;
+    }
+  }
+  useEffect (() => {
+  fetchParticipants();
+  },[id])
+
+  const handleSubmit = (roomId: number, messageContent: string , senderId: number | undefined) => {
+    socket.emit('conversation', {messageContent, roomId , senderId});
     setMessage("");
   };
   
   useEffect(() => {
-    socket.on('conversation', (message) => {
-      console.log("Message from server: ", message);
-      // messages.current.push(message);
-    });
-  }, [message]);
+    socket.on('message', (newMessage) => {
+      console.log("Message from server: ", newMessage);
+      // setOldMessages[...prevmsg, newMessage];
+      oldMessages?.push(newMessage);
 
-  useEffect(() => {
-    fetHistoric(id).then((data) => {
-      setHistoric(data);
     });
-  }, [id]);
-    
-    {/*      ///////////      CHAT AREA ///////////////////////////                                       */}
+  }, []);
+
+  {/* ///////////      CHAT AREA /////////////////////////// */}
   return (
     <>
     <div>
-        <Messages initialMessages={messages}  me={me.current} partner={partner.current} chatId={id} />
+        <Messages initialMessages={oldMessages}  me={me.current} roomId={id} />
         <div className="w-full h-full grid grid-cols-8 place-items-center focus-within:ring-indigo-600">
           <div className="col-start-1 col-span-7 w-full h-full flex items-center justify-center">
             <div className="w-full h-full row-start-4 row-span-5 flex items-center justify-cente">
@@ -139,7 +140,7 @@ const ChatInput = (id: string | number) => {
                 className="w-full h-full flex items-center justify-center"
                 onSubmit={(e) => {
                   e.preventDefault();
-                  handleSubmit(me.current.id, partner.current.id, message,type.current);
+                  handleSubmit(id.id , message, me?.current?.id);
               }}
               >
                 <TextareaAutosize
@@ -149,7 +150,7 @@ const ChatInput = (id: string | number) => {
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
                       e.preventDefault();
-                        handleSubmit(me.current.id, partner.current.id, message,type.current);
+                      handleSubmit(id.id , message, me?.current?.id);
                     }
                   }}
                   placeholder="Type your message"

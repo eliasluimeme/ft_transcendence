@@ -36,7 +36,7 @@ const Page = () => {
       );
 
       if (response.status === 201) {
-        console.log(code);
+        // console.log(code);
         router.push("/");
         console.log("Data sent successfully!");
       } else {

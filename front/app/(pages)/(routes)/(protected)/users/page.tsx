@@ -7,13 +7,13 @@ import GameInfo from "@/components/ui/usercompo/GameInfo";
 import { useSearchParams } from 'next/navigation';
 
 
-const page = () => {
+const Page = () => {
     const searchParams = useSearchParams()
      
     const search  = searchParams.get('search')
     // const search = {id : "mamali"}
     // console.log("search: ", search)
-    console.log("jouj merrat")
+    // console.log("jouj merrat")
 
     return (
         <div className="w-full h-full bg-[#36393E] rounded-lg font-Goldman">
@@ -44,4 +44,4 @@ const page = () => {
       );
 };
 
-export default page;
+export default Page;

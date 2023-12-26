@@ -1,8 +1,5 @@
 import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
-import { AuthService } from 'src/auth/auth.service';
-import { userIdDTO } from 'src/user/dto/userId.dto';
-import { UserService } from 'src/user/user.service';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import {
   WebSocketGateway,
@@ -12,22 +9,22 @@ import {
   OnGatewayDisconnect,
   OnGatewayConnection,
 } from '@nestjs/websockets';
-import { JwtService, TokenExpiredError } from '@nestjs/jwt';
+import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { idMessageDto } from './dto/id.dto';
 
 @Injectable()
 @WebSocketGateway({
   cors: {
     origin: 'http://localhost:3000',
+    credentials: true,
   },
   namespace: 'chat',
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
-    // private readonly chatService: ChatService,
-    // private authService: AuthService,
+    private chatService: ChatService,
     private prisma: PrismaService,
-    // private userService: UserService,
     private jwtService: JwtService,
   ) {}
 
@@ -58,41 +55,48 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
             return user;
         } else return user;
     } catch (error) {
-        // check prisma error status code
         console.error('Error finding user: ', error);
     }
 }
 
-  async handleConnection(client: Socket) {
+async join_chat_rooms(socket: Socket, user_id: number) {
+    const all_user_rooms = await this.chatService.getAllUserRooms(user_id)
+    all_user_rooms.array.forEach((room) => {
+      socket.join(room.id)
+    });
+  }
+
+async handleConnection(client: Socket) {
     // Handle connection event
-    console.log('connected', client.id);
-    try {
-      console.log("tokeeen:", client.handshake.headers.cookie)
+  // console.log('connected', client.id);
+  try {
+      console.log("tokeeen :", client.handshake.headers)
       const token = this.extractTokenFromCookies(client.handshake.headers.cookie);
-      if (!token)
-        return this.disconnect(client);
-
-      const verifiedToken = await this.jwtService.verifyAsync(
-        token,
-        { secret: process.env.JWT_SECRET },
-      );
-      if (!verifiedToken)
-        return this.disconnect(client);
-
+      if (!token) return this.disconnect(client);
+      
+      const verifiedToken = await this.jwtService.verifyAsync(token, {
+        secret: process.env.JWT_SECRET,
+      });
+      if (!verifiedToken) return this.disconnect(client);
+      
       const user = await this.findUserByIntraId(verifiedToken.userId)
-      if (!user)
-        return this.disconnect(client);
+      
+    //   console.log('user    ', user )
+    if (!user)
+      return this.disconnect(client);
 
-      this.userToClient.set(user.id, client.id);
-      console.log(client.id, 'successfully connected ');
+    this.userToClient.set(user.id, client.id);
+    console.log(client.id, 'successfully connected ');
+    client.data.user = verifiedToken
+    // const user_id = client.data.user.userId
+    await this.join_chat_rooms(client, user.id)
     } catch (error) {
-      console.log('erroooor: ', error);
+        console.log('erroooor: ', error);
       return this.disconnect(client);
     }
   }
 
   handleDisconnect(client: Socket) {
-    // Handle disconnection event
     delete this.userToClient[client.id];
     this.disconnect(client);
     console.log('disconnected', client.id);
@@ -104,26 +108,44 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('conversation')
-  async handelConversation(@MessageBody() data: any) {
-    const { senderId, reciverId, messageContent, type } = data;
-    console.log('data is ', data);
-    if (type === 'DM') {
-      this.server
-        .to(this.userToClient[senderId])
-        .emit('conversation', messageContent);
-      this.server
-        .to(this.userToClient[reciverId])
-        .emit('conversation', messageContent);
-      console.log('data is ', data);
-    } else if (type === 'GROUP') {
-      this.server.emit('conversation', messageContent);
+  async handelConversation(socket : Socket , @MessageBody() data: idMessageDto) {
+    // console.log('heeloooooooo ' ,data);
+    const idRoom : string = data.roomId.toString();
+    const roomId : number = data.roomId;
+    const room  = await this.chatService.getExistenceRoom(roomId); // for checking if room exists
+    if (!room)
+      socket.emit('error', "chat room does not exist");
+    const roomUser = await this.chatService.get_room_user(roomId, data.senderId) // for checking if user is banned && muted && blocked
+    if (roomUser.isBlocked){
+      socket.emit("Error", "You have been blocked")
+      return ;
     }
+    if (roomUser.isMuted){
+      socket.emit("Error", "You have been muted")
+      return ;
+    } 
+    if (roomUser.isBanned){
+      socket.emit("Error", "You have been banned")
+      return ;
+    } 
+
+    console.log("room id inside conversation === ", typeof(idRoom))
+    const pyload : idMessageDto = {
+      roomId: data.roomId,
+      content : data.content,
+      senderId : data.senderId,
+      timestamp: new Date(),
+    }
+
+    socket.to(idRoom).emit('message', pyload);
+    
+    await this.chatService.addMessage(pyload.senderId, roomId, data.content);
   }
 
-  @SubscribeMessage('notifications')
-  async notifications(@MessageBody() data: any) {
-    const { senderId, reciverId, content } = data;
-    this.server.to(this.userToClient[reciverId]).emit('notifications', content);
-  }
+  // @SubscribeMessage('notifications')
+  // async notifications(@MessageBody() data: any) {
+  //   const { senderId, reciverId, content } = data;
+  //   this.server.to(this.userToClient[reciverId]).emit('notifications', content);
+  // }
 
 }

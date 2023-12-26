@@ -154,7 +154,7 @@ model Message {
 }
 
 model Chatroom {
-  id Int @id @default(autoincrement())
+  id  Int @id @default(autoincrement())
 
   name String
   photo String?
@@ -185,6 +185,7 @@ model ChatroomUsers {
 
   isMuted Boolean @default(false)
   isBanned Boolean @default(false)
+  isBlocked Boolean @default(false)
 
   muteExpiration DateTime?
 
