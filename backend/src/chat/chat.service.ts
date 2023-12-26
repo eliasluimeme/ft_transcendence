@@ -1254,78 +1254,45 @@ export class ChatService {
 
 }
 
-    // async saveMessageToDatabase(messageContente: string, roomId: number): Promise<void> {
-    //     await this.prisma.message.create({
-    //         data: {
-    //             chatroomId: roomId,
-    //             content: messageContente,
-    //         },
-    //     })
-        
-    // }
+    async setOnlineStatus( userId: number ) {
+        try {
+            const user = await this.prisma.user.update({
+                where: {
+                    id: userId,
+                },
+                data: {
+                    status: 'ONLINE',
+                }
+            })
+            if (user)
+                return { success: true, message: 'User online' }
+            else throw new BadRequestException('Something went wrong. Please try again');
+        } catch (error) {
+            if (error instanceof BadRequestException)
+                throw error;
+            console.log(error)
+        }
+    }
 
+    async get_room_user(roomId: number, userId: number) {
+        try {
+            const user = await this.prisma.chatroomUsers.findFirst({
+                where: {
+                    userId: userId,
+                    chatroomId: roomId,
+                },
+            })
+            console.log(user)
+            if (user) {
+                const { isMuted, isBanned } = user
+                return { isMuted, isBanned }
+            }
+            else throw new NotFoundException('User not found');
+        } catch (error) {
+            if (error instanceof NotFoundException)
+                throw error;
+            console.log(error)
+        }
+    }
 
-// async addMessage( userId: number, roomId: number, message: string) 
-// {
-//         try {
-//             const userInChatroom = await this.prisma.chatroomUsers.findFirst({
-//                 where: {
-//                     userId: userId,
-//                     chatroomId: roomId,
-//                 },
-//               });
-
-//               if (!userInChatroom)
-//                 throw new Error('User not found in the chat room.');
-          
-//               const newMessage = await this.prisma.message.create({
-//                 data: {
-//                     content: message,
-//                     senderId: userInChatroom.id,
-//                     chatroomId: roomId,
-//                 },
-//               });
-          
-//               await this.prisma.chatroomUsers.update({
-//                 where: { id: userInChatroom.id },
-//                 data: {
-//                   messages: {
-//                     connect: {
-//                       id: newMessage.id,
-//                     },
-//                   },
-//                 },
-//               });
-          
-//             if (newMessage)
-//                 return { success: true, message: 'Message sent' }
-//             else throw new BadRequestException('Something went wrong. Please try again');
-//         } catch (error) {
-//             if (error instanceof BadRequestException)
-//                 throw error;
-//             console.log(error)
-//         }
-    
-//     }
-
-//     async setOnlineStatus( userId: number ) {
-//         try {
-//             const user = await this.prisma.user.update({
-//                 where: {
-//                     id: userId,
-//                 },
-//                 data: {
-//                     status: 'ONLINE',
-//                 }
-//             })
-//             if (user)
-//                 return { success: true, message: 'User online' }
-//             else throw new BadRequestException('Something went wrong. Please try again');
-//         } catch (error) {
-//             if (error instanceof BadRequestException)
-//                 throw error;
-//             console.log(error)
-//         }
-//     }
-
-// }
+}
