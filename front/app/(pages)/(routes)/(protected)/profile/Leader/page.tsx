@@ -15,7 +15,7 @@ const page = () => {
               <div className="relative w-[90%] h-[97%] col-start-8 col-span-4 rounded-lg">
                 <Image
                   className="rounded-lg shadow-shadoww"
-                  src="https://cdn.dribbble.com/users/1764261/screenshots/3937130/media/200a0c094cdfe8b5dddff7416de8c390.png?resize=800x600&vertical=center"
+                  src="/profile/rank.svg"
                   alt=""
                   sizes="(max-width: 600px) 400px,
                 (max-width: 1200px) 800px,

@@ -5,6 +5,7 @@ import { useState } from "react";
 import Head from "next/head";
 import { useRouter } from "next/navigation";
 import { userAgent } from "next/server";
+import { usePathname } from 'next/navigation'
 
 
 
@@ -15,6 +16,7 @@ export default function StartLayout({
 }) {
   const [inputValue, setInputValue] = useState('');
   const router = useRouter();
+  const pathname = usePathname()
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
     // console.log(inputValue);
@@ -53,7 +55,8 @@ export default function StartLayout({
 
   return (
     <div className="flex h-full w-full p-3 gap-3 font-custom">
-      <NavBar />
+      {pathname !== "/game/board" &&  <NavBar />}
+     
       <div className="absolute w-[30%] flex space-x-2 right-[10%] top-[3%]">
         <svg
           className="w-5 h-5 "

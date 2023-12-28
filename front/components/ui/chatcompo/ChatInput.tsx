@@ -74,7 +74,7 @@ const fetHistoric = async (id: any) => {
   }
 };
 
-const ChatInput = (id: string | number) => {
+const ChatInput = (id: any) => {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const [message, setMessage] = useState<string>("");
   const [historic, setHistoric] = useState<Message[]>([]);
