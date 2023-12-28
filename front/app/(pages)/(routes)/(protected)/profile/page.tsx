@@ -16,7 +16,7 @@ const page = () => {
             <div className="relative w-[96%] h-[94%] rounded-lg row-start-2 col-start-1 col-span-5">
               <Image
                 className="rounded-lg shadow-shadoww"
-                src="https://cdn.dribbble.com/users/944284/screenshots/3041046/media/1d0fd0b5c9b20de91501818723bd05a8.png?resize=800x600&vertical=center"
+                src="/profile/ping.svg"
                 alt=""
                 sizes="(max-width: 600px) 400px,
                 (max-width: 1200px) 800px,

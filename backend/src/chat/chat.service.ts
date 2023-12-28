@@ -70,7 +70,9 @@ export class ChatService {
                         return { convId: id, name, photo }
                     else return null;
                 } else {
-                    const user = conv.ChatroomUsers.find(u => u.userId !== userId).userId;
+                    let user: any;
+                    if (conv.ChatroomUsers.find(u => u.userId !== userId))
+                        user = conv.ChatroomUsers.find(u => u.userId !== userId).userId;
 
                     if (iblocked.find(u => u.blockedId === user) || blockedme.find(u => u.blockerId === user))
                         return null; 
@@ -380,7 +382,7 @@ export class ChatService {
             return { visibility: room.visibility, roomName: uname[0], users };
           } else 
             return { visibility: room.visibility, roomName: room.name, users };
-            
+
         } catch (error) {
             if (error instanceof NotFoundException || error instanceof ForbiddenException)
                 throw error;
@@ -1166,13 +1168,13 @@ export class ChatService {
               const newMessage = await this.prisma.message.create({
                 data: {
                     content: message,
-                    senderId: userInChatroom.id,
+                    senderId: userId,
                     chatroomId: roomId,
                 },
               });
           
               await this.prisma.chatroomUsers.update({
-                where: { id: userInChatroom.id },
+                where: { id: userId },
                 data: {
                   messages: {
                     connect: {

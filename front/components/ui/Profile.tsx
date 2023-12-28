@@ -220,7 +220,7 @@ const Pic = () => {
   const handleSaveAvatar = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:3001/settings/update",
+        "http://localhost:3001/settings/avatar",
         { photo: selectedImage },
         {
           withCredentials: true,
@@ -231,11 +231,11 @@ const Pic = () => {
       );
 
       if (response.status === 201) {
+        toast.success("Avatar Uploaded Successfuly")
         setInputValues({
           ...inputValues,
           photo: response.data.photo,
         });
-        console.log("Image URL sent successfully!");
         setUploadModalAvatarOpen(false); // Close the modal if needed
       } else {
         // Handle failure (e.g., show error message)

@@ -1,7 +1,11 @@
 import React from "react";
 import Image from "next/image";
 
-const Bot = () => {
+const Bot = (props:any) => {
+  const newGameVsBot = () => {
+    props.socket.emit('newGameBot', "3");
+    props.setStatus(1);
+  }
   return (
     <div className="grid grid-cols-3 w-full h-full">
       <div className="col-start-1 col-span-2 relative w-full h-full flex items-center justify-center">
@@ -20,7 +24,7 @@ const Bot = () => {
       <div className="col-start-3 flex flex-col items-center justify-center ">
         <div>Play With</div>
         <div className="text-[40px] text-[#F87B3F]">BoT</div>
-        <button className="border w-[80%] h-[10%] rounded-lg bg-[#EDF0F4] text-[#3B2D59] shadow-sm shadow-white hover:text-opacity-70">
+        <button onClick={newGameVsBot} className="border w-[80%] h-[10%] rounded-lg bg-[#EDF0F4] text-[#3B2D59] shadow-sm shadow-white hover:text-opacity-70">
           Play
         </button>
       </div>

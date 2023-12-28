@@ -50,7 +50,7 @@ export class GameService {
     if (newroom.vsbot)
     {
       this.vsBot = true;
-      this.bot.speed = newroom.mode * 500000;
+      this.bot.speed = newroom.mode * 10;
     }
     this.roomstatus = "open";
     this.rplayer.id = newroom.id2;
@@ -75,7 +75,7 @@ export class GameService {
   }
   
   scoreChecker(){
-    if (this.lplayer.score == 2 || this.rplayer.score == 2) {
+    if (this.lplayer.score == 10 || this.rplayer.score == 10) {
       this.logger.error("The game finish");
       this.clearTimers();
       this.roomstatus = "closed";

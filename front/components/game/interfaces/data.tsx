@@ -11,9 +11,7 @@ export interface NewGame {
 };
 
 export interface CtxType {
-    modeChoosed: boolean;
-    type: string;
-    mode: string;
+    socket: any;
 }
 
 export interface Padel  {
@@ -34,10 +32,17 @@ export interface Point {
     y: number;
 }
 
-export interface Board {
+export interface BoardInfo {
     ball: Point;
     rpadel: number;
     lpadel: number;
     lscore: number;
     rscore: number;
+}
+
+export interface User {
+    id: number;
+    fullName: string;
+    userName: string;
+    photo: string;
 }

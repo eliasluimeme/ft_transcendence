@@ -153,7 +153,7 @@ export class UserController {
     @Post('settings/avatar')
     @UseGuards(Jwt2faAuthGuard)
     async updateAvatar(@Req() req, @Body() body: any): Promise<any> {
-      return await this.userService.updateAvatar(req.user.intraId, body.photo);
+      return await this.userService.updateAvatar(req.user.id, body.photo);
     }
 
     @Post('photo/upload')

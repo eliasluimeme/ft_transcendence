@@ -1,36 +1,85 @@
 "use client";
-
-import {MyContext} from '@/components/game/tools/ModeContext';
-import { MyContextProvider } from '@/components/game/tools/MyContextProvider';
-import React, { useContext } from 'react'
+import Loading from "@/components/game/modules/Loading";
+import Results from "@/components/game/modules/Results";
+import Room from "@/components/game/modules/Room";
+import Settings from "@/components/game/modules/Settings";
+import { useEffect, useState, useRef, useContext} from "react";
+import { MyContext } from "@/components/game/tools/ModeContext";
 import { useRouter } from 'next/navigation'
-import Tab  from '@/components/game/elements/Tab'
-import Loading from '@/components/ui/gamecompo/Loading';
+import axios from "axios";
+import io from 'socket.io-client';
 
-export default function Page() {
+//const socket = io('http://localhost:3001/game');
+
+export default function page() {
+  const [status, setStatus] = useState(0);
+  //const mode = useContext(MyContext);
+  //const socket = mode.contextValue.socket;
+  const ld = useRef(false);
+  const [socket, setSocket] = useState<any>(null);
+  const [data, setData] = useState<any>();
+  const [self, setSelf] = useState<any>();
+  const me = useRef({side: 'left', userName: "", photo: ""});
   const router = useRouter();
-  const mode = useContext(MyContext);
-  const text = "Welcome to the classic game of Ping Pong! In this version, you'll be facing off against \
-  a computer-controlled bot. The objective is simple: score as many points as possible by keeping the ball in play.";
-  const findRoom = (t: string, m: string) => {
-    if (t == "player" || t == "bot") {
-      const { contextValue, updateContextValue} = mode;
-      updateContextValue({modeChoosed:true, type:t, mode:m})
-      router.push(`/game/board`); 
+  const gameRslts = useRef<string>();
+  const changeModule = async (status:number) => {
+    setStatus(prev => prev = status);
+  };
+
+  const fetchData = async () => {
+    try {
+      const response = await axios.get("http://localhost:3001/settings", {
+        withCredentials: true,
+      });
+      if (response.status === 200) {
+        me.current.userName = response.data.userName;
+        me.current.photo = response.data.photo;
+      } else {
+        console.log("failed to fetchdata");
+      }
+    } catch (error) {
+      router.push("/Login");
+      console.error("An error occurred while fetching user data:", error);
     }
   };
 
-  return (
-    <div className='py-16 font-custom w-full h-full grid sm:grid-cols-1 lg:grid-cols-1 md:p-5 lg:p-10'>
-      {/* <Loading /> */}
-      <div className="container m-auto px-6 text-gray-500 md:px-12 xl:px-0">
-        <div className="mx-auto grid gap-6 md:w-3/4 lg:w-full lg:grid-cols-2">
-          <Tab typ e= "Bot" mode= "Easy" text= {text} bfunction= {() => findRoom('bot', '3')} />
-          <Tab type= "Bot" mode= "Medium" text= {text} bfunction= {() => findRoom('bot', '2')} />
-          <Tab type= "Bot" mode= "Hard" text= {text} bfunction= {() => findRoom('bot', '1')} />
-          <Tab type= "Player" mode= "None" text= {text} bfunction={() => findRoom('player', '')} />
-        </div>
-      </div>                     
-    </div>
-  )
-}
+  useEffect( () => {
+    console.log("ana kayn f page");
+    if (!ld.current) {
+      setSocket(io('http://localhost:3001/game', { transports : ['websocket'] }));
+      ld.current = true;
+    }
+    if (socket) {
+      socket.on('goback', (reason: string) => {
+        console.log("sala match");
+        gameRslts.current = reason;
+        router.replace('/');
+      });
+      socket.on('roomCreated', (data:any) => {
+        console.log("room created");
+        fetchData();
+        me.current.side = data.side;
+        setSelf(me.current);
+        console.log("opp", data);
+        setData(data);
+        setStatus(2);
+      });
+      return (() => {
+        console.log("rani khrjt mn page");
+        socket.disconnect();
+      });
+    }
+    return;
+  }, [socket]);
+
+  if (!socket)
+    return;
+  if(status == 0 && socket)
+    return (<Settings socket={socket} setStatus={(msg:number) => changeModule(msg)}/>);
+  else if(status == 1)
+    return(<Loading socket={socket} setStatus={(msg:number) => changeModule(msg)}/>);
+  else if(status == 2)
+    return(<Room socket={socket} data={data} me={self}/>);
+  else if (status == 3)
+    return(<Results rslt={gameRslts} setStatus={(msg:number) => changeModule(msg)} />);
+};
