@@ -27,7 +27,7 @@ export class GameGateway implements OnGatewayInit{
   @WebSocketServer() server: Server;
   private players: Map<string,Player> = new Map();
   private readonly logger: Logger = new Logger(GameGateway.name);
-  private queue: Socket[] = [];
+  private queue: Player[] = [];
   private readonly board: BoardData = {
     board: {width: 1000, height: 500},
     padel: {width: 15, height: 100},
@@ -162,17 +162,24 @@ export class GameGateway implements OnGatewayInit{
     if (this.players.has(player1.id))
     {
       if (player1.sock != client.id)  
-      client.disconnect();
+      {
+        this.server.to(client.id).emit('goback', "You were disconnected");
+        client.disconnect();
+      }
       return;
     }
     if (!this.queue.length) {
-      this.queue.push(client);
+      this.queue.push(player1);
+      return;
+    }
+    if(this.queue[0].id == player1.id) {
+      this.server.to(client.id).emit('goback', "You are already in queue");
       return;
     }
     const user1 = this.findUserByIntraId(player1.id);
     const matching = this.queue.pop();
-    const user2 = this.findUserByIntraId(matching.data);
-    const player2 = {id: matching.data, sock: matching.id, roomid: player1.id};
+    const user2 = this.findUserByIntraId(matching.id);
+    const player2 = {id: matching.id, sock: matching.sock, roomid: player1.id};
     const room: NewRoom = {
       vsbot: false,
       mode: 0,
@@ -192,6 +199,6 @@ export class GameGateway implements OnGatewayInit{
 
   @SubscribeMessage('cancelMatching')
   cancel(@ConnectedSocket() client: Socket) {
-    this.queue = this.queue.filter((waiters) => {client.id != waiters.id});
+    this.queue = this.queue.filter((waiter) => {client.id != waiter.id});
   }
 }

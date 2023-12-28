@@ -6,7 +6,6 @@ import {BoardInfo} from '@/components/game/interfaces/data';
 const Room = (props:any) => {
   const socket = props.socket;
   const opp = {userName: props.data.oppName, photo: props.data.oppPhoto};
-  console.log("Room", opp);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const parentRef = useRef<HTMLDivElement | null>(null);
   const boardSize = useRef({width: 0, height: 0});
@@ -33,7 +32,7 @@ const Room = (props:any) => {
     ctx.clearRect(0, 0, boardSize.current.width, boardSize.current.height);
     //const img = new Image(boardSize.current.width, boardSize.current.height);
     //img.src = '/game/bg.png';
-    ctx.drawImage(img, 0, 0, boardSize.current.width, boardSize.current.height);
+    //ctx.drawImage(img, 0, 0, boardSize.current.width, boardSize.current.height);
     ctx.fillStyle = "Gray";
     ctx.fillRect(mypadel.current.x, mypadel.current.y, 15, 100);
     ctx.fillRect(oppadel.current.x, oppadel.current.y, 15, 100);
@@ -45,10 +44,10 @@ const Room = (props:any) => {
     const ctx = canvas.getContext('2d')!;
     ctx.beginPath();
     ctx.arc(x, y, radius, 0, 2 * Math.PI);
-    ctx.fillStyle = 'red';
+    ctx.fillStyle = 'white';
     ctx.fill();
     ctx.lineWidth = 1;
-    ctx.strokeStyle = 'black';
+    //ctx.strokeStyle = 'black';
     ctx.stroke();
     ctx.closePath();
   }
@@ -87,9 +86,7 @@ const Room = (props:any) => {
       oppadel.current.x = 0;
     }
     const sendData = () => {
-      console.log("rani kansift");
       socket.emit('updateRoom', Math.round((mypadel.current.y * 500) / boardSize.current.height));
-      //newChange(prev => prev + 1);
     };
     socket.on('updatePlayer', (board: BoardInfo) => {
       ball.current = {
@@ -103,7 +100,7 @@ const Room = (props:any) => {
       setScores({lscore:board.lscore, rscore: board.rscore});
       newChange(prev => prev + 1);
     });
-    timer = setInterval(sendData, 5);
+    timer = setInterval(sendData, 16);
     return () => {
       window.removeEventListener('resize', setBoardSize);
       window.removeEventListener('keydown', handleArrowKeys);
