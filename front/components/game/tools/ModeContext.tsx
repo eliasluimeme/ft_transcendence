@@ -10,7 +10,9 @@ export interface ProvideType {
 }
 export const MyContext = createContext<ProvideType>(
   {  contextValue: {
-      socket:io('http://localhost:3001/game',),
+      socket:io('http://localhost:3001/game', {
+        withCredentials: true,
+      }),
     },
     updateContextValue:(newValue: CtxType) => {}
   }

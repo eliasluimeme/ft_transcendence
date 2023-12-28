@@ -11,10 +11,10 @@ import { ChatService } from './chat/chat.service';
 import { ChatController } from './chat/chat.controller';
 import { ChatModule } from './chat/chat.module';
 import { join } from 'path';
-import { ChatGateway } from './chat/chat.gateway';
-import { JwtModule } from '@nestjs/jwt';
+import { AppGateway } from './app.gateway';
 import { ScheduleModule } from '@nestjs/schedule';
 import { GameModule } from './game/game.module';
+import { JwtService } from '@nestjs/jwt';
 
 
 @Module({
@@ -27,7 +27,7 @@ import { GameModule } from './game/game.module';
       isGlobal: true,
   })],
   controllers: [AppController, ChatController],
-  providers: [ AppService, ChatService ]
+  providers: [ AppService, ChatService,JwtService, AppGateway, ]
 
 
 })

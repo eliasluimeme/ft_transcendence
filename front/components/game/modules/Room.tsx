@@ -119,13 +119,13 @@ const Room = (props:any) => {
   }, [isChanged]);
   
   return (
-    <div className='h-full w-full flex-col overflow-hidden'>
-      <div className='w-full h-[100px] grid grid-cols-2 mt-10'>
+    <div className='h-full w-full flex-col'>
+      <div className='w-full hidden md:grid grid-cols-2 fixed  top-[calc(50%-50px)]'>
         {props.me.side == "left" ? <BoardLeftSide user={props.me} score={scores.lscore}/> : <BoardLeftSide user={opp} score={scores.lscore}/>}
         {props.me.side == "left" ?  <BoardRightSide user={opp} score={scores.rscore}/> : <BoardRightSide user={props.me} score={scores.rscore}/>}
       </div>
-      <div ref={parentRef} className='w-full h-[80%]'>
-        <canvas ref={canvasRef}></canvas>
+      <div ref={parentRef} className=' w-full h-full relative z-10'>
+        <canvas ref={canvasRef} className='border-2 border-[#fff] h-full'></canvas>
       </div>
     </div>
   )

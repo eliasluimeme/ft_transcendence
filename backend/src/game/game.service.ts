@@ -23,7 +23,7 @@ export class GameService {
     vec: {x: 0, y: 0},
     rad: 10,
     speed: 2,
-    repete: 500,
+    repete: 16,
     timer: '',
     dir: 'left',
   }
@@ -70,6 +70,7 @@ export class GameService {
     }
   }
   moveBall() {
+    //this.logger.error(this.ball.repete);
     this.ball.cords.x += this.ball.vec.x;
     this.ball.cords.y += this.ball.vec.y;
   }
@@ -91,7 +92,7 @@ export class GameService {
     this.ball.cords = {x: 500, y: 250};
     this.lplayer.padely = 0;
     this.rplayer.padely = 5;
-    this.ball.repete = 5;
+    this.ball.repete = 16;
     this.clearTimers();
     this.resetTimers();
   }
@@ -210,7 +211,7 @@ export class GameService {
     var intersect = this.findIntersection(padeltop, padelbottom);
     if (intersect.x < 0)
       return;
-    var angle = (((padeltop.y + (this.padel.height / 2)) - intersect.y) / (this.padel.height / 2)) * -75;
+    var angle = (((padeltop.y + (this.padel.height / 2)) - intersect.y) / (this.padel.height / 2)) * -60;
     if (this.ball.dir == 'left')
     {
       this.calculVecs(angle);

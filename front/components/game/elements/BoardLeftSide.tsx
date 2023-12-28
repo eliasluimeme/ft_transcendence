@@ -3,13 +3,13 @@ import React, {useEffect, useRef} from 'react'
 const BoardLeftSide = (props:any) => {
     const user = props.user;
     const score = props.score;
-    console.log("LeftSide", user);
+    //console.log("LeftSide", user);
 
     return (
-        <div className='grid grid-cols-3 border border-black/50 rounded-lg h-[100px]'>
+        <div className='grid grid-cols-3 rounded-lg h-[100px]'>
             <div className='flex items-center justify-center'>
                 <img
-                className='rounded-lg border border-black/25'
+                className='rounded-lg'
                 src={user.photo}
                 alt=""
                 height={80}

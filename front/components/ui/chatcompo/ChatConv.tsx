@@ -10,13 +10,16 @@ import {
 } from "@/components/ui/popover";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import internal from "stream";
 import { StaticRequire } from "next/dist/shared/lib/get-img-props";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import Messages from "./Messages";
 import toast from "react-hot-toast";
+import { io } from "socket.io-client";
+import { MyContext } from "@/components/game/tools/ModeContext";
+import { MyContextProvider } from "@/components/game/tools/MyContextProvider";
 
 interface Members {
   id: number;
@@ -27,6 +30,7 @@ interface Members {
 
 function ChatConv(oldeId: any) {
   const [update, toupdate] = useState<number>(0);
+  const gamexontext = useContext(MyContext);
   const router = useRouter();
   const [roomName , setRoomName] = useState<string>('');
   const id = oldeId['id']
@@ -45,6 +49,7 @@ function ChatConv(oldeId: any) {
           },
         }
       );
+      // gamexontext.contextValue.socket.emit("inviteEvent", invitedPlayerId)
       if (response.status === 200) {
         if (response.data.role === "OWNER" || response.data.role === "ADMIN")
           setrol(true);

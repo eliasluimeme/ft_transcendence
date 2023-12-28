@@ -3,6 +3,11 @@ import React from "react";
 import Image from "next/image";
 import Redirect from "@/components/ui/homeComp/Redirect";
 import { Toaster } from "react-hot-toast";
+import { io } from "socket.io-client";
+
+// const socket = io('http://localhost:3001/status', {
+//   withCredentials: true,
+// })
 
 const Page = () => {
   return (

@@ -7,7 +7,7 @@ import { MyContext } from './ModeContext';
 export const MyContextProvider = ({ children }: {
   children: JSX.Element;
 }) => {
-  const [contextValue, setContextValue] = useState<CtxType>({type: '', mode: ''});
+  const [contextValue, setContextValue] = useState<CtxType>({socket: ''});
 
   const updateContextValue = (newValue: CtxType) => {
     setContextValue(newValue);
