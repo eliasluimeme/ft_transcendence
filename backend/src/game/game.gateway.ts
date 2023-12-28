@@ -21,7 +21,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
   origin: 'http://localhost:3000',
   credentials: true,
 },
-namespace: 'game',})
+namespace: '/game',})
 @UseGuards(GameGuard)
 export class GameGateway implements OnGatewayInit{
   @WebSocketServer() server: Server;
@@ -135,7 +135,7 @@ export class GameGateway implements OnGatewayInit{
       sock2: ''
     };
     this.rooms.set(player.id,new GameService(room));
-    this.server.to(player.sock).emit('roomCreated', 'left');
+    this.server.to(player.sock).emit('roomCreated', {side: 'left', oppName: "Bot", oppPhoto: "http://localhost:3001/bg.png"});
     this.rooms.get(player.id).resetBoard();
     //sending ready event to each player with opponent data
   }
@@ -162,15 +162,17 @@ export class GameGateway implements OnGatewayInit{
     if (this.players.has(player1.id))
     {
       if (player1.sock != client.id)  
-        client.disconnect();
+      client.disconnect();
       return;
     }
     if (!this.queue.length) {
       this.queue.push(client);
       return;
     }
-    const opponent = this.queue.pop();
-    const player2 = {id: opponent.data, sock: opponent.id, roomid: player1.id};
+    const user1 = this.findUserByIntraId(player1.id);
+    const matching = this.queue.pop();
+    const user2 = this.findUserByIntraId(matching.data);
+    const player2 = {id: matching.data, sock: matching.id, roomid: player1.id};
     const room: NewRoom = {
       vsbot: false,
       mode: 0,
@@ -182,8 +184,8 @@ export class GameGateway implements OnGatewayInit{
     this.players.set(player1.id, player1);
     this.players.set(player2.id, player2);
     this.rooms.set(player1.id,new GameService(room));
-    this.server.to(player1.sock).emit('roomCreated', 'left');
-    this.server.to(player2.sock).emit('roomCreated', 'right');
+    this.server.to(player1.sock).emit('roomCreated', {side: 'left', oppName: (await user2).userName, oppPhoto: (await user2).photo});
+    this.server.to(player2.sock).emit('roomCreated', {side: 'right', oppName: (await user1).userName, oppPhoto: (await user1).photo});
     this.rooms.get(player1.id).resetBoard();
     //sending ready event to each player with opponent data
   }
@@ -191,6 +193,5 @@ export class GameGateway implements OnGatewayInit{
   @SubscribeMessage('cancelMatching')
   cancel(@ConnectedSocket() client: Socket) {
     this.queue = this.queue.filter((waiters) => {client.id != waiters.id});
-    this.server.to(client.id).emit('goback', "[Game Canceled] U canceled the matching process");
   }
 }

@@ -31,6 +31,7 @@ export class GameGuard implements CanActivate {
     }
     catch (error) {
       logger.error("[Access Denied]: JWT Signature is not valid.");
+      console.log(error);
       return false;
     }
   }

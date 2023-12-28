@@ -5,6 +5,8 @@ import { useState } from "react";
 import Head from "next/head";
 import { useRouter } from "next/navigation";
 import { userAgent } from "next/server";
+import { MyContext } from "@/components/game/tools/ModeContext";
+import { MyContextProvider } from "@/components/game/tools/MyContextProvider";
 
 
 
@@ -75,7 +77,7 @@ export default function StartLayout({
           className="w-[100%] h-[2%] border-color: rgb(255 255 255) bg-transparent border rounded-full text-[15px]  border-gray-500 text-gray-500"
         />
       </div>
-      <main className="h-full w-full">{children}</main>
+        <main className="h-full w-full">{children}</main>
     </div>
   );
 }

@@ -1,24 +1,20 @@
-"use client";
-import React, { useEffect, useState, useRef } from 'react'
-import { useRouter } from 'next/navigation';
-import {MyContext} from '@/components/game/tools/ModeContext';
-import {useContext} from "react";
-import io from 'socket.io-client';
-import {Board} from '@/components/game/interfaces/data'
+import React, {useContext, useEffect, useRef, useState} from 'react'
+import BoardLeftSide from '../elements/BoardLeftSide';
+import BoardRightSide from '../elements/BoardRightSide';
+import {BoardInfo} from '@/components/game/interfaces/data';
 
-export default function page() {
-
-  const router = useRouter();
-  const mode = useContext(MyContext);
+const Room = (props:any) => {
+  const socket = props.socket;
+  const opp = {userName: props.data.oppName, photo: props.data.oppPhoto};
+  console.log("Room", opp);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const parentRef = useRef<HTMLDivElement | null>(null);
   const boardSize = useRef({width: 0, height: 0});
-  const mypadel = useRef({x: 0, y: 0, side: 'left'});
-  const oppadel = useRef({x: 0, y: 0, side: 'right'});
+  const mypadel = useRef({x: 0, y: 0});
+  const oppadel = useRef({x: 0, y: 0});
   const ball = useRef({x: 0, y: 0});
   const [isChanged, newChange] = useState(0);
   const [scores, setScores] = useState({lscore:0, rscore:0});
-  const [loaded, isLoaded] = useState(false);
   // const {serBoard, updateSerBoard} = useState({width: 0, height: 0});
 
   const setBoardSize = () => {
@@ -35,8 +31,8 @@ export default function page() {
     const canvas = canvasRef.current!;
     const ctx = canvas.getContext('2d')!;
     ctx.clearRect(0, 0, boardSize.current.width, boardSize.current.height);
-    const img = new Image(boardSize.current.width, boardSize.current.height);
-    img.src = '/game/bg1.png';
+    //const img = new Image(boardSize.current.width, boardSize.current.height);
+    //img.src = '/game/bg.png';
     ctx.drawImage(img, 0, 0, boardSize.current.width, boardSize.current.height);
     ctx.fillStyle = "Gray";
     ctx.fillRect(mypadel.current.x, mypadel.current.y, 15, 100);
@@ -78,84 +74,72 @@ export default function page() {
 
 
   useEffect( () => {
-    if (!mode.contextValue.modeChoosed)
-      router.replace('/game');
+    var timer:any;
     setBoardSize();
     window.addEventListener('resize', setBoardSize);
     window.addEventListener('keydown', handleArrowKeys);
-    return () => {
-      window.removeEventListener('resize', setBoardSize);
-      window.removeEventListener('keydown', handleArrowKeys);
+    if(props.me.side == 'left') {
+      mypadel.current.x = 0;
+      oppadel.current.x = boardSize.current.width - 15;
     }
-  }, []);
-
-  useEffect(() => {
-    const socket = io('http://localhost:3001/game', { transports : ['websocket'] });
+    else {
+      mypadel.current.x = boardSize.current.width - 15;
+      oppadel.current.x = 0;
+    }
     const sendData = () => {
+      console.log("rani kansift");
       socket.emit('updateRoom', Math.round((mypadel.current.y * 500) / boardSize.current.height));
+      //newChange(prev => prev + 1);
     };
-    if (mode.contextValue.type == "bot")
-      socket.emit('newGameBot');
-    else
-      socket.emit('newGamePlayer');
-    socket.on('goback', (reason: string) => {
-      window.alert(reason);
-      router.replace('/game');
-    });
-    socket.on('updatePlayer', (board: Board) => {
+    socket.on('updatePlayer', (board: BoardInfo) => {
       ball.current = {
         x: Math.round((board.ball.x * boardSize.current.width) / 1000),
         y: Math.round((board.ball.y * boardSize.current.height) / 500),
       };
-      if (oppadel.current.side == 'left')
+      if (props.me.side != 'left')
         oppadel.current.y = Math.round((board.lpadel * boardSize.current.height) / 500);
       else
         oppadel.current.y = Math.round((board.rpadel * boardSize.current.height) / 500);
       setScores({lscore:board.lscore, rscore: board.rscore});
       newChange(prev => prev + 1);
     });
-    var timer:any;
-    socket.on('roomCreated', (side: string)=> {
-      if(side == 'left') {
-        mypadel.current.x = 0;
-        oppadel.current.x = boardSize.current.width - 15;
-      }
-      else {
-        mypadel.current.x = boardSize.current.width - 15;
-        mypadel.current.side = 'right';
-        oppadel.current.x = 0;
-        oppadel.current.side = 'left';
-      }
-      timer = setInterval(sendData, 5);
-      isLoaded(prev => prev = true);
-      newChange(prev => prev + 1);
-    });
+    timer = setInterval(sendData, 5);
     return () => {
-      socket.disconnect();
+      window.removeEventListener('resize', setBoardSize);
+      window.removeEventListener('keydown', handleArrowKeys);
       clearInterval(timer);
-    };
+    }
   }, []);
-
-
+  
   useEffect( () => {
     repaintCanvas();
     return () => {
     }
-  }, [isChanged, loaded]);
-
+  }, [isChanged]);
+  
   return (
-    <div className='h-full w-full bg-[#16304b] flex-col'>
-      <div className='w-full h-[20%] border border-white/25 grid grid-cols-1 sm:grid-cols-2'>
-        <li>
-          Left player score: {scores.lscore}
-        </li>
-        <li>
-          Right player score: {scores.rscore}
-        </li>
+    <div className='h-full w-full flex-col'>
+      <div className='w-full h-[100px] grid grid-cols-2 mt-10'>
+        {props.me.side == "left" ? <BoardLeftSide user={props.me} score={scores.lscore}/> : <BoardLeftSide user={opp} score={scores.lscore}/>}
+        {props.me.side == "left" ?  <BoardRightSide user={opp} score={scores.rscore}/> : <BoardRightSide user={props.me} score={scores.rscore}/>}
       </div>
-      <div ref={parentRef} className='w-full h-[80%] border border-white/25'>
+      <div ref={parentRef} className='w-full h-[80%]'>
         <canvas ref={canvasRef}></canvas>
       </div>
     </div>
-  );
+  )
 }
+
+export default Room
+
+
+// if(side == 'left') {
+//   mypadel.current.x = 0;
+//   oppadel.current.x = boardSize.current.width - 15;
+// }
+// else {
+//   mypadel.current.x = boardSize.current.width - 15;
+//   mypadel.current.side = 'right';
+//   oppadel.current.x = 0;
+//   oppadel.current.side = 'left';
+// }

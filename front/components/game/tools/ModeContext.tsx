@@ -1,6 +1,7 @@
 "use client"
 import { createContext } from 'react';
 import { CtxType } from '../interfaces/data';
+import io from 'socket.io-client';
 
 
 export interface ProvideType {
@@ -9,9 +10,7 @@ export interface ProvideType {
 }
 export const MyContext = createContext<ProvideType>(
   {  contextValue: {
-    modeChoosed : false,
-    type: '',
-    mode:''
+      socket:io('http://localhost:3001/game',),
     },
     updateContextValue:(newValue: CtxType) => {}
   }
