@@ -3,14 +3,12 @@
 import { FC, useEffect, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
-// import { format } from 'date-fns'
-import ChatInput from './ChatInput'
 import { format } from 'date-fns';
 
 type Message = {
-  senderId: number
+  userId: number
   content: string
-  timestamp: number
+  createdAt: Date
 }
 
 type  user = { 
@@ -21,7 +19,7 @@ type  user = {
   }
 
 interface MessagesProps {
-    initialMessages: Message[] | undefined
+    initialMessages: Message[]
     me: user | undefined
     roomId: any
   }
@@ -31,32 +29,32 @@ interface MessagesProps {
     me,
     roomId,
   }) => {
- 
-    const [messages, setMessages] = useState<Message[] | undefined>(initialMessages)
-  
-    // useEffect(() => {  
-    //   const messageHandler = (message: Message) => {
-    //     setMessages((prev) => [message, ...prev])
-    //   }
-    // }, [roomId])
-  
     const scrollDownRef = useRef<HTMLDivElement | null>(null)
   
-    const formatTimestamp = (timestamp: number) => {
+    const formatTimestamp = (timestamp: Date) => {
       return format(timestamp, 'HH:mm')
     }
   
-    if(!Array.isArray(messages))
-      return null;
-    return messages.map((message) => {
-      const isCurrentUser = message.senderId === me?.id;
-      // const fromSameSender =
-      //   messages[index - 1]?.senderId === me?.id;
+    useEffect(() => {
+      if (scrollDownRef.current) {
+        scrollDownRef.current.scrollIntoView()
+      }
+    }, [initialMessages])
+  
+    return (
+    <>
+    <div className="overflow-y-scroll w-full sm:h-[500px] lg:h-[980px] p-[80px]">
+    <div >
+      {
+      initialMessages?.map((message) => {
+      const isCurrentUser = message.userId === me?.id;
   
       return (
         <div
-          className="chat-message"
-          key={`${message.timestamp}`}
+        className="mb-[10px]" 
+        style={{ maxHeight: '400px' }} 
+        
+          key={`${message.createdAt}`}
         >
           <div
             className={cn("flex items-end", {
@@ -67,22 +65,22 @@ interface MessagesProps {
               className={cn(
                 "flex flex-col space-y-2 text-base max-w-xs mx-2",
                 {
-                  "order-1 items-end": isCurrentUser,
-                  "order-2 items-start": !isCurrentUser,
+                  "order-1 items-end": !isCurrentUser,
+                  "order-2 items-start": isCurrentUser,
                 }
               )}
             >
               <span
                 className={cn("px-4 py-2 rounded-lg inline-block", {
-                  "bg-[#F87B3F] text-white": !isCurrentUser,
-                  "border text-white": isCurrentUser,
+                  "bg-[#F87B3F] text-white": isCurrentUser,
+                  "border text-white": !isCurrentUser,
                   "rounded-br-none":  isCurrentUser,
                   "rounded-bl-none":  !isCurrentUser,
                 })}
               >
                 {message.content}{" "}
                 <span className="ml-2 text-xs text-black">
-                  {formatTimestamp(message.timestamp)}
+                {formatTimestamp(message.createdAt)}
                 </span>
               </span>
             </div>
@@ -91,9 +89,11 @@ interface MessagesProps {
               className={cn("relative w-6 h-6", {
                 "order-2": isCurrentUser,
                 "order-1": !isCurrentUser,
-                // invisible: fromSameSender,
               })}
             >
+              <div id='scroll' ref={scrollDownRef} >
+              </div>
+              {/* type of room  === image*/}
               {/* <Image
                 fill
                 src={
@@ -109,7 +109,11 @@ interface MessagesProps {
           </div>
         </div>
       );
-    });
-  };
-  
+    })
+      }
+      </div>
+      </div>
+    </>
+    );
+  }
   export default Messages

@@ -30,6 +30,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @WebSocketServer()
   server: Server;
+    socket: Socket;
 
   userToClient = new Map<number, string>();
 
@@ -61,16 +62,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 async join_chat_rooms(socket: Socket, user_id: number) {
     const all_user_rooms = await this.chatService.getAllUserRooms(user_id)
-    all_user_rooms.array.forEach((room) => {
-      socket.join(room.id)
+    all_user_rooms.forEach((room) => {
+      socket.join(room.chatroom.id + "_room")
     });
   }
 
 async handleConnection(client: Socket) {
-    // Handle connection event
-  // console.log('connected', client.id);
-  try {
-      console.log("tokeeen :", client.handshake.headers)
+    try {
       const token = this.extractTokenFromCookies(client.handshake.headers.cookie);
       if (!token) return this.disconnect(client);
       
@@ -80,15 +78,12 @@ async handleConnection(client: Socket) {
       if (!verifiedToken) return this.disconnect(client);
       
       const user = await this.findUserByIntraId(verifiedToken.userId)
-      
-    //   console.log('user    ', user )
     if (!user)
       return this.disconnect(client);
 
     this.userToClient.set(user.id, client.id);
     console.log(client.id, 'successfully connected ');
     client.data.user = verifiedToken
-    // const user_id = client.data.user.userId
     await this.join_chat_rooms(client, user.id)
     } catch (error) {
         console.log('erroooor: ', error);
@@ -108,38 +103,32 @@ async handleConnection(client: Socket) {
   }
 
   @SubscribeMessage('conversation')
-  async handelConversation(socket : Socket , @MessageBody() data: idMessageDto) {
-    // console.log('heeloooooooo ' ,data);
-    const idRoom : string = data.roomId.toString();
-    const roomId : number = data.roomId;
-    const room  = await this.chatService.getExistenceRoom(roomId); // for checking if room exists
+  async handelConversation(socket: Socket, @MessageBody() data: any) {
+    const newId : number = parseInt(data.roomId); 
+    const room  = await this.chatService.getExistenceRoom(newId);
     if (!room)
-      socket.emit('error', "chat room does not exist");
-    const roomUser = await this.chatService.get_room_user(roomId, data.senderId) // for checking if user is banned && muted && blocked
+      this.server.emit('error', "chat room does not exist");
+    const roomUser = await this.chatService.get_room_user(newId, data.senderId)
     // if (roomUser.isBlocked){
-    //   socket.emit("Error", "You have been blocked")
+    //   this.server.emit("Error", "You have been blocked")
     //   return ;
     // }
     if (roomUser.isMuted){
-      socket.emit("Error", "You have been muted")
+      this.server.emit("Error", "You have been muted")
       return ;
     } 
     if (roomUser.isBanned){
-      socket.emit("Error", "You have been banned")
+      this.server.emit("Error", "You have  been banned")
       return ;
     } 
-
-    console.log("room id inside conversation === ", typeof(idRoom))
     const pyload : idMessageDto = {
+      userId : data.senderId,
+      content : data.messageContent,
+      createdAt : new Date(),
       roomId: data.roomId,
-      content : data.content,
-      senderId : data.senderId,
-      timestamp: new Date(),
     }
-
-    socket.to(idRoom).emit('message', pyload);
-    
-    await this.chatService.addMessage(pyload.senderId, roomId, data.content);
+      this.server.to(data.roomId  + "_room").emit('reciecved', pyload);
+      await this.chatService.addMessage(data.senderId, newId, data.messageContent);
   }
 
   // @SubscribeMessage('notifications')

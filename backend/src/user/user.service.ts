@@ -1,8 +1,5 @@
-import { BadGatewayException, BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import * as fs from 'fs';
-import { Observable, of } from 'rxjs';
-import { CLIENT_RENEG_LIMIT } from 'tls';
 import { settingsDTO } from './dto/settings.dto';
 // import { ChatGateway } from 'src/chat/chat.gateway';
 
@@ -114,7 +111,7 @@ export class UserService {
           };
         }),
       );
-      console.log('matchHistory: ', matchHistory);
+      // console.log('matchHistory: ', matchHistory);
       const { photo, userName, fullName, achievements } = user;
       return {
         userName,
@@ -477,7 +474,7 @@ export class UserService {
           achievements: true,
         },
       });
-      console.log('userrr', userAchievements);
+      // console.log('userrr', userAchievements);
       return userAchievements;
     } catch (error) {
       console.log('error finding users: ', error);
@@ -673,7 +670,7 @@ export class UserService {
           ChatroomUsers: true,
         },
       });
-      console.log('room: ', room);
+      // console.log('room: ', room);
 
       // send notification to receiver
       return { status: friendShip.status };
@@ -823,7 +820,7 @@ export class UserService {
         },
       });
 
-      console.log('block: ', block);
+      // console.log('block: ', block);
       if (block[0]) return { block: true };
       else return { block: false };
     } catch (error) {

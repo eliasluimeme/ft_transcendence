@@ -1,7 +1,6 @@
 'use client';
 
 import Image from "next/image";
-import Style from "./sideBar.module.css";
 import "@/components/ui/CSS/font.css";
 import SearchBar from "./SearchBar";
 import { useState, useEffect } from "react";

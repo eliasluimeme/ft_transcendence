@@ -8,8 +8,8 @@ export class idDto {
 
 export class idMessageDto {
     @IsNotEmpty()
-    @IsNumber()
-    roomId : number;
+    @IsString()
+    roomId : string;
 
     @IsNotEmpty()
     @IsString()
@@ -17,9 +17,9 @@ export class idMessageDto {
 
     @IsNotEmpty()
     @IsNumber()
-    senderId : number ;
+    userId : number ;
 
     @IsNotEmpty()
     @IsDate()
-    timestamp: Date;
+    createdAt: Date;
 }

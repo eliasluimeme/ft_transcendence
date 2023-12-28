@@ -2,7 +2,7 @@
 
 import TextareaAutosize from "react-textarea-autosize";
 import { cn } from '@/lib/utils'
-import React, { useEffect, useRef, useState } from "react";
+import React, { EffectCallback, useEffect, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import { Button } from "../button";
 import Image from "next/image";
@@ -15,10 +15,10 @@ const socket = io('http://localhost:3001/chat', {
 });
 
 type Message = {
-  id: string;
-  senderId: number;
+  userId: number;
   content: string;
-  timestamp: number;
+  createdAt: Date;
+  id?: string;
 };
 
 type User = {
@@ -33,32 +33,12 @@ type Participant = {
   users: User[]
 }
 
-const fetHistoric = async (id :any) => {
-  try { 
-    const response = await axios.get('http://localhost:3001/chat/conversations/messages',
-    {
-      withCredentials: true,
-      params :  id
-    });
-    if (response.status === 200) {
-      console.log('data ========> ', response.data);
-      return response.data;
-    } else {
-      return undefined;
-    }
-  } catch (error) {
-    console.error(error);
-    return undefined;
-  }
-}
-
-
 const ChatInput = (id: any) => {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const [message, setMessage] = useState<string>("");
   const [historic, setHistoric] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState<Message[]>();
-  const [ oldMessages, setOldMessages]= useState<Message[]>();
+  const [ oldMessages, setOldMessages]= useState<Message[]>([]);
   const me = useRef<User>()
   const partners = useRef<User[] | undefined>()
   const type  = useRef<string>('DM');
@@ -72,8 +52,6 @@ const ChatInput = (id: any) => {
       });
       if (response.status === 200) {
         setOldMessages(response.data[0].messages)
-        console.log(oldMessages)
-        // return response.data;
       } else {
         return undefined;
       }
@@ -85,6 +63,8 @@ const ChatInput = (id: any) => {
   useEffect(() =>{
     fetHistoric();
   },[id])
+
+
   const fetchParticipants = async () => {
     try {
       const response = await axios.get('http://localhost:3001/chat/conversations/members',
@@ -102,7 +82,6 @@ const ChatInput = (id: any) => {
           }
           )
           partners.current = response.data.users;
-          // console.log("this is partner ==== > " , partners.current);
         }
       } else {
         return undefined;
@@ -121,31 +100,32 @@ const ChatInput = (id: any) => {
     setMessage("");
   };
   
-  useEffect(() => {
-    socket.on('message', (newMessage) => {
-      console.log("Message from server: ", newMessage);
-      // setOldMessages[...prevmsg, newMessage];
-      // check if sender not blockeed 
-      oldMessages?.push(newMessage);
+  useEffect(()=> {
+    socket.off('reciecved').on('reciecved', (pyload) => {
+      setOldMessages((prevMessages) => [...prevMessages, pyload]);
 
     });
   }, []);
 
+
   {/* ///////////      CHAT AREA /////////////////////////// */}
   return (
     <>
-    <div>
+    <div className="w-full h-full grid grid-rows-6">
+      <div className="w-full h-full row-start-1 row-span-5">
         <Messages initialMessages={oldMessages}  me={me.current} roomId={id} />
-        <div className="w-full h-full grid grid-cols-8 place-items-center focus-within:ring-indigo-600">
-          <div className="col-start-1 col-span-7 w-full h-full flex items-center justify-center">
-            <div className="w-full h-full row-start-4 row-span-5 flex items-center justify-cente">
+        </div>
+        <div className="w-full h-full place-items-center focus-within:ring-indigo-600 row-start-6">
+          <div className="w-full h-full flex items-center justify-around">
+            <div className="w-full h-full flex items-center justify-around">
               <form
-                className="w-full h-full flex items-center justify-center"
+                className="w-[90%] h-[50%] flex items-center justify-around"
                 onSubmit={(e) => {
                   e.preventDefault();
-                  handleSubmit(id.id , message, me?.current?.id);
-              }}
-              >
+                  if (message)
+                    handleSubmit(id.id , message, me?.current?.id);
+                }}
+                >
                 <TextareaAutosize
                   rows={1}
                   value={message}
@@ -153,16 +133,17 @@ const ChatInput = (id: any) => {
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
                       e.preventDefault();
-                      handleSubmit(id.id , message, me?.current?.id);
+                      if (message)
+                        handleSubmit(id.id , message, me?.current?.id);
                     }
                   }}
                   placeholder="Type your message"
-                  className="w-full h-full rounded-lg text-black placeholder:text-gray-400 focus:ring-0 sm:text-sm"
+                  className="w-full rounded-lg text-black placeholder:text-gray-400 focus:ring-0 sm:text-sm"
                 />
-                <div className="w-full h-full col-start-8 col-span-1">
+                <div className="w-full h-full">
                   <div className="w-full h-full flex items-center justify-center">
                     <button
-                      className="w-[80%] h-[90%] bg-[#F87B3F] rounded-lg"
+                      className="w-[30%] h-[20%] bg-[#F87B3F] rounded-lg"
                       type="submit"
                     >
                       Send

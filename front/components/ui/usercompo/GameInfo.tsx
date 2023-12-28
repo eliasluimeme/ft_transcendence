@@ -15,8 +15,8 @@ type Achievement = {
   description: string;
   achieved: boolean;
 };
-const getAchivment = (indice: string) => {
-  console.log("indice achivements : ====> ", indice);
+const GetAchivment = (indice: string) => {
+  // console.log("indice achivements : ====> ", indice);
   // const [achievements, setAchievements] = useState<Achievement[]>([
   //   { description: "", achieved: true },
   //   { description: "", achieved: false },
@@ -152,7 +152,7 @@ type MatchHistory = {
   opo2image: string;
 };
 
-const getMatchHistory = (indice: string): MatchHistory[] => {
+const GetMatchHistory = (indice: string): MatchHistory[] => {
   const [matchHistory, setMatchHistory] = useState<MatchHistory[]>([
     // Your initial state remains the same
   ]);
@@ -198,8 +198,8 @@ const GameInfo = (id: any) => {
   // console.log("l9laoui")
   const indice: string = id.id;
   // console.log("test allah allah",indice);
-  const achievements = getAchivment(indice);
-  const matchHistory = getMatchHistory(indice);
+  const achievements = GetAchivment(indice);
+  const matchHistory = GetMatchHistory(indice);
   return (
     <div className="w-full h-full">
       <div className="w-full h-full grid grid-rows-3">

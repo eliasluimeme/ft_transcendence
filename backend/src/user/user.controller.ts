@@ -91,7 +91,7 @@ export class UserController {
     @UseGuards(Jwt2faAuthGuard)
     @UsePipes(ValidationPipe)
     async getUserProfile(@Req() req: any, @Query() params: userNameDTO, @Res() res): Promise<any> {
-      console.log('users profile:', params.user)
+      // console.log('users profile:', params.user)
       res.json( await this.userService.searchUser( req.user, params.user ) );
     }
 

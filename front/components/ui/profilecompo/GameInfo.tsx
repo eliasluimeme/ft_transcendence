@@ -15,7 +15,7 @@ type Achievement = {
   description: string;
   achieved: boolean;
 };
-const getAchivment = () => {
+const GetAchivment = () => {
   const [achievements, setAchievements] = useState<Achievement[]>([
     { description: "", achieved: true },
     { description: "", achieved: false },
@@ -133,7 +133,7 @@ type MatchHistory = {
   opo2image: string;
 };
 
-const getMatchHistory = (): MatchHistory[] => {
+const GetMatchHistory = (): MatchHistory[] => {
   const [matchHistory, setmatchHistory] = useState<MatchHistory[]>([]);
   const fetchData = async () => {
     try {
@@ -141,7 +141,7 @@ const getMatchHistory = (): MatchHistory[] => {
         withCredentials: true,
       });
       if (response.status === 200) {
-        console.log(response.data.match);
+        // console.log(response.data.match);
         const newMatchHistory: MatchHistory[] = response.data.match.map(
           (match: any) => ({
             opo1: match.player1.userName,
@@ -168,8 +168,8 @@ const getMatchHistory = (): MatchHistory[] => {
 };
 
 const GameInfo: React.FC = () => {
-  const achievements = getAchivment();
-  const matchHistory = getMatchHistory();
+  const achievements = GetAchivment();
+  const matchHistory = GetMatchHistory();
   return (
     <div className="w-full h-full">
       <div className="w-full h-full grid grid-rows-3">

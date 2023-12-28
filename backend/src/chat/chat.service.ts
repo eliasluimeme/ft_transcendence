@@ -143,63 +143,7 @@ export class ChatService {
     //     }
     //   }
 
-    // async getConvoMembers(userId: number, roomId: number) {
-    //     try {
-    //         // console.log('getConvoMembers   ', userId, roomId);
-    //         const room = await this.prisma.chatroom.findUnique({
-    //             where: {
-    //           id: roomId,
-    //         },
-    //         include: {
-    //           ChatroomUsers: {
-    //             include: {
-    //                 user: {
-    //                 select: {
-    //                     id: true,
-    //                   userName: true,
-    //                   photo: true,
-    //                 },
-    //               },
-    //             },
-    //           },
-    //         },
-    //       });
-    //       if (!room) throw new NotFoundException('Room does not exist');
-    
-    //       const userss = room.ChatroomUsers.map((user) => {
-    //         return {
-    //           id: user.user.id,
-    //           userName: user.user.userName,
-    //           photo: user.user.photo,
-    //         };
-    //     });
-    
-    //       if (!userss.find((user) => user.id === userId))
-    //       throw new ForbiddenException('You are not in this room');
-    
-    //       const users = userss.map((user) => {
-    //         if (user.id === userId) {
-    //           return {
-    //             id: user.id,
-    //             name: user.userName,
-    //             photo: user.photo,
-    //             self: true,
-    //           };
-    //         } else {
-    //           return {
-    //             id: user.id,
-    //             name: user.userName,
-    //             photo: user.photo,
-    //             self: false,
-    //           };
-    //         }
-    //       });
-    //     //   console.log("==========> " , users, room.visibility);
-    //       return { visibility: room.visibility, users };
-    //     } catch (error) {
-    //       console.log(error);
-    //     }
-    //   }
+
 
       getVisibility(visibility: string): VISIBILITY {
         switch (visibility) {
@@ -351,14 +295,14 @@ export class ChatService {
                 const { id, name, photo, group, visibility, messages } = msg;
 
                 const msgs = messages.map(msg => {
-                    const { id, content, createdAt, sender } = msg;
+                    const { content, createdAt, sender } = msg;
                     const { userName, photo } = sender.user;
 
                     // TODO: check ckicked and banned users messages
-
-                    if ( msg.senderId === userId )
-                        return { userId: msg.senderId, sender: "me", photo, role: sender.role , content, createdAt,  }
-                    else return { userId: id, sender: userName, photo, role: sender.role , content, createdAt,  }
+                    // console.log("messagessss: ", msg);
+                    // if ( msg.sender.user.id === userId )
+                    //     return { userId: msg.sender.user.id, sender: "me", photo, role: sender.role , content, createdAt,  }
+                    return { userId: msg.sender.user.id , sender: userName, photo, role: sender.role , content, createdAt,  }
                 })
 
                 if (visibility === VISIBILITY.DM) {
@@ -367,7 +311,6 @@ export class ChatService {
                 } else
                     return { id, name, photo, group, visibility, messages: msgs }
             }))
-            // console.log("filtred messages ===> " , filtredMessages)
             return filtredMessages;
         } catch(error) {
             console.log(error);
@@ -1238,9 +1181,11 @@ export class ChatService {
                   },
                 },
               });
-          
-            if (newMessage)
+              
+            if (newMessage){
+                console.log('message saved successfully');
                 return { success: true, message: 'Message sent' }
+            }
             else throw new BadRequestException('Something went wrong. Please try again');
         } catch (error) {
             if (error instanceof BadRequestException)

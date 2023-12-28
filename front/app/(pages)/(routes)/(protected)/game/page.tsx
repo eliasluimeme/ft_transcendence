@@ -5,8 +5,9 @@ import { MyContextProvider } from '@/components/game/tools/MyContextProvider';
 import React, { useContext } from 'react'
 import { useRouter } from 'next/navigation'
 import Tab  from '@/components/game/elements/Tab'
+import Loading from '@/components/ui/gamecompo/Loading';
 
-export default function page() {
+export default function Page() {
   const router = useRouter();
   const mode = useContext(MyContext);
   const text = "Welcome to the classic game of Ping Pong! In this version, you'll be facing off against \
@@ -20,7 +21,8 @@ export default function page() {
   };
 
   return (
-    <div className='py-16 font-custom w-full h-full bg-[#16304b] grid sm:grid-cols-1 lg:grid-cols-1 md:p-5 lg:p-10'>
+    <div className='py-16 font-custom w-full h-full grid sm:grid-cols-1 lg:grid-cols-1 md:p-5 lg:p-10'>
+      {/* <Loading /> */}
       <div className="container m-auto px-6 text-gray-500 md:px-12 xl:px-0">
         <div className="mx-auto grid gap-6 md:w-3/4 lg:w-full lg:grid-cols-2">
           <Tab typ e= "Bot" mode= "Easy" text= {text} bfunction= {() => findRoom('bot', '3')} />

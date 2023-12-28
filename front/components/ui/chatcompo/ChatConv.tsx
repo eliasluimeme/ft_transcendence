@@ -28,10 +28,11 @@ interface Members {
 function ChatConv(oldeId: any) {
   const [update, toupdate] = useState<number>(0);
   const router = useRouter();
+  const [roomName , setRoomName] = useState<string>('');
   const id = oldeId['id']
   // console.log("id", id);
   /////////////////end point to get rol/////////////////////////////
-  const [typeofRoom, setTypofRoom] = useState<boolean>(true);
+  const [typeofRoom, setTypofRoom] = useState<string>('');
   const [rol, setrol] = useState(true);
   const fetchrol = async () => {
     try {
@@ -98,6 +99,32 @@ function ChatConv(oldeId: any) {
   useEffect(() => {
     fetchownerimage();
   }, [update]);
+
+  const fetchRoomData = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:3001/chat/conversations/members",
+        {
+          withCredentials: true,
+          params: {
+            id: id,
+          },
+        }
+      );
+      if (response.status === 200) {
+        setTypofRoom(response.data.visibility);
+        setRoomName(response.data.roomName);
+      } else {
+        console.log("Failed to fetch member data");
+      }
+    } catch (error) {
+      console.error("An error occurred while fetching member data:", error);
+    }
+  }
+  useEffect(() => {
+    fetchRoomData();
+  },[id])
+
   const [muteStatue, setMuteStatu] = useState<boolean | undefined>(false);
   const [admine, setAdmine] = useState<boolean>(false);
 
@@ -465,19 +492,19 @@ function ChatConv(oldeId: any) {
 
   return (
     <div className="h-full w-full  grid grid-rows-6 ">
-      <div className="w-full h-full row-start-1 row-span-1 flex items-center justify-center space-x-4  ">
+      <div className="w-full h-full row-start-1 row-span-1  flex items-center justify-center space-x-4">
         <div className=" w-[90%] h-[30%] bg-[#F87B3F] rounded-lg grid grid-cols-3">
           <div className="text-xl text-[12px] col-start-1 col-span-1 flex items-center">
-            {/* {typeofRoom ? (
+            {typeofRoom == "DM" ? (
                 <button className="ml-[5px] text-opacity-[30%] hover:text-opacity-[100%]" // TODO fetch data 
                 onClick={ () => 
-                  router.push('/users?search=' + nickName) }
+                  router.push('/users?search=' + roomName) }
                   >
-                {nickName}
+                {roomName}
                 </button>
             ):(
-              <div> GroupName </div>
-            )} */}
+              <div className="ml-[5px] text-opacity-[30%] hover:text-opacity-[100%]" > {roomName} </div>
+            )}
           </div>
           <div className="col-start-3 col-span-1 flex justify-end space-x-5 items-center mr-[8px]">
             <button className="w-[50px] border flex items-center justify-center rounded-lg bg-[#36393E] bg-opacity-25 hover:bg-opacity-60">
@@ -592,7 +619,7 @@ function ChatConv(oldeId: any) {
                         </button>
                       </div>
                     </div>
-                    {typeofRoom ? (
+                    {typeofRoom === 'PROTECTED' ? (
                       <div className="flex items-center justify-center space-x-4 border h-[50px] rounded-lg p-2px">
                         <div className="text-[10px]">change password : </div>
                         <input
@@ -645,8 +672,8 @@ function ChatConv(oldeId: any) {
           </div>
         </div>
       </div>
-      <div className="w-full h-full row-start-2 row-span-6 flex items-center justify-center">
-        <div className="rounded-lg w-[90%] h-[20%]">
+      <div className="w-full h-full row-start-2 row-span-5 flex items-center justify-center">
+        <div className="w-full h-full  rounded-lg ">
           <ChatInput id={id} />
         </div>
       </div>
