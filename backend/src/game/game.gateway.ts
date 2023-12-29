@@ -25,6 +25,7 @@ namespace: '/game',})
 @UseGuards(GameGuard)
 export class GameGateway implements OnGatewayInit{
   @WebSocketServer() server: Server;
+  private online: Map<string, string> = new Map();
   private players: Map<string,Player> = new Map();
   private readonly logger: Logger = new Logger(GameGateway.name);
   private queue: Player[] = [];
@@ -65,7 +66,17 @@ export class GameGateway implements OnGatewayInit{
     });
   }
 
+  handleConnection(client: Socket) {
+    const online = this.online.has(client.data);
+    this.logger.warn("++++++++++++++++++++++++", online);
+    if (!online)
+      this.online.set(client.data, client.id);
+  }
+
   handleDisconnect(client: Socket) {
+    const online = this.online.has(client.data);
+    if (online)
+      this.online.delete(client.data);
     this.logger.warn("Client is disconnected");
     const looser: Player = this.players.get(client.data);
     if (!looser)
@@ -201,4 +212,19 @@ export class GameGateway implements OnGatewayInit{
   cancel(@ConnectedSocket() client: Socket) {
     this.queue = this.queue.filter((waiter) => {client.id != waiter.id});
   }
+  @SubscribeMessage('inviteEvent')
+  handelInvite(@MessageBody() data: any) {
+    const online = this.online.get(data[0].recieverId);
+    if (online)
+      this.server.to(online).emit('inviteEvent', data);
 }
+
+@SubscribeMessage('acceptedInvite')
+handelAccept(@ConnectedSocket() client: Socket ,@MessageBody() data: any) {
+  const online = this.online.get(data.senderId);
+  if (online){
+    this.server.to(online).emit('acceptedInvite', data.accepterName);
+    }
+  }
+}
+

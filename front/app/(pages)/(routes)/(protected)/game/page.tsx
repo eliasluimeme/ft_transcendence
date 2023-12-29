@@ -66,7 +66,7 @@ export default function page() {
       });
       return (() => {
         console.log("rani khrjt mn page");
-        socket.disconnect();
+        // socket.disconnect();
       });
     }
     return;

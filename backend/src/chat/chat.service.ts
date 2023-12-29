@@ -334,6 +334,7 @@ export class ChatService {
                   user: {
                     select: {
                       id: true,
+                      intraId: true,
                       userName: true,
                       photo: true,
                     },
@@ -348,6 +349,7 @@ export class ChatService {
           const userss = room.ChatroomUsers.map((user) => {
             return {
               id: user.user.id,
+              intraId: user.user.intraId,
               userName: user.user.userName,
               photo: user.user.photo,
             };
@@ -360,6 +362,7 @@ export class ChatService {
             if (user.id === userId) {
               return {
                 id: user.id,
+                intraId: user.intraId,
                 name: user.userName,
                 photo: user.photo,
                 self: true,
@@ -367,6 +370,7 @@ export class ChatService {
             } else {
               return {
                 id: user.id,
+                intraId: user.intraId,
                 name: user.userName,
                 photo: user.photo,
                 self: false,

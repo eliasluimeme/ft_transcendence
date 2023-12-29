@@ -126,8 +126,8 @@ const ChatInput = (id: any) => {
                     handleSubmit(id.id , message, me?.current?.id);
                 }}
                 >
-                <TextareaAutosize
-                  rows={1}
+                <textarea
+                  // rows={1}
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   onKeyDown={(e) => {
