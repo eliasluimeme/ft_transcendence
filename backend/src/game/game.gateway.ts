@@ -4,8 +4,6 @@ import {
   WebSocketGateway,
   SubscribeMessage,
   MessageBody,
-  OnGatewayConnection,
-  OnGatewayDisconnect,
   OnGatewayInit,
   WebSocketServer,
   ConnectedSocket,
@@ -212,6 +210,7 @@ export class GameGateway implements OnGatewayInit{
   cancel(@ConnectedSocket() client: Socket) {
     this.queue = this.queue.filter((waiter) => {client.id != waiter.id});
   }
+  
   @SubscribeMessage('inviteEvent')
   handelInvite(@MessageBody() data: any) {
     const online = this.online.get(data[0].recieverId);
@@ -220,11 +219,11 @@ export class GameGateway implements OnGatewayInit{
 }
 
 @SubscribeMessage('acceptedInvite')
-handelAccept(@ConnectedSocket() client: Socket ,@MessageBody() data: any) {
+handelAccept(@MessageBody() data: any) {
   const online = this.online.get(data.senderId);
   if (online){
     this.server.to(online).emit('acceptedInvite', data.accepterName);
     }
   }
-}
 
+}

@@ -22,6 +22,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { io } from "socket.io-client";
 import { MyContext } from "@/components/game/tools/ModeContext";
 import { MyContextProvider } from "@/components/game/tools/MyContextProvider";
+import { time } from "console";
 
 interface Members {
   id: number;
@@ -515,6 +516,7 @@ function ChatConv(oldeId: any) {
     useEffect(() => {
       gamecontext.contextValue.socket.off('acceptedInvite').on('acceptedInvite', (pyload: string) => {
         toast.success(`${pyload} accepted your invitation , let's play !`)
+        setTimeout
         router.push('/game');
         });
       },[]);
