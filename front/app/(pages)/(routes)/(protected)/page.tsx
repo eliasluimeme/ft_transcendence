@@ -1,19 +1,53 @@
 "use client";
-import React , { useContext, useEffect} from "react";
+import React, {useContext, useEffect} from "react";
 import Image from "next/image";
 import Redirect from "@/components/ui/homeComp/Redirect";
-import { Toaster } from "react-hot-toast";
-import { io } from "socket.io-client";
-import { MyContext } from "@/components/game/tools/ModeContext";
+import { Toaster, toast } from "react-hot-toast";
+import { useRouter } from "next/navigation";
+import { SocketContext, ModeContext } from "@/components/game/tools/Contexts";
 
-// const socket = io('http://localhost:3001/status', {
-//   withCredentials: true,
-// })
+
 
 const Page = () => {
+  const router = useRouter();
+  const socket = useContext(SocketContext);
+  const mode = useContext(ModeContext);
 
-  const gamecontext = useContext(MyContext);
+  useEffect(() => {
+    socket.off('acceptedInvite').on('acceptedInvite', (pyload: string) => {
+      toast.success(`${pyload} accepted your invitation , let's play !`)
+      setTimeout
+      mode.updateContextValue('friend');
+      router.push('/game/board');
+      });
+    },[]);
 
+  const handleAccept = (pyload: any) => {
+    socket.emit('acceptedInvite', pyload);
+    mode.updateContextValue('friend');
+    router.push('/game/board');
+  };
+
+  useEffect(() => {
+    socket.off('inviteEvent').on('inviteEvent', (data : any) => {
+       toast(() => (
+        <span>
+          <b>{data[0].senderName} invited you to play Pong ! </b>
+          <button onClick={() => toast.dismiss()}
+          className="border bg-red-500 rounded-ls px-5 py-1"
+          >
+            Dismiss
+          </button>
+          <button onClick={() => handleAccept(data[1])}
+          className="border bg-green-500 rounded-ls  px-5 py-1"
+          >
+            Accept
+          </button>
+        </span>
+      ));
+    });
+    
+  }, []);
 
   return (
     <div className="w-full h-full bg-[#36393E] rounded-lg grid grid-cols-2 font-Goldman">

@@ -1,11 +1,13 @@
 import React from 'react'
+import { useRouter } from 'next/navigation';
 
 const Loading = (props:any) => {
   const socket = props.socket;
+  const router = useRouter();
 
   const cancelMatching = () => {
     socket.emit("cancelMatching");
-    props.setStatus(0);
+    router.push("/game");
   };
 
   return (

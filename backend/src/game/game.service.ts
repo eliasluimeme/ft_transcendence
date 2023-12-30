@@ -7,9 +7,9 @@ import { clearInterval } from 'timers';
 export class GameService {
   //Room attributes
   private logger: Logger = new Logger(GameService.name);
-  private readonly board = {width: 1000, height: 500};
+  private readonly board = {width: 500, height: 500};
   private roomstatus: string = "onhold";
-  private readonly padel = {width: 15, height: 100, speed: 20};
+  private readonly padel = {width: 15, height: 100, speed: 50};
   private vsBot: boolean = false;
   private bot: Bot = {speed: 0, timer: ''};
   private started: boolean = false;
@@ -18,12 +18,14 @@ export class GameService {
   private goalTimer: any;
   private lachiev: boolean[] = [false, false, false, false, false];
   private rachiev: boolean[] = [false, false, false, false, false];
+  private leftReady: boolean = false;
+  private rightReady: boolean = false;
   private ball: Ball = {
     cords:  {x: 500, y: 250},
     vec: {x: 0, y: 0},
     rad: 10,
     speed: 2,
-    repete: 16,
+    repete: 8,
     timer: '',
     dir: 'left',
   }
@@ -89,10 +91,10 @@ export class GameService {
     // this.logger.error(angle);
     this.calculVecs(angle);
     this.ball.speed = 2;
-    this.ball.cords = {x: 500, y: 250};
+    this.ball.cords = {x: 250, y: 250};
     this.lplayer.padely = 0;
     this.rplayer.padely = 5;
-    this.ball.repete = 16;
+    this.ball.repete = 8;
     this.clearTimers();
     this.resetTimers();
   }
@@ -125,6 +127,16 @@ export class GameService {
   }
 
 // tools functions
+  isReady(id: string): boolean | any
+  {
+    if(this.lplayer.id == id && !this.leftReady)
+      this.leftReady = true;
+    if(this.rplayer.id == id && !this.rightReady)
+      this.rightReady = true;
+    if(this.leftReady && this.rightReady)
+      return {player1: this.lplayer.id, player2: this.rplayer.id};
+    return false;
+  }
   getRandomNumber(min:number, max:number):number {
     const side = Math.round(Math.random());
     if (side)

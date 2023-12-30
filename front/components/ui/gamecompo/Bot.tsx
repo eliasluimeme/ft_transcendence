@@ -1,10 +1,14 @@
-import React from "react";
+"use client"
+import React, { useContext } from "react";
 import Image from "next/image";
-
-const Bot = (props:any) => {
+import { ModeContext } from "@/components/game/tools/Contexts";
+import { useRouter } from "next/navigation";
+const Bot = () => {
+  const modectx = useContext(ModeContext);
+  const router = useRouter();
   const newGameVsBot = () => {
-    props.socket.emit('newGameBot', "3");
-    props.setStatus(1);
+    modectx.updateContextValue("bot");
+    router.push("/game/board");
   }
   return (
     <div className="grid grid-cols-3 w-full h-full">

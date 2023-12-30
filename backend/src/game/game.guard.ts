@@ -20,11 +20,9 @@ export class GameGuard implements CanActivate {
   {
     try {
     var logger: Logger = new Logger(GameGuard.name);
-    //logger.log("Checking JWT Signature...");
     const cookieHeader = client.handshake.headers.cookie;
     if (!cookieHeader)
       return false;
-    // logger.error(cookieHeader);
     const cookies = require('cookie').parse(cookieHeader);
     const token = cookies['access_token'];
     if (!token) return false;
@@ -34,7 +32,6 @@ export class GameGuard implements CanActivate {
     }
     catch (error) {
       logger.error("[Access Denied]: JWT Signature is not valid.");
-      //console.log(error);
       return false;
     }
   }

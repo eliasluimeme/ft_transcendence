@@ -141,7 +141,6 @@ const GetMatchHistory = (): MatchHistory[] => {
         withCredentials: true,
       });
       if (response.status === 200) {
-        // console.log(response.data.match);
         const newMatchHistory: MatchHistory[] = response.data.match.map(
           (match: any) => ({
             opo1: match.player1.userName,

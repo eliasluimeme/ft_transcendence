@@ -55,6 +55,7 @@ export class GameGateway implements OnGatewayInit{
     }
 }
 
+// connection/diconnection functions
   afterInit(client: Socket)
   { 
     this.logger.log("Gateway is initialized.");
@@ -64,74 +65,53 @@ export class GameGateway implements OnGatewayInit{
     });
   }
 
-  handleConnection(client: Socket) {
-    const online = this.online.has(client.data);
-    this.logger.warn("++++++++++++++++++++++++", online);
-    if (!online)
-      this.online.set(client.data, client.id);
-  }
-
   handleDisconnect(client: Socket) {
-    const online = this.online.has(client.data);
-    if (online)
-      this.online.delete(client.data);
     this.logger.warn("Client is disconnected");
+    this.queue = this.queue.filter((waiter) => {client.id != waiter.sock});
+    const online = this.online.get(client.data);
     const looser: Player = this.players.get(client.data);
+    this.online.delete(client.data);
     if (!looser)
       return;
-    this.rooms.get(looser.roomid).clearTimers();
-    this.removeRoom(looser.roomid, true);
+    if (looser)
+    {
+      this.rooms.get(looser.roomid).clearTimers();
+      this.removeRoom(looser.roomid, true);
+    }
+    // this.userservice.updateUser(parseInt(client.data), {
+    //   status: 'OFFLINE',
+    // });
+  }
+  async handleConnection(client: Socket) {
+
+    if (!GameGuard.validateToken(client, this.config.get('JWT_SECRET'))) {
+      this.server.to(client.id).emit('goback', "[Access Denied]: Log in to access the game");
+      return;
+    }
+    const online = this.online.get(client.data);
+    if(online)
+      return;
+    this.online.set(client.data, client.id);
+    this.logger.warn("Player: ", client.data, "is connected");
+    // this.userservice.updateUser(parseInt(client.data), {
+    //   status: 'ONLINE',
+    // })
   }
 
-  removeRoom(roomid: string, disconnect: boolean) {
-    
-    const rslts = this.rooms.get(roomid).roomRslts();
-    // this.logger.error("room is removed.");
-    if (rslts.winner.id)
-    {
-      this.players.delete(rslts.winner.id);
-      if (disconnect)
-        this.server.to(rslts.winner.sock).emit('goback', "Your opponent has disconnected");
-      else
-        this.server.to(rslts.winner.sock).emit('goback', "You won the game");
-      // this.userservice.updateUser(parseInt(rslts.looser.id), {
-      //   achievements: rslts.looser.achievs,
-      //   losses: {increment: 1}
-      // });
-    }
-    if (rslts.looser.id)
-    {
-      this.players.delete(rslts.looser.id);
-      if (disconnect)
-        this.server.to(rslts.looser.sock).emit('goback', "You were disconnected");
-      else
-        this.server.to(rslts.looser.sock).emit('goback', "You were lost the game");
-      // this.userservice.updateUser(parseInt(rslts.winner.id), {
-      //   achievements: rslts.winner.achievs,
-      //   wins: {increment: 1}
-      // });
-    }
-    if (rslts.looser.id && rslts.winner.id) {
-      this.userservice.addToGameHistory({
-        winnerId: rslts.winner.id,
-        winnerScore: rslts.winner.score,
-        looserId: rslts.looser.id,
-        looserScore: rslts.looser.score,
-        disconnect: disconnect
-      });
-    }
-    this.rooms.delete(roomid);
-  }
-
-  @SubscribeMessage('newGameBot')
-  async newGameBot(@ConnectedSocket() client: Socket, @MessageBody() mode: string)
+// add new room functions
+  @SubscribeMessage('newBotGame')
+  newGameBot(@ConnectedSocket() client: Socket, @MessageBody() mode: string)
   {
-    // this.logger.warn("hello");
+    const online = this.online.get(client.data);
+    if (online != client.id) {
+      this.server.to(client.id).emit('goback', "You are connected in other page");
+      return;
+    }
     const player = {id: client.data, sock: client.id, roomid: client.data};
     if (this.players.has(player.id))
     {
       if (player.sock != client.id)  
-        client.disconnect();
+              this.server.to(client.id).emit('goback', "You are already ingame");
       return;
     }
     this.players.set(player.id, player);
@@ -146,35 +126,22 @@ export class GameGateway implements OnGatewayInit{
     this.rooms.set(player.id,new GameService(room));
     this.server.to(player.sock).emit('roomCreated', {side: 'left', oppName: "Bot", oppPhoto: "http://localhost:3001/bg.png"});
     this.rooms.get(player.id).resetBoard();
-    //sending ready event to each player with opponent data
   }
-
-  @SubscribeMessage('updateRoom')
-  async updateRoom(@MessageBody() y: number, @ConnectedSocket() client: Socket) {
-    const player: Player = this.players.get(client.data);
-    if (!player || player.sock != client.id) {
-      client.disconnect();
-      return;
-    }
-    if(this.rooms.get(player.roomid).getRoomStatus() == "closed") {
-      this.removeRoom(player.roomid, false);
-      return;
-    }
-    const board = this.rooms.get(player.roomid).updateBoard(player.id, y);
-    this.server.to(client.id).emit('updatePlayer', board);
-  }
-
-  @SubscribeMessage('newGamePlayer')
+  @SubscribeMessage('newRandomGame')
   async newGamePlayer(@ConnectedSocket() client: Socket)
   { 
+    const online = this.online.get(client.data);
+    if (online != client.id) {
+      this.server.to(client.id).emit('goback', "You are connected in other page");
+      return;
+    }
     const player1 = {id: client.data, sock: client.id, roomid: client.data};
+    if (!this.online.has(player1.id))
+      return;
     if (this.players.has(player1.id))
     {
       if (player1.sock != client.id)  
-      {
         this.server.to(client.id).emit('goback', "You were disconnected");
-        client.disconnect();
-      }
       return;
     }
     if (!this.queue.length) {
@@ -203,13 +170,86 @@ export class GameGateway implements OnGatewayInit{
     this.server.to(player1.sock).emit('roomCreated', {side: 'left', oppName: (await user2).userName, oppPhoto: (await user2).photo});
     this.server.to(player2.sock).emit('roomCreated', {side: 'right', oppName: (await user1).userName, oppPhoto: (await user1).photo});
     this.rooms.get(player1.id).resetBoard();
-    //sending ready event to each player with opponent data
+  }
+  @SubscribeMessage('joinGame')
+  async startGame(@ConnectedSocket() client: Socket) {
+    const online1 = this.online.get(client.data);
+    if (!online1 || online1 != client.id)
+      return;
+    const pready = this.players.get(client.data);
+    if (this.rooms.has(pready.roomid))
+      console.log("Ys room kayna");
+    const startgame = this.rooms.get(pready.roomid).isReady(client.data);
+    console.log(startgame);
+    if (startgame === false)
+      return;
+    const player1 = this.players.get(startgame.player1);
+    const player2 = this.players.get(startgame.player2);
+    const user1 = this.findUserByIntraId(player1.id);
+    const user2 = this.findUserByIntraId(player2.id);
+    console.log(player1.sock, player2.sock);
+    this.server.to(player1.sock).emit('roomCreated', {side: 'left', oppName: (await user2).userName, oppPhoto: (await user2).photo});
+    this.server.to(player2.sock).emit('roomCreated', {side: 'right', oppName: (await user1).userName, oppPhoto: (await user1).photo});
+    this.rooms.get(player1.id).resetBoard();
+  }
+  // @SubscribeMessage('accepted')
+  // newFriendGame(@ConnectedSocket() client: Socket, @MessageBody() data: any)
+  // { 
+  //   const player1: Player= {id: client.data, sock: client.id, roomid: client.data};
+  //   const player2: Player= {id: data.senderId, sock: this.online.get(data.senderId), roomid: client.data};
+  //   this.server.to(player2.sock).emit('acceptedInvite', data.accepterName);
+  //   const room: NewRoom = {
+  //     vsbot: false,
+  //     mode: 0,
+  //     id1: player1.id,
+  //     sock1: player1.sock,
+  //     id2: player2.id,
+  //     sock2: player2.sock
+  //   };
+  //   this.players.set(player1.id, player1);
+  //   this.players.set(player2.id, player2);
+  //   this.rooms.set(player1.id,new GameService(room));
+  // }
+
+// update room data function
+  @SubscribeMessage('updateRoom')
+  updateRoom(@MessageBody() y: number, @ConnectedSocket() client: Socket) {
+    const player: Player = this.players.get(client.data);
+    if (!player || player.sock != client.id) {
+            this.server.to(client.id).emit('goback', "You are ingame");
+      return;
+    }
+    if(this.rooms.get(player.roomid).getRoomStatus() == "closed") {
+      this.removeRoom(player.roomid, false);
+      return;
+    }
+    const board = this.rooms.get(player.roomid).updateBoard(player.id, y);
+    this.server.to(client.id).emit('updatePlayer', board);
   }
 
+// Surrender functions
   @SubscribeMessage('cancelMatching')
   cancel(@ConnectedSocket() client: Socket) {
-    this.queue = this.queue.filter((waiter) => {client.id != waiter.id});
+    this.queue = this.queue.filter((waiter) => {client.id != waiter.sock});
   }
+  @SubscribeMessage('quitGame')
+  quitGame(client: Socket) {
+    this.logger.warn("Client is quited");
+    const looser: Player = this.players.get(client.data);
+    if (!looser)
+      return;
+    this.rooms.get(looser.roomid).clearTimers();
+    this.removeRoom(looser.roomid, true);
+  }
+
+// Invite functions
+  // @SubscribeMessage('inviteEvent')
+  // inviteFriend(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
+  //   const me = this.online.get(client.data);
+  //   const friend = this.online.get(data[0].recieverId);
+  //   if (friend && me)
+  //     this.server.to(friend).emit('inviteEvent', client.id);
+  // }
   
   @SubscribeMessage('inviteEvent')
   handelInvite(@MessageBody() data: any) {
@@ -219,11 +259,59 @@ export class GameGateway implements OnGatewayInit{
 }
 
 @SubscribeMessage('acceptedInvite')
-handelAccept(@MessageBody() data: any) {
-  const online = this.online.get(data.senderId);
-  if (online){
-    this.server.to(online).emit('acceptedInvite', data.accepterName);
-    }
-  }
+handelAccept(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
+  const player1: Player= {id: client.data, sock: client.id, roomid: client.data};
+  const player2: Player= {id: data.senderId, sock: this.online.get(data.senderId), roomid: client.data};
+  this.server.to(player2.sock).emit('acceptedInvite', data.accepterName);
+  const room: NewRoom = {
+    vsbot: false,
+    mode: 0,
+    id1: player1.id,
+    sock1: player1.sock,
+    id2: player2.id,
+    sock2: player2.sock
+  };
+  this.players.set(player1.id, player1);
+  this.players.set(player2.id, player2);
+  this.rooms.set(player1.id,new GameService(room));
+}
 
+// remove room and update db function
+  async removeRoom(roomid: string, disconnect: boolean) {
+      
+    const rslts = this.rooms.get(roomid).roomRslts();
+    // this.logger.error("room is removed.");
+    if (rslts.winner.id)
+    {
+      this.players.delete(rslts.winner.id);
+      if (disconnect)
+        this.server.to(rslts.winner.sock).emit('goback', "Your opponent has disconnected");
+      else
+        this.server.to(rslts.winner.sock).emit('goback', "You won the game");
+      // this.userservice.updateUser(parseInt(rslts.winner.id), {
+      //   status: 'ONLINE',
+      // });
+    }
+    if (rslts.looser.id)
+    {
+      this.players.delete(rslts.looser.id);
+      if (disconnect)
+        this.server.to(rslts.looser.sock).emit('goback', "You were disconnected");
+      else
+        this.server.to(rslts.looser.sock).emit('goback', "You were lost the game");
+      // this.userservice.updateUser(parseInt(rslts.looser.id), {
+      //   status: 'ONLINE',
+      // });
+    }
+    if (rslts.looser.id && rslts.winner.id) {
+      this.userservice.addToGameHistory({
+        winnerId: rslts.winner.id,
+        winnerScore: rslts.winner.score,
+        looserId: rslts.looser.id,
+        looserScore: rslts.looser.score,
+        disconnect: disconnect
+      });
+    }
+    this.rooms.delete(roomid);
+  }
 }

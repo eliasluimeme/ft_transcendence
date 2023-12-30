@@ -1,11 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card";
 import Link from "next/link";
 import axios from "axios";
 
@@ -17,7 +12,7 @@ type Data = {
   rank: string;
 };
 
-const getInitialData = (): Data => {
+const GetInitialData = (): Data => {
   const [profileInfo, setProfileInfo] = useState<Data>({
     image: "",
     statu: "",
@@ -83,8 +78,7 @@ const Informations: React.FC<{ data: Data }> = ({ data }) => {
 };
 
 const InfoProfil = () => {
-  const data = getInitialData();
-  const [friend, sendFriend] = useState(false);
+  const data = GetInitialData();
 
   return (
     <div className="w-full h-full grid grid-cols-12">

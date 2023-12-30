@@ -9,12 +9,7 @@ import { useSearchParams } from 'next/navigation';
 
 const Page = () => {
     const searchParams = useSearchParams()
-     
     const search  = searchParams.get('search')
-    // const search = {id : "mamali"}
-    // console.log("search: ", search)
-    // console.log("jouj merrat")
-
     return (
         <div className="w-full h-full bg-[#36393E] rounded-lg font-Goldman">
           <div className="w-full h-full rounded-lg grid grid-container place-items-center">

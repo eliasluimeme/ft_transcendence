@@ -11,18 +11,11 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import { useState, useEffect, useContext } from "react";
-import internal from "stream";
-import { StaticRequire } from "next/dist/shared/lib/get-img-props";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import Messages from "./Messages";
 import toast from "react-hot-toast";
-import { toast as toastify, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { io } from "socket.io-client";
-import { MyContext } from "@/components/game/tools/ModeContext";
-import { MyContextProvider } from "@/components/game/tools/MyContextProvider";
-import { time } from "console";
+import { SocketContext } from "@/components/game/tools/Contexts";
 
 interface Members {
   id: number;
@@ -33,12 +26,12 @@ interface Members {
 
 function ChatConv(oldeId: any) {
   const [update, toupdate] = useState<number>(0);
-  const gamecontext = useContext(MyContext);
+  const socket = useContext(SocketContext);
   const router = useRouter();
   const [roomName , setRoomName] = useState<string>('');
-  // const [intraId , setIntraId] = useState<string>('');
   const [senderInvit, setSenderInvit] = useState<any>({});
   const [recieverInvit , setRecieverInvit] = useState<any>({});
+
   const id = oldeId['id']
   // console.log("id", id);
   /////////////////end point to get rol/////////////////////////////
@@ -160,7 +153,6 @@ function ChatConv(oldeId: any) {
         }
       );
       if (response.status === 200) {
-        // console.log("to test :", response.data);
         const newMembers: Members[] = response.data.map((member: any) => ({
           id: member.id,
           nickname: member.userName, // Assuming userName is mapped to nickname
@@ -198,7 +190,6 @@ function ChatConv(oldeId: any) {
         }
       );
       if (response.status === 200) {
-        // console.log(response.data);
         setMuteStatu(response.data.isMuted);
         if (rol === true && response.data.role === "USER") setAdmine(false);
       } else {
@@ -236,7 +227,6 @@ function ChatConv(oldeId: any) {
         if (!data) {
           return;
         }
-        // console.log("this is the id befor", id);
         const response = await axios.post(
           "http://localhost:3001/chat/settings/mute",
           {
@@ -361,7 +351,6 @@ function ChatConv(oldeId: any) {
           }
         );
         if (response.status === 201) {
-          // setAdmine(response.data);
           if (response.data.role === "ADMIN")
             toast.success("Admin Added Successfuly");
           else if (response.data.role === "USER")
@@ -508,19 +497,6 @@ function ChatConv(oldeId: any) {
 
     //////////////////////// Invit Friend to play with  ///////////////////////////////
 
-    const handleAccept = (pyload: any) => {
-      gamecontext.contextValue.socket.emit('acceptedInvite', pyload);
-      router.push('/game');
-    };
-    
-    useEffect(() => {
-      gamecontext.contextValue.socket.off('acceptedInvite').on('acceptedInvite', (pyload: string) => {
-        toast.success(`${pyload} accepted your invitation , let's play !`)
-        setTimeout
-        router.push('/game');
-        });
-      },[]);
-
       const invitToPlay = () => {
         const send = {
           recieverId : recieverInvit.intraId,
@@ -531,29 +507,9 @@ function ChatConv(oldeId: any) {
           senderId : senderInvit.intraId, 
           accepterName: recieverInvit.name,
         }
-        gamecontext.contextValue.socket.emit('inviteEvent', send , recieve);
+        socket.emit('inviteEvent', send , recieve);
       } 
-      
-    useEffect(() => {
-      gamecontext.contextValue.socket.off('inviteEvent').on('inviteEvent', (data : any) => {
-        console.log('Im here inside useEffect !', data);
-         toast(() => (
-          <span>
-            <b>{data[0].senderName} invited you to play Pong ! </b>
-            <button onClick={() => toast.dismiss()}
-            className="border bg-red-500 rounded-ls px-5 py-1"
-            >
-              Dismiss
-            </button>
-            <button onClick={() => handleAccept(data[1])}
-            className="border bg-green-500 rounded-ls  px-5 py-1"
-            >
-              Accept
-            </button>
-          </span>
-        ));
-      });
-    }, []);
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   return (

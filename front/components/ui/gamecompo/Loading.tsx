@@ -1,9 +1,5 @@
 import { FC } from 'react'
 
-// interface LoadingProps {
-  
-// }
-
 const Loading: FC<{}> = ({}) => {
   return(
    <div 

@@ -1,5 +1,5 @@
 import React from "react";
-import { useState, useEffect } from "react";
+import { useState  } from "react";
 import {
   Popover,
   PopoverContent,
@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/popover";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 
 const CreateRoom = () => {
   const router = useRouter();
@@ -48,9 +48,7 @@ const CreateRoom = () => {
       console.error("An error occurred while fetching group data:", error);
     }
   };
-  // useEffect(() => {
-  //   takefreind();
-  // }, []);
+
   /////////////////////////////////
 
   return (
@@ -92,7 +90,6 @@ const CreateRoom = () => {
           Save
         </button>
       </div>
-      {/* <Toaster /> */}
     </div>
   );
 };

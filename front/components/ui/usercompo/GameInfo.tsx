@@ -16,13 +16,6 @@ type Achievement = {
   achieved: boolean;
 };
 const GetAchivment = (indice: string) => {
-  // console.log("indice achivements : ====> ", indice);
-  // const [achievements, setAchievements] = useState<Achievement[]>([
-  //   { description: "", achieved: true },
-  //   { description: "", achieved: false },
-  //   { description: "", achieved: true },
-  //   { description: "", achieved: true },
-  // ]);
   const achievementsInitialState: Achievement[] = [
     { description: "", achieved: true },
     { description: "", achieved: false },
@@ -32,7 +25,6 @@ const GetAchivment = (indice: string) => {
   const [achievements, setAchievements] = useState<Achievement[]>(
     achievementsInitialState
   );
-  // Fetch data using useEffect only once when the component mounts
   useEffect(() => {
     const fetchData = async () => {
       console.log("Fetching data...");
@@ -195,9 +187,7 @@ const GetMatchHistory = (indice: string): MatchHistory[] => {
 };
 
 const GameInfo = (id: any) => {
-  // console.log("l9laoui")
   const indice: string = id.id;
-  // console.log("test allah allah",indice);
   const achievements = GetAchivment(indice);
   const matchHistory = GetMatchHistory(indice);
   return (

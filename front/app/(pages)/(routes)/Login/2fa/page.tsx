@@ -1,8 +1,6 @@
 "use client";
 import React from "react";
 import { useState } from "react";
-import Image from "next/image";
-import { useEffect } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 
@@ -36,7 +34,6 @@ const Page = () => {
       );
 
       if (response.status === 201) {
-        // console.log(code);
         router.push("/");
         console.log("Data sent successfully!");
       } else {
@@ -61,7 +58,6 @@ const Page = () => {
           <input
             type="text"
             name="number"
-            // value={}
             onChange={handleInputChange}
             className="text-black w-full py-2 px-3 border border-gray-300 rounded-lg focus:outline-none focus:border-gray-900"
           />

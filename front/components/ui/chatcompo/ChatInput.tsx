@@ -1,11 +1,7 @@
 "use client";
 
-import TextareaAutosize from "react-textarea-autosize";
-import { cn } from '@/lib/utils'
-import React, { EffectCallback, useEffect, useRef, useState } from "react";
-import { io, Socket } from "socket.io-client";
-import { Button } from "../button";
-import Image from "next/image";
+import React, {useEffect, useRef, useState } from "react";
+import { io } from "socket.io-client";
 import axios from "axios";
 import Messages from "./Messages";
 import { User } from "lucide-react";
@@ -36,8 +32,6 @@ type Participant = {
 const ChatInput = (id: any) => {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const [message, setMessage] = useState<string>("");
-  const [historic, setHistoric] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState<Message[]>();
   const [ oldMessages, setOldMessages]= useState<Message[]>([]);
   const me = useRef<User>()
   const partners = useRef<User[] | undefined>()
@@ -107,7 +101,6 @@ const ChatInput = (id: any) => {
     });
   }, []);
 
-
   {/* ///////////      CHAT AREA /////////////////////////// */}
   return (
     <>
@@ -127,7 +120,6 @@ const ChatInput = (id: any) => {
                 }}
                 >
                 <textarea
-                  // rows={1}
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   onKeyDown={(e) => {

@@ -1,14 +1,11 @@
 "use client";
 import { useState, useEffect, useContext } from "react";
 import * as React from "react";
-import Image from "next/image";
 import "@/components/ui/CSS/game.css";
 import axios from "axios";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { MyContext } from "@/components/game/tools/ModeContext";
-import { MyContextProvider } from "@/components/game/tools/MyContextProvider";
+import { SocketContext, ModeContext } from "@/components/game/tools/Contexts";
 import toast from "react-hot-toast";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useRouter } from "next/navigation";
 
 type freind = {
@@ -22,19 +19,21 @@ const GetFriends = () => {
   const [freind, setfreind] = useState<freind[]>([]);
   const [me, setMe] = useState<freind>()
 
-  const gamecontext = useContext(MyContext);
+  const socket = useContext(SocketContext);
+  const mode = useContext(ModeContext);
 
   //////////////////////// Invit Friend to play with  ///////////////////////////////
 
     const handleAccept = (pyload: any) => {
-      gamecontext.contextValue.socket.emit('acceptedInvite', pyload);
+      socket.emit('acceptedInvite', pyload);
       router.push('/game');
     };
     
     useEffect(() => {
-      gamecontext.contextValue.socket.off('acceptedInvite').on('acceptedInvite', (pyload: string) => {
+      socket.off('acceptedInvite').on('acceptedInvite', (pyload: string) => {
         toast.success(`${pyload} accepted your invitation , let's play !`)
-        router.push('/game');
+        mode.updateContextValue('friend');
+        router.push('/game/board');
         });
       },[]);
 
@@ -50,11 +49,11 @@ const GetFriends = () => {
           accepterName: friend.userName,
         }
 
-        gamecontext.contextValue.socket.emit('inviteEvent', send , recieve);
+        socket.emit('inviteEvent', send , recieve);
       } 
       
     useEffect(() => {
-      gamecontext.contextValue.socket.off('inviteEvent').on('inviteEvent', (data : any) => {
+      socket.off('inviteEvent').on('inviteEvent', (data : any) => {
         console.log('Im here inside useEffect !', data);
          toast(() => (
           <span>

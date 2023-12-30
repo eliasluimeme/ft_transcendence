@@ -2,9 +2,7 @@
 
 import Image from "next/image";
 import "@/components/ui/CSS/font.css";
-import SearchBar from "./SearchBar";
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import axios from "axios";
 import JoinRoom from "./JoinRoom";
@@ -15,7 +13,6 @@ import {
 } from "@/components/ui/popover";
 import CreateRoom from "./CreateRoom";
 import { useRouter } from "next/navigation";
-import Freinds from "../gamecompo/Freinds";
 
 type Freind = {
   id: string;

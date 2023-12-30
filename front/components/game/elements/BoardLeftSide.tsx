@@ -1,9 +1,8 @@
-import React, {useEffect, useRef} from 'react'
+import React from 'react'
 
 const BoardLeftSide = (props:any) => {
     const user = props.user;
     const score = props.score;
-    //console.log("LeftSide", user);
 
     return (
         <div className='grid grid-cols-3 rounded-lg h-[100px]'>

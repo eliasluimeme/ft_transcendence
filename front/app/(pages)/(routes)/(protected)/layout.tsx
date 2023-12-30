@@ -1,14 +1,11 @@
 'use client'
 import axios from "axios";
 import NavBar from "@/components/ui/NavBar";
-import { useState } from "react";
-import Head from "next/head";
+import { useState,useEffect, useContext } from "react";
 import { useRouter } from "next/navigation";
-import { userAgent } from "next/server";
-import { MyContext } from "@/components/game/tools/ModeContext";
-import { MyContextProvider } from "@/components/game/tools/MyContextProvider";
 import { usePathname } from 'next/navigation'
-
+import { ModeCtxProvider } from "@/components/game/tools/ModeCtxProvider";
+import { SocketContext } from "@/components/game/tools/Contexts";
 
 
 export default function StartLayout({
@@ -21,7 +18,6 @@ export default function StartLayout({
   const pathname = usePathname()
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
-    // console.log(inputValue);
   };
 
   const handleKeyUp = async (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -33,33 +29,34 @@ export default function StartLayout({
 
   const sendDataToBackend = async () => {
     try {
-      // console.log("input", inputValue)
       const response = await axios.get('http://localhost:3001/users/search', {
         withCredentials: true,
         params: {
           user : inputValue,
         }
       });
-      // console.log(response)
       if (response.status === 200) {
         if (response.data.self === true)
           router.push('/profile');
         else
           router.push('/users?search=' + inputValue);
       }
-
-      // console.log('Data sent to backend:', response.data);
     } catch (error) {
-        // console.log('temaaaaa')
         router.push('/users/notfound');
-      // console.error('Error sending data to backend:', error);
     }
   };
+  const socket = useContext(SocketContext);
+  useEffect( () => {
+    return(() => {
+      console.log("Dazt mn hnra");
+      socket.disconnect();
+    });
+  }, []);
 
   return (
     <div className="flex h-full w-full p-3 gap-3 font-custom">
-      {pathname !== "/game" &&  <NavBar />}
-      {pathname !== "/game" &&
+      {pathname !== "/game/board" &&  <NavBar />}
+      {pathname !== "/game/board" &&
      <div>
       <div className="absolute w-[30%] flex space-x-2 right-[10%] top-[3%]">
         <svg
@@ -84,7 +81,9 @@ export default function StartLayout({
       </div>
       </div>
       }
+      <ModeCtxProvider>
         <main className="h-full w-full">{children}</main>
+      </ModeCtxProvider>
     </div>
   );
 }
