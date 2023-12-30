@@ -71,14 +71,14 @@ export class GameGateway implements OnGatewayInit{
     this.queue = this.queue.filter((waiter) => {client.id != waiter.sock});
     const online = this.online.get(client.data);
     const looser: Player = this.players.get(client.data);
-    if (!online || !looser)
+    this.online.delete(client.data);
+    if (!looser)
       return;
     if (looser)
     {
       this.rooms.get(looser.roomid).clearTimers();
       this.removeRoom(looser.roomid, true);
     }
-    this.online.delete(client.data);
     // this.userservice.updateUser(parseInt(client.data), {
     //   status: 'OFFLINE',
     // });
@@ -92,7 +92,8 @@ export class GameGateway implements OnGatewayInit{
     const online = this.online.get(client.data);
     if(online)
       return;
-    this.logger.error(client.data);
+    this.online.set(client.data, client.id);
+    this.logger.warn("Player: ", client.data, "is connected");
     // this.userservice.updateUser(parseInt(client.data), {
     //   status: 'ONLINE',
     // });
@@ -102,7 +103,11 @@ export class GameGateway implements OnGatewayInit{
   @SubscribeMessage('newBotGame')
   newGameBot(@ConnectedSocket() client: Socket, @MessageBody() mode: string)
   {
-    //check online map
+    const online = this.online.get(client.data);
+    if (online != client.id) {
+      this.server.to(client.id).emit('goback', "You are connected in other page");
+      return;
+    }
     const player = {id: client.data, sock: client.id, roomid: client.data};
     if (this.players.has(player.id))
     {
@@ -126,7 +131,11 @@ export class GameGateway implements OnGatewayInit{
   @SubscribeMessage('newRandomGame')
   async newGamePlayer(@ConnectedSocket() client: Socket)
   { 
-    //check online map
+    const online = this.online.get(client.data);
+    if (online != client.id) {
+      this.server.to(client.id).emit('goback', "You are connected in other page");
+      return;
+    }
     const player1 = {id: client.data, sock: client.id, roomid: client.data};
     if (!this.online.has(player1.id))
       return;

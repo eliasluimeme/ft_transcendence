@@ -10,10 +10,10 @@ export const SocketCtxProvider = ({ children }: {
     withCredentials: true,
   });
 
-  useEffect(() => {
-    return () => {
+  useEffect( () => {
+    return(() => {
       socket.disconnect();
-    };
+    });
   }, []);
 
   return (

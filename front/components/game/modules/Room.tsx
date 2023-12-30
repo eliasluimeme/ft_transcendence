@@ -90,7 +90,7 @@ const Room = (props:any) => {
     };
     socket.on('updatePlayer', (board: BoardInfo) => {
       ball.current = {
-        x: Math.round((board.ball.x * boardSize.current.width) / 1000),
+        x: Math.round((board.ball.x * boardSize.current.width) / 500),
         y: Math.round((board.ball.y * boardSize.current.height) / 500),
       };
       if (props.me.side != 'left')
@@ -105,6 +105,7 @@ const Room = (props:any) => {
       window.removeEventListener('resize', setBoardSize);
       window.removeEventListener('keydown', handleArrowKeys);
       clearInterval(timer);
+      socket.emit('quitGame');
     }
   }, []);
   

@@ -510,14 +510,14 @@ function ChatConv(oldeId: any) {
 
     const handleAccept = (pyload: any) => {
       socket.emit('acceptedInvite', pyload);
-      router.push('/game');
+      router.push('/game/board');
     };
     
     useEffect(() => {
       socket.off('acceptedInvite').on('acceptedInvite', (pyload: string) => {
         toast.success(`${pyload} accepted your invitation , let's play !`)
         setTimeout
-        router.push('/game');
+        router.push('/game/board');
         });
       },[]);
 

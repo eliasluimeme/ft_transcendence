@@ -53,7 +53,10 @@ export default function page() {
           console.log("dkhlt");
         }
         else if(modectx.mode == "random")
-          socket.emit("newRadomGame");
+        {
+          socket.emit("newRandomGame", '');
+          console.log("ah dkhlt hna");
+        }
 
         socket.on('goback', (reason: string) => {
           gameRslts.current = reason;
@@ -71,7 +74,6 @@ export default function page() {
         return (() => {
           console.log("ah dkhlt hna");
           modectx.updateContextValue("");
-          socket.emit('quitGame');
         });
     }
     return;

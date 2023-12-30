@@ -7,9 +7,9 @@ import { clearInterval } from 'timers';
 export class GameService {
   //Room attributes
   private logger: Logger = new Logger(GameService.name);
-  private readonly board = {width: 1000, height: 500};
+  private readonly board = {width: 500, height: 500};
   private roomstatus: string = "onhold";
-  private readonly padel = {width: 15, height: 100, speed: 20};
+  private readonly padel = {width: 15, height: 100, speed: 50};
   private vsBot: boolean = false;
   private bot: Bot = {speed: 0, timer: ''};
   private started: boolean = false;
@@ -25,7 +25,7 @@ export class GameService {
     vec: {x: 0, y: 0},
     rad: 10,
     speed: 2,
-    repete: 16,
+    repete: 8,
     timer: '',
     dir: 'left',
   }
@@ -94,7 +94,7 @@ export class GameService {
     this.ball.cords = {x: 500, y: 250};
     this.lplayer.padely = 0;
     this.rplayer.padely = 5;
-    this.ball.repete = 16;
+    this.ball.repete = 8;
     this.clearTimers();
     this.resetTimers();
   }

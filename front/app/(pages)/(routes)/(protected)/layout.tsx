@@ -7,7 +7,8 @@ import { useRouter } from "next/navigation";
 import { userAgent } from "next/server";
 import { usePathname } from 'next/navigation'
 import { ModeCtxProvider } from "@/components/game/tools/ModeCtxProvider";
-
+import { SocketCtxProvider } from "@/components/game/tools/SocketCtxProvider";
+import { SocketContext } from "@/components/game/tools/Contexts";
 
 
 export default function StartLayout({
@@ -54,6 +55,13 @@ export default function StartLayout({
       // console.error('Error sending data to backend:', error);
     }
   };
+  const socket = useContext(SocketContext);
+  useEffect( () => {
+    return(() => {
+      console.log("Dazt mn hnra");
+      socket.disconnect();
+    });
+  }, []);
 
   return (
     <div className="flex h-full w-full p-3 gap-3 font-custom">
