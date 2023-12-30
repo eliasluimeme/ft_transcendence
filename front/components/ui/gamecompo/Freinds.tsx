@@ -120,8 +120,8 @@ const GetFriends = () => {
 
 const Freinds = () => {
   return (
-    <div className="w-full h-full">
-      <div className="w-full h-full grid grid-rows-5 place-items-center">
+    <div className="w-full h-full container ">
+      <div className="w-full h-full grid grid-rows-5 place-items-center ">
         <div className="w-full h-full row-start-1 row-span-1 flex items-center justify-center text-[40px] text-center">
           Invite Friends
         </div>
