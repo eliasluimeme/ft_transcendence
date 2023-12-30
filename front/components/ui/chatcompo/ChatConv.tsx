@@ -17,9 +17,12 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import Messages from "./Messages";
 import toast from "react-hot-toast";
+import { toast as toastify, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { io } from "socket.io-client";
-import { MyContext } from "@/components/game/tools/ModeContext";
-import { MyContextProvider } from "@/components/game/tools/MyContextProvider";
+import { SocketContext } from "@/components/game/tools/Contexts";
+import { SocketCtxProvider } from "@/components/game/tools/SocketCtxProvider";
+import { time } from "console";
 
 interface Members {
   id: number;
@@ -30,9 +33,12 @@ interface Members {
 
 function ChatConv(oldeId: any) {
   const [update, toupdate] = useState<number>(0);
-  const gamexontext = useContext(MyContext);
+  const socket = useContext(SocketContext);
   const router = useRouter();
   const [roomName , setRoomName] = useState<string>('');
+  // const [intraId , setIntraId] = useState<string>('');
+  const [senderInvit, setSenderInvit] = useState<any>({});
+  const [recieverInvit , setRecieverInvit] = useState<any>({});
   const id = oldeId['id']
   // console.log("id", id);
   /////////////////end point to get rol/////////////////////////////
@@ -49,7 +55,6 @@ function ChatConv(oldeId: any) {
           },
         }
       );
-      // gamexontext.contextValue.socket.emit("inviteEvent", invitedPlayerId)
       if (response.status === 200) {
         if (response.data.role === "OWNER" || response.data.role === "ADMIN")
           setrol(true);
@@ -119,6 +124,12 @@ function ChatConv(oldeId: any) {
       if (response.status === 200) {
         setTypofRoom(response.data.visibility);
         setRoomName(response.data.roomName);
+        const reciever  = response.data.users.find((u: any)  => u.self === false)
+        const me = response.data.users.find((u: any)  => u.self === true);
+        if (reciever)
+          setRecieverInvit(reciever);
+        if (me)
+          setSenderInvit(me);
       } else {
         console.log("Failed to fetch member data");
       }
@@ -495,6 +506,56 @@ function ChatConv(oldeId: any) {
     }
   };
 
+    //////////////////////// Invit Friend to play with  ///////////////////////////////
+
+    const handleAccept = (pyload: any) => {
+      socket.emit('acceptedInvite', pyload);
+      router.push('/game');
+    };
+    
+    useEffect(() => {
+      socket.off('acceptedInvite').on('acceptedInvite', (pyload: string) => {
+        toast.success(`${pyload} accepted your invitation , let's play !`)
+        setTimeout
+        router.push('/game');
+        });
+      },[]);
+
+      const invitToPlay = () => {
+        const send = {
+          recieverId : recieverInvit.intraId,
+          senderName: senderInvit.name,
+        }
+
+        const recieve = {
+          senderId : senderInvit.intraId, 
+          accepterName: recieverInvit.name,
+        }
+        socket.emit('inviteEvent', send , recieve);
+      } 
+      
+    useEffect(() => {
+      socket.off('inviteEvent').on('inviteEvent', (data : any) => {
+        console.log('Im here inside useEffect !', data);
+         toast(() => (
+          <span>
+            <b>{data[0].senderName} invited you to play Pong ! </b>
+            <button onClick={() => toast.dismiss()}
+            className="border bg-red-500 rounded-ls px-5 py-1"
+            >
+              Dismiss
+            </button>
+            <button onClick={() => handleAccept(data[1])}
+            className="border bg-green-500 rounded-ls  px-5 py-1"
+            >
+              Accept
+            </button>
+          </span>
+        ));
+      });
+    }, []);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   return (
     <div className="h-full w-full  grid grid-rows-6 ">
       <div className="w-full h-full row-start-1 row-span-1  flex items-center justify-center space-x-4">
@@ -512,7 +573,12 @@ function ChatConv(oldeId: any) {
             )}
           </div>
           <div className="col-start-3 col-span-1 flex justify-end space-x-5 items-center mr-[8px]">
-            <button className="w-[50px] border flex items-center justify-center rounded-lg bg-[#36393E] bg-opacity-25 hover:bg-opacity-60">
+            <button 
+              className="w-[50px] border flex items-center justify-center rounded-lg bg-[#36393E] bg-opacity-25 hover:bg-opacity-60"
+              onClick={() => {
+                invitToPlay()
+              }}
+              >
               <FaGamepad />
             </button>
             <Popover>

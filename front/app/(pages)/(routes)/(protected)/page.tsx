@@ -1,15 +1,21 @@
 "use client";
-import React from "react";
+import React, {useContext, useEffect} from "react";
 import Image from "next/image";
 import Redirect from "@/components/ui/homeComp/Redirect";
+import { SocketCtxProvider } from "@/components/game/tools/SocketCtxProvider";
 import { Toaster } from "react-hot-toast";
 import { io } from "socket.io-client";
-
-// const socket = io('http://localhost:3001/status', {
-//   withCredentials: true,
-// })
+import { SocketContext } from "@/components/game/tools/Contexts";
 
 const Page = () => {
+  
+  const socket = useContext(SocketContext);
+  useEffect( () => {
+    return(() => {
+      //socket.disconnect();
+    });
+  }, []);
+
   return (
     <div className="w-full h-full bg-[#36393E] rounded-lg grid grid-cols-2 font-Goldman">
       <div className="col-start-1 flex items-center justify-center">

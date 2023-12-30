@@ -34,9 +34,6 @@ const Room = (props:any) => {
     const canvas = canvasRef.current!;
     const ctx = canvas.getContext('2d')!;
     ctx.clearRect(0, 0, boardSize.current.width, boardSize.current.height);
-    //const img = new Image(boardSize.current.width, boardSize.current.height);
-    //img.src = '/game/bg.png';
-    //ctx.drawImage(img, 0, 0, boardSize.current.width, boardSize.current.height);
     ctx.fillStyle = "Gray";
     ctx.fillRect(mypadel.current.x, mypadel.current.y, 15, 100);
     ctx.fillRect(oppadel.current.x, oppadel.current.y, 15, 100);
@@ -51,7 +48,6 @@ const Room = (props:any) => {
     ctx.fillStyle = 'white';
     ctx.fill();
     ctx.lineWidth = 1;
-    //ctx.strokeStyle = 'black';
     ctx.stroke();
     ctx.closePath();
   }
@@ -132,15 +128,3 @@ const Room = (props:any) => {
 }
 
 export default Room
-
-
-// if(side == 'left') {
-//   mypadel.current.x = 0;
-//   oppadel.current.x = boardSize.current.width - 15;
-// }
-// else {
-//   mypadel.current.x = boardSize.current.width - 15;
-//   mypadel.current.side = 'right';
-//   oppadel.current.x = 0;
-//   oppadel.current.side = 'left';
-// }

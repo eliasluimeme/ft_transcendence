@@ -1,85 +1,34 @@
-"use client";
-import Loading from "@/components/game/modules/Loading";
-import Results from "@/components/game/modules/Results";
-import Room from "@/components/game/modules/Room";
-import Settings from "@/components/game/modules/Settings";
-import { useEffect, useState, useRef, useContext} from "react";
-import { MyContext } from "@/components/game/tools/ModeContext";
-import { useRouter } from 'next/navigation'
-import axios from "axios";
-import io from 'socket.io-client';
+import React, {useEffect, useRef, useContext} from 'react'
+import "@/app/(pages)/(routes)/(protected)/game/style.css";
+import "@/components/ui/CSS/game.css";
+import Random from "@/components/ui/gamecompo/Random";
+import Freinds from "@/components/ui/gamecompo/Freinds";
+import Bot from "@/components/ui/gamecompo/Bot";
+import Map from "@/components/ui/gamecompo/Map";
 
-const socket = io('http://localhost:3001');
+const page = () => {
+  return (
+    <div className="w-full h-full font-Goldman game-background rounded-lg">
+      <div className="w-full h-full rounded-lg grid grid-container place-items-center">
+        <div className=" w-[98%] h-[98%] border rounded-lg take">
+          <div className="w-full h-full grid grid-cols-6 grid-rows-6 place-items-center">
+            <div className="row-start-1 col-span-2 col-start-1 row-span-6 rounded-lg border w-[94%] h-[94%] ">
+              <Freinds />
+            </div>
+            <div className="w-[98%] h-[82%] border rounded-lg col-start-3 col-span-4 row-start-1 row-span-2">
+              <Random></Random>
+            </div>
+            <div className="w-[97%] h-[91%] border rounded-lg col-start-3 col-span-3 row-start-3 row-span-4">
+              <Bot></Bot>
+            </div>
+            <div className="w-[94%] h-[91%] border rounded-lg col-start-6  row-start-3 row-span-4">
+              <Map></Map>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
-export default function page() {
-  const [status, setStatus] = useState(0);
-  //const mode = useContext(MyContext);
-  //const socket = mode.contextValue.socket;
-  const ld = useRef(false);
-  const [socket, setSocket] = useState<any>(null);
-  const [data, setData] = useState<any>();
-  const [self, setSelf] = useState<any>();
-  const me = useRef({side: 'left', userName: "", photo: ""});
-  const router = useRouter();
-  const gameRslts = useRef<string>();
-  const changeModule = async (status:number) => {
-    setStatus(prev => prev = status);
-  };
-
-  const fetchData = async () => {
-    try {
-      const response = await axios.get("http://localhost:3001/settings", {
-        withCredentials: true,
-      });
-      if (response.status === 200) {
-        me.current.userName = response.data.userName;
-        me.current.photo = response.data.photo;
-      } else {
-        console.log("failed to fetchdata");
-      }
-    } catch (error) {
-      router.push("/Login");
-      console.error("An error occurred while fetching user data:", error);
-    }
-  };
-
-  useEffect( () => {
-    console.log("ana kayn f page");
-    if (!ld.current) {
-      setSocket(io('http://localhost:3001/game', { transports : ['websocket'] }));
-      ld.current = true;
-    }
-    if (socket) {
-      socket.on('goback', (reason: string) => {
-        console.log("sala match");
-        gameRslts.current = reason;
-        router.replace('/');
-      });
-      socket.on('roomCreated', (data:any) => {
-        console.log("room created");
-        fetchData();
-        me.current.side = data.side;
-        setSelf(me.current);
-        console.log("opp", data);
-        setData(data);
-        setStatus(2);
-      });
-      return (() => {
-        console.log("rani khrjt mn page");
-        socket.disconnect();
-      });
-    }
-    return;
-  }, [socket]);
-
-  if (!socket)
-    return;
-  if(status == 0 && socket)
-    return (<Settings socket={socket} setStatus={(msg:number) => changeModule(msg)}/>);
-  else if(status == 1)
-    return(<Loading socket={socket} setStatus={(msg:number) => changeModule(msg)}/>);
-  else if(status == 2)
-    return(<Room socket={socket} data={data} me={self}/>);
-  else if (status == 3)
-    return(<Results rslt={gameRslts} setStatus={(msg:number) => changeModule(msg)} />);
-};
+export default page

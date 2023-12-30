@@ -18,6 +18,8 @@ export class GameService {
   private goalTimer: any;
   private lachiev: boolean[] = [false, false, false, false, false];
   private rachiev: boolean[] = [false, false, false, false, false];
+  private leftReady: boolean = false;
+  private rightReady: boolean = false;
   private ball: Ball = {
     cords:  {x: 500, y: 250},
     vec: {x: 0, y: 0},
@@ -125,6 +127,21 @@ export class GameService {
   }
 
 // tools functions
+  isReady(id: string): boolean | any
+  {
+    if (this.vsBot)
+    {
+      this.leftReady = true;
+      return true;
+    }
+    if(this.lplayer.id == id && !this.leftReady)
+      this.leftReady = true;
+    if(this.lplayer.id == id && !this.leftReady)
+      this.leftReady = true;
+    if(this.leftReady && this.rightReady)
+      return {player1: this.lplayer.id, player2: this.rplayer.id};
+    return false;
+  }
   getRandomNumber(min:number, max:number):number {
     const side = Math.round(Math.random());
     if (side)
