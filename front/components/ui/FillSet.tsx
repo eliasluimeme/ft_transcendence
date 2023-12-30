@@ -81,7 +81,7 @@ const FillSet: React.FC = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-[#1E2124] text-gray-300">
       <div className="w-96 p-6 bg-[#36393E] shadow-lg rounded-lg">
-        <form onSubmit={handleSubmit}>
+        <form >
           <div className="mb-6">
             <label
               htmlFor="inline-full-name"

@@ -59,10 +59,10 @@ export class GameGateway implements OnGatewayInit{
   afterInit(client: Socket)
   { 
     this.logger.log("Gateway is initialized.");
-    this.server.on('connection', (client: Socket) => {
-      if (!GameGuard.validateToken(client, this.config.get('JWT_SECRET')))
-      {this.server.to(client.id).emit('goback', "[Access Denied]: Log in to access the game");}
-    });
+    // this.server.on('connection', (client: Socket) => {
+    //   if (!GameGuard.validateToken(client, this.config.get('JWT_SECRET')))
+    //   {this.server.to(client.id).emit('goback', "[Access Denied]: Log in to access the game");}
+    // });
   }
 
   handleDisconnect(client: Socket) {
@@ -192,24 +192,6 @@ export class GameGateway implements OnGatewayInit{
     this.server.to(player2.sock).emit('roomCreated', {side: 'right', oppName: (await user1).userName, oppPhoto: (await user1).photo});
     this.rooms.get(player1.id).resetBoard();
   }
-  // @SubscribeMessage('accepted')
-  // newFriendGame(@ConnectedSocket() client: Socket, @MessageBody() data: any)
-  // { 
-  //   const player1: Player= {id: client.data, sock: client.id, roomid: client.data};
-  //   const player2: Player= {id: data.senderId, sock: this.online.get(data.senderId), roomid: client.data};
-  //   this.server.to(player2.sock).emit('acceptedInvite', data.accepterName);
-  //   const room: NewRoom = {
-  //     vsbot: false,
-  //     mode: 0,
-  //     id1: player1.id,
-  //     sock1: player1.sock,
-  //     id2: player2.id,
-  //     sock2: player2.sock
-  //   };
-  //   this.players.set(player1.id, player1);
-  //   this.players.set(player2.id, player2);
-  //   this.rooms.set(player1.id,new GameService(room));
-  // }
 
 // update room data function
   @SubscribeMessage('updateRoom')
@@ -285,9 +267,9 @@ handelAccept(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
     {
       this.players.delete(rslts.winner.id);
       if (disconnect)
-        this.server.to(rslts.winner.sock).emit('goback', "Your opponent has disconnected");
+        this.server.to(rslts.winner.sock).emit('goback', "win");
       else
-        this.server.to(rslts.winner.sock).emit('goback', "You won the game");
+        this.server.to(rslts.winner.sock).emit('goback', "win");
       // this.userservice.updateUser(parseInt(rslts.winner.id), {
       //   status: 'ONLINE',
       // });
@@ -296,9 +278,9 @@ handelAccept(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
     {
       this.players.delete(rslts.looser.id);
       if (disconnect)
-        this.server.to(rslts.looser.sock).emit('goback', "You were disconnected");
+        this.server.to(rslts.looser.sock).emit('goback', "lost");
       else
-        this.server.to(rslts.looser.sock).emit('goback', "You were lost the game");
+        this.server.to(rslts.looser.sock).emit('goback', "lost");
       // this.userservice.updateUser(parseInt(rslts.looser.id), {
       //   status: 'ONLINE',
       // });

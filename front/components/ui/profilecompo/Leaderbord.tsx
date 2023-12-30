@@ -18,7 +18,6 @@ const GetLeader = () => {
         withCredentials: true,
       });
       if (response.status === 200) {
-        console.log("leadder board", response);
         const newleader: Leader[] = response.data.map(
           (l: any) => ({
             rank: l.rank,

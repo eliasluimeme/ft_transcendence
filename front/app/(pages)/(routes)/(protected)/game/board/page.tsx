@@ -58,7 +58,7 @@ export default function Page() {
 
         socket.on('goback', (reason: string) => {
           gameRslts.current = reason;
-          router.push("/");
+          setStatus(2);
         });
 
         socket.on('roomCreated', (data:any) => {
@@ -84,5 +84,5 @@ export default function Page() {
   else if(status == 1)
     return(<Room socket={socket} data={data} me={self}/>);
   else if (status == 2)
-    return(<Results rslt={gameRslts} setStatus={(msg:number) => changeModule(msg)} />);
+    return(<Results rslt={gameRslts.current} setStatus={(msg:number) => changeModule(msg)} />);
 };

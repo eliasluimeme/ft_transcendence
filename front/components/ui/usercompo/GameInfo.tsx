@@ -27,7 +27,6 @@ const GetAchivment = (indice: string) => {
   );
   useEffect(() => {
     const fetchData = async () => {
-      console.log("Fetching data...");
       try {
         const response = await axios.get(
           "http://localhost:3001/users/achievement",
@@ -181,8 +180,6 @@ const GetMatchHistory = (indice: string): MatchHistory[] => {
   useEffect(() => {
     fetchData();
   }, []);
-  console.log(matchHistory);
-
   return matchHistory;
 };
 
