@@ -26,7 +26,7 @@ const Room = (props:any) => {
       oppadel.current.x = boardSize.current.width - 15;
     else
       mypadel.current.x = boardSize.current.width - 15;
-    newChange(prev => prev + 1);
+    //newChange(prev => prev + 1);
   };
 
   const  repaintCanvas = () => {
@@ -58,7 +58,7 @@ const Room = (props:any) => {
         mypadel.current.y -= 50;
       else
         mypadel.current.y = 0;
-      newChange(prev => prev + 1);
+      //newChange(prev => prev + 1);
     }
     else if(event.key == 'ArrowDown' && mypadel.current.y + 100 != boardSize.current.height)
     {
@@ -66,13 +66,14 @@ const Room = (props:any) => {
         mypadel.current.y += 50;
       else
         mypadel.current.y = boardSize.current.height - 100;
-      newChange(prev => prev + 1);
+      //newChange(prev => prev + 1);
     }
   }
 
 
   useEffect( () => {
     var timer:any;
+    const updateCanvas = () => {newChange(prev => prev + 1)};
     setBoardSize();
     window.addEventListener('resize', setBoardSize);
     window.addEventListener('keydown', handleArrowKeys);
@@ -97,13 +98,15 @@ const Room = (props:any) => {
       else
         oppadel.current.y = Math.round((board.rpadel * boardSize.current.height) / 500);
       setScores({lscore:board.lscore, rscore: board.rscore});
-      newChange(prev => prev + 1);
+      //newChange(prev => prev + 1);
     });
+    var updater = setInterval(updateCanvas, 16);
     timer = setInterval(sendData, 16);
     return () => {
       window.removeEventListener('resize', setBoardSize);
       window.removeEventListener('keydown', handleArrowKeys);
       clearInterval(timer);
+      clearInterval(updater);
       socket.emit('quitGame');
     }
   }, []);

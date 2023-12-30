@@ -18,12 +18,12 @@ const page = () => {
             <div className="w-[98%] h-[82%] border rounded-lg col-start-3 col-span-4 row-start-1 row-span-2">
               <Random></Random>
             </div>
-            <div className="w-[97%] h-[91%] border rounded-lg col-start-3 col-span-3 row-start-3 row-span-4">
+            <div className="w-[97%] h-[91%] border rounded-lg col-start-3 col-span-4 row-start-3 row-span-4">
               <Bot></Bot>
             </div>
-            <div className="w-[94%] h-[91%] border rounded-lg col-start-6  row-start-3 row-span-4">
+            {/* <div className="w-[94%] h-[91%] border rounded-lg col-start-6  row-start-3 row-span-4">
               <Map></Map>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

@@ -46,7 +46,6 @@ const GetAchivment = () => {
             achieved: response.data.achievements[3],
           },
         ];
-        console.log(newAchievements);
         setAchievements(newAchievements);
       } else {
         console.log("failed to fetchdata");
@@ -152,7 +151,6 @@ const GetMatchHistory = (): MatchHistory[] => {
         );
 
         setmatchHistory(newMatchHistory);
-        console.log(matchHistory);
       } else {
         console.log("failed to fetchdata");
       }

@@ -9,13 +9,12 @@ export class GameService {
   private logger: Logger = new Logger(GameService.name);
   private readonly board = {width: 500, height: 500};
   private roomstatus: string = "onhold";
-  private readonly padel = {width: 15, height: 100, speed: 50};
+  private readonly padel = {width: 15, height: 100, speed: 20};
   private vsBot: boolean = false;
   private bot: Bot = {speed: 0, timer: ''};
   private started: boolean = false;
   private colTimers: {wall: any, padel: any} = {wall: '', padel: ''};
   private scoreTimer: any;
-  private goalTimer: any;
   private lachiev: boolean[] = [false, false, false, false, false];
   private rachiev: boolean[] = [false, false, false, false, false];
   private leftReady: boolean = false;
@@ -25,7 +24,7 @@ export class GameService {
     vec: {x: 0, y: 0},
     rad: 10,
     speed: 2,
-    repete: 8,
+    repete: 12,
     timer: '',
     dir: 'left',
   }
@@ -52,7 +51,7 @@ export class GameService {
     if (newroom.vsbot)
     {
       this.vsBot = true;
-      this.bot.speed = newroom.mode * 10;
+      this.bot.speed = newroom.mode * 500;
     }
     this.roomstatus = "open";
     this.rplayer.id = newroom.id2;
@@ -65,9 +64,9 @@ export class GameService {
   moveBot() {
     if (this.ball.cords.x > this.board.width / 2)
     {
-      if (this.ball.cords.y < this.rplayer.padely)
+      if ((this.ball.cords.y < this.rplayer.padely) && (this.rplayer.padely - this.padel.speed > 0))
         this.rplayer.padely -= this.padel.speed;
-      else if (this.ball.cords.y > this.rplayer.padely + this.padel.height)
+      else if ((this.ball.cords.y > this.rplayer.padely + this.padel.height) && (this.rplayer.padely + this.padel.height < this.board.height))
         this.rplayer.padely += this.padel.speed;
     }
   }
@@ -78,7 +77,21 @@ export class GameService {
   }
   
   scoreChecker(){
-    if (this.lplayer.score == 10 || this.rplayer.score == 10) {
+    if (this.ball.cords.x >= this.board.width)
+    {
+      this.lplayer.score++;
+      if (this.lplayer.score == 9 && this.rplayer.score == 0)
+        this.rplayer.cbTrigger = true;
+      this.resetBoard();
+    }
+    else if (this.ball.cords.x <= 0)
+    {
+      this.rplayer.score++;
+      if (this.rplayer.score == 9 && this.lplayer.score == 0)
+        this.lplayer.cbTrigger = true;
+      this.resetBoard();
+    }
+    if (this.lplayer.score == 5 || this.rplayer.score == 5) {
       this.logger.error("The game finish");
       this.clearTimers();
       this.roomstatus = "closed";
@@ -94,7 +107,7 @@ export class GameService {
     this.ball.cords = {x: 250, y: 250};
     this.lplayer.padely = 0;
     this.rplayer.padely = 5;
-    this.ball.repete = 8;
+    this.ball.repete = 12;
     this.clearTimers();
     this.resetTimers();
   }
@@ -106,10 +119,9 @@ export class GameService {
       this.ball.timer = setInterval(this.moveBall.bind(this), this.ball.repete);
       if (this.vsBot)
         this.bot.timer = setInterval(this.moveBot.bind(this), this.bot.speed);
-      this.colTimers.wall = setInterval(this.wallCollusion.bind(this), this.ball.repete);
-      this.colTimers.padel = setInterval(this.padelCollusion.bind(this), this.ball.repete);
-      this.goalTimer = setInterval(this.isGoal.bind(this), this.ball.repete);
-      this.scoreTimer = setInterval(this.scoreChecker.bind(this), this.ball.repete);
+      this.colTimers.wall = setInterval(this.wallCollusion.bind(this), 16);
+      this.colTimers.padel = setInterval(this.padelCollusion.bind(this), 16);
+      this.scoreTimer = setInterval(this.scoreChecker.bind(this), 16);
     }
   }
 
@@ -122,7 +134,6 @@ export class GameService {
       clearInterval(this.ball.timer);
       clearInterval(this.bot.timer);
       clearInterval(this.scoreTimer);
-      clearInterval(this.goalTimer);
     }
   }
 
@@ -177,23 +188,6 @@ export class GameService {
     return ({x: -1, y: -1});
   }
 
-  isGoal() {
-    if (this.ball.cords.x >= this.board.width)
-    {
-      this.lplayer.score++;
-      if (this.lplayer.score == 9 && this.rplayer.score == 0)
-        this.rplayer.cbTrigger = true;
-      this.resetBoard();
-    }
-    else if (this.ball.cords.x <= 0)
-    {
-      this.rplayer.score++;
-      if (this.rplayer.score == 9 && this.lplayer.score == 0)
-        this.lplayer.cbTrigger = true;
-      this.resetBoard();
-    }
-  }
-
   wallCollusion() {
     if ((this.ball.cords.y <= (this.ball.rad / 2) || this.ball.cords.y >= (this.board.height - this.ball.rad)) && 
     (this.ball.cords.x && this.ball.cords.x < (this.board.width - this.ball.rad))) {
@@ -227,16 +221,16 @@ export class GameService {
     if (this.ball.dir == 'left')
     {
       this.calculVecs(angle);
-      if (this.ball.repete < 8)
+      if (this.ball.repete < 5)
         this.lplayer.quickRef++;
     }
     else
     {
       this.calculVecs(180 - angle);
-      if (this.ball.repete < 8)
+      if (this.ball.repete < 10)
         this.rplayer.quickRef++;
     }
-    if (this.ball.repete > 5)
+    if (this.ball.repete > 10)
       this.ball.repete-= 1;
     clearInterval(this.ball.timer);
     this.ball.timer = setInterval(this.moveBall.bind(this), this.ball.repete);
@@ -244,7 +238,6 @@ export class GameService {
     setTimeout(() => {
       this.colTimers.padel = setInterval(this.padelCollusion.bind(this), this.ball.repete);
     }, 50);
-    // this.logger.warn(angle);
   }
 //update and send data to player function
   updateBoard(id: string, y: number): Board{
@@ -263,15 +256,33 @@ export class GameService {
   }
 
   roomRslts() {
-    if (this.lplayer.score > this.rplayer.score)
+    if (this.lplayer.score > this.rplayer.score) {
+      if (this.lplayer.quickRef >= 5)
+        this.lachiev[1] = true;
+      if (this.lplayer.quickRef >= 10)
+        this.rachiev[1] = true;
+      if (this.lplayer.cbTrigger)
+        this.lachiev[2] = true;
+      if (this.rplayer.score == 0)
+        this.lachiev[3] = true;
       return ({
         winner: {id: this.lplayer.id, sock: this.lplayer.sock, score: this.lplayer.score, achievs: this.lachiev},
         looser: {id: this.rplayer.id, sock: this.rplayer.sock, score: this.rplayer.score, achievs: this.rachiev}
       });
-    else
+    }
+    else {
+      if (this.rplayer.quickRef >= 5)
+      this.rachiev[1] = true;
+      if (this.rplayer.quickRef >= 10)
+        this.rachiev[1] = true;
+      if (this.rplayer.cbTrigger)
+        this.rachiev[2] = true;
+      if (this.lplayer.score == 0)
+        this.rachiev[3] = true;
       return ({
         winner: {id: this.rplayer.id, sock: this.rplayer.sock, score: this.rplayer.score, achievs: this.rachiev},
         looser: {id: this.lplayer.id, sock: this.lplayer.sock, score: this.lplayer.score, achievs: this.lachiev}
       });
+    }
   }
 }
