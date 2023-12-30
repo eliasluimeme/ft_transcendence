@@ -58,7 +58,7 @@ export default function Page() {
 
         socket.on('goback', (reason: string) => {
           gameRslts.current = reason;
-          router.push("/");
+          router.push("/game");
         });
 
         socket.on('roomCreated', (data:any) => {

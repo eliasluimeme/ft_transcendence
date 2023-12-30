@@ -58,15 +58,13 @@ export class GameGateway implements OnGatewayInit{
 // connection/diconnection functions
   afterInit(client: Socket)
   { 
-    this.logger.log("Gateway is initialized.");
     this.server.on('connection', (client: Socket) => {
       if (!GameGuard.validateToken(client, this.config.get('JWT_SECRET')))
       {this.server.to(client.id).emit('goback', "[Access Denied]: Log in to access the game");}
     });
   }
 
-  handleDisconnect(client: Socket) {
-    this.logger.warn("Client is disconnected");
+  async handleDisconnect(client: Socket) {
     this.queue = this.queue.filter((waiter) => {client.id != waiter.sock});
     const online = this.online.get(client.data);
     const looser: Player = this.players.get(client.data);
@@ -78,9 +76,18 @@ export class GameGateway implements OnGatewayInit{
       this.rooms.get(looser.roomid).clearTimers();
       this.removeRoom(looser.roomid, true);
     }
-    // this.userservice.updateUser(parseInt(client.data), {
-    //   status: 'OFFLINE',
-    // });
+    try {
+      await this.prisma.user.update({
+        where: {
+          intraId: client.data
+        },
+        data: {
+          status: 'OFFLINE'
+        }
+      })
+    } catch (error) {
+      console.log(error);
+    }
   }
   async handleConnection(client: Socket) {
 
@@ -92,10 +99,18 @@ export class GameGateway implements OnGatewayInit{
     if(online)
       return;
     this.online.set(client.data, client.id);
-    this.logger.warn("Player: ", client.data, "is connected");
-    // this.userservice.updateUser(parseInt(client.data), {
-    //   status: 'ONLINE',
-    // })
+    try {
+      await this.prisma.user.update({
+        where: {
+          intraId: client.data
+        },
+        data: {
+          status: 'ONLINE'
+        }
+      })
+    } catch (error) {
+      console.log(error);
+    }
   }
 
 // add new room functions
@@ -234,7 +249,6 @@ export class GameGateway implements OnGatewayInit{
   }
   @SubscribeMessage('quitGame')
   quitGame(client: Socket) {
-    this.logger.warn("Client is quited");
     const looser: Player = this.players.get(client.data);
     if (!looser)
       return;
@@ -288,9 +302,18 @@ handelAccept(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
         this.server.to(rslts.winner.sock).emit('goback', "Your opponent has disconnected");
       else
         this.server.to(rslts.winner.sock).emit('goback', "You won the game");
-      // this.userservice.updateUser(parseInt(rslts.winner.id), {
-      //   status: 'ONLINE',
-      // });
+        try {
+          await this.prisma.user.update({
+            where: {
+              intraId: rslts.winner.id
+            },
+            data: {
+              status: 'ONLINE'
+            }
+          })
+        } catch (error) {
+          console.log(error);
+        }
     }
     if (rslts.looser.id)
     {
@@ -299,9 +322,18 @@ handelAccept(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
         this.server.to(rslts.looser.sock).emit('goback', "You were disconnected");
       else
         this.server.to(rslts.looser.sock).emit('goback', "You were lost the game");
-      // this.userservice.updateUser(parseInt(rslts.looser.id), {
-      //   status: 'ONLINE',
-      // });
+        try {
+          await this.prisma.user.update({
+            where: {
+              intraId: rslts.looser.id
+            },
+            data: {
+              status: 'ONLINE'
+            }
+          })
+        } catch (error) {
+          console.log(error);
+        }
     }
     if (rslts.looser.id && rslts.winner.id) {
       this.userservice.addToGameHistory({

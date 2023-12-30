@@ -7,12 +7,7 @@ import { JoinGroupChatDTO } from './dto/joinGroupChat.dto';
 
 @Injectable()
 export class ChatService {
-  
     constructor(private prisma: PrismaService) {}
-    
-    // chat owner should be able to change and remove password
-    // The user should be able to invite other users to play a Pong game through the chat interface.
-    // The user should be able to access other players profiles through the chat interface.
     
     async getConversations(userId: number) {
         try {
@@ -87,66 +82,6 @@ export class ChatService {
         }
     }
 
-    // async getConvoMembers(userId: number, roomId: number) {
-    //     try {
-    //         // console.log('getConvoMembers   ', userId, roomId);
-    //       const room = await this.prisma.chatroom.findUnique({
-    //         where: {
-    //           id: roomId,
-    //         },
-    //         include: {
-    //           ChatroomUsers: {
-    //             include: {
-    //               user: {
-    //                 select: {
-    //                   id: true,
-    //                   userName: true,
-    //                   photo: true,
-    //                 },
-    //               },
-    //             },
-    //           },
-    //         },
-    //       });
-    //       if (!room) throw new NotFoundException('Room does not exist');
-    
-    //       const userss = room.ChatroomUsers.map((user) => {
-    //         return {
-    //           id: user.user.id,
-    //           userName: user.user.userName,
-    //           photo: user.user.photo,
-    //         };
-    //       });
-    
-    //       if (!userss.find((user) => user.id === userId))
-    //         throw new ForbiddenException('You are not in this room');
-    
-    //       const users = userss.map((user) => {
-    //         if (user.id === userId) {
-    //           return {
-    //             id: user.id,
-    //             name: user.userName,
-    //             photo: user.photo,
-    //             self: true,
-    //           };
-    //         } else {
-        //           return {
-    //             id: user.id,
-    //             name: user.userName,
-    //             photo: user.photo,
-    //             self: false,
-    //           };
-    //         }
-    //       });
-    //     //   console.log("==========> " , users, room.visibility);
-    //       return { visibility: room.visibility, users };
-    //     } catch (error) {
-    //       console.log(error);
-    //     }
-    //   }
-
-
-
       getVisibility(visibility: string): VISIBILITY {
         switch (visibility) {
             case 'DM':
@@ -166,7 +101,7 @@ export class ChatService {
         try {
             const visibility = this.getVisibility(infos.roomType);
             if (infos.pw)
-            infos.pw = await argon.hash(infos.pw)
+                infos.pw = await argon.hash(infos.pw)
 
             const ifRoomExists = await this.prisma.chatroom.findFirst({
                 where: {
@@ -236,8 +171,8 @@ export class ChatService {
             if (!groupChat)
                 throw new ForbiddenException('Room does not exist')
             if (groupChat.password && !await argon.verify(groupChat.password, infos.pw))
-            throw new ForbiddenException('Wrong password')
-        if (groupChat.ChatroomUsers.find(user => user.userId === userId))
+                throw new ForbiddenException('Wrong password')
+            if (groupChat.ChatroomUsers.find(user => user.userId === userId))
                 throw new ForbiddenException('You are already in this room')
             
             const newChatroomUser = await this.prisma.chatroom.update({
@@ -279,6 +214,8 @@ export class ChatService {
                                             id: true,
                                             userName: true,
                                             photo: true,
+                                            blocked: true,
+                                            blocker: true,
                                         }
                                     },
                                     role: true,
@@ -293,25 +230,38 @@ export class ChatService {
                 }
             })
 
+            const blocked = messages.map(msg => {
+                if (msg.messages.find(m => m.sender.user.blocker.find(user => user.blockedId === userId))) {
+                    const id = msg.messages.find(m => m.sender.user.blocker.find(user => user.blockedId === userId)).sender.user.id
+                    return {userId1: userId, userId2: id}
+                }
+                if (msg.messages.find(m => m.sender.user.blocked.find(user => user.blockerId === userId))) {
+                    const id = msg.messages.find(m => m.sender.user.blocked.find(user => user.blockerId === userId)).sender.user.id
+                    return {userId1: userId, userId2: id}
+                }
+            });
+            console.log("bbbbb: ", blocked);
+
             const filtredMessages = await Promise.all(messages.map( async msg => {
                 const { id, name, photo, group, visibility, messages } = msg;
 
                 const msgs = messages.map(msg => {
                     const { content, createdAt, sender } = msg;
                     const { userName, photo } = sender.user;
+                    // console.log("messagessss: ", msg.sender.user.blocked, msg.sender.user.blocker);
 
-                    // TODO: check ckicked and banned users messages
-                    // console.log("messagessss: ", msg);
-                    // if ( msg.sender.user.id === userId )
-                    //     return { userId: msg.sender.user.id, sender: "me", photo, role: sender.role , content, createdAt,  }
+                    if (msg.sender.user.blocker.find(user => user.blockedId === userId) || msg.sender.user.blocked.find(user => user.blockerId === userId))
+                        return null
+                    // if (msg.sender.user.blocked.find(user => user.blockerId === userId))
+                    //     return null
+
                     return { userId: msg.sender.user.id , sender: userName, photo, role: sender.role , content, createdAt,  }
-                })
+                }).filter(msg => msg !== null)
 
                 if (visibility === VISIBILITY.DM) {
-                    // TODO: check name of convo
-                    return { id, name, photo, group, visibility, messages: msgs }
+                    return { id, name, photo, group, visibility, blocked: blocked, messages: msgs }
                 } else
-                    return { id, name, photo, group, visibility, messages: msgs }
+                    return { id, name, photo, group, visibility, blocked: blocked, messages: msgs }
             }))
             return filtredMessages;
         } catch(error) {
@@ -664,54 +614,6 @@ export class ChatService {
         return user;
     }
 
-    // async unmuteMember(userId: number, roomId: number, memberId: number) {
-        //     const user = await this.prisma.chatroomUsers.findFirst({
-    //         where: {
-        //             userId: userId,
-    //             chatroomId: roomId,
-    //         },
-    //         include: {
-    //             chatroom: {
-    //                 include: {
-    //                     ChatroomUsers: true,
-    //                 }
-    //             },
-    //         }
-    //     }).then( async (user) => {
-    //         console.log("user", user.chatroom.ChatroomUsers)
-    //         if (!user)
-    //             throw new NotFoundException('Room does not exist')
-    //         if (user.role !== 'OWNER' && user.role !== 'ADMIN')
-    //             throw new ForbiddenException('You are not allowed to unmute members')
-    //         if (!user.chatroom.ChatroomUsers.find( user => user.userId === memberId))
-    //             throw new ForbiddenException('Member does not exist')
-    //         if (user.chatroom.ChatroomUsers.find( user => user.userId === memberId).isMuted === false)
-    //             throw new ForbiddenException('Member already unmuted')
-
-    //         const chatRoomUserId = user.chatroom.ChatroomUsers.find( user => user.userId === memberId).id;
-
-    //         return await this.prisma.chatroomUsers.update({
-        //             where: {
-            //                 id: chatRoomUserId,
-            //             },
-    //             data: {
-    //                 isMuted: false,
-    //             }
-    //         }).then(() => {
-    //             return { success: true, message: 'Member unmuted' }
-    //         }).catch((error) => {
-    //             console.log(error);
-    //             throw new BadRequestException('Something went wrong')
-    //         })
-    //     }).catch( (error) => {
-    //         if (error instanceof ForbiddenException || error instanceof NotFoundException)
-    //             throw error;
-    //         console.log(error);
-    //     })
-
-    //     return user;
-    // }
-
     async unmutescheduler(): Promise<any> {
         const currentTime = new Date();
         
@@ -924,7 +826,7 @@ export class ChatService {
                 return { role: update.role }
         }).catch( (error) => {
             if (error instanceof ForbiddenException || error instanceof NotFoundException)
-            throw error;
+                throw error;
             console.log(error);
         })
 
@@ -1168,22 +1070,21 @@ export class ChatService {
 
               if (!userInChatroom)
                 throw new Error('User not found in the chat room.');
+            // console.log("chataat: ", userInChatroom)
           
               const newMessage = await this.prisma.message.create({
                 data: {
                     content: message,
-                    senderId: userId,
+                    senderId: userInChatroom.id,
                     chatroomId: roomId,
                 },
               });
           
               await this.prisma.chatroomUsers.update({
-                where: { id: userId },
+                where: { id: userInChatroom.id },
                 data: {
                   messages: {
-                    connect: {
-                      id: newMessage.id,
-                    },
+                    connect: {id: newMessage.id},
                   },
                 },
               });
@@ -1208,7 +1109,7 @@ export class ChatService {
                     chatroomId: roomId,
                 },
             })
-            console.log(user)
+
             if (user) {
                 const { isMuted, isBanned } = user
                 return { isMuted, isBanned }

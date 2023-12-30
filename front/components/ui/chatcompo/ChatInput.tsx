@@ -13,6 +13,7 @@ const socket = io('http://localhost:3001/chat', {
 type Message = {
   userId: number;
   content: string;
+  sender: string;
   createdAt: Date;
   id?: string;
 };
@@ -33,9 +34,10 @@ const ChatInput = (id: any) => {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const [message, setMessage] = useState<string>("");
   const [ oldMessages, setOldMessages]= useState<Message[]>([]);
+  const [blocked, setBlocked] = useState<any>();
   const me = useRef<User>()
   const partners = useRef<User[] | undefined>()
-  const type  = useRef<string>('DM');
+  const [type, setType] = useState<string>('DM');
 
   const fetHistoric = async () => {
     try { 
@@ -45,6 +47,7 @@ const ChatInput = (id: any) => {
         params :  id
       });
       if (response.status === 200) {
+        setBlocked(response.data[0].blocked)
         setOldMessages(response.data[0].messages)
       } else {
         return undefined;
@@ -67,6 +70,7 @@ const ChatInput = (id: any) => {
         params :  id      
       });
       if (response.status === 200) {
+        setType(response.data.visibility);
         const size = Object.keys(response.data.users).length;
         if (size >= 1){
           response.data.users.forEach((user : User) => {
@@ -96,7 +100,8 @@ const ChatInput = (id: any) => {
   
   useEffect(()=> {
     socket.off('reciecved').on('reciecved', (pyload) => {
-      setOldMessages((prevMessages) => [...prevMessages, pyload]);
+      // if ()
+        setOldMessages((prevMessages) => [...prevMessages, pyload]);
 
     });
   }, []);
@@ -106,7 +111,7 @@ const ChatInput = (id: any) => {
     <>
     <div className="w-full h-full grid grid-rows-6">
       <div className="w-full h-full row-start-1 row-span-5">
-        <Messages initialMessages={oldMessages}  me={me.current} roomId={id} />
+        <Messages initialMessages={oldMessages}  me={me.current} roomType={type} blocked={blocked} />
         </div>
         <div className="w-full h-full place-items-center focus-within:ring-indigo-600 row-start-6">
           <div className="w-full h-full flex items-center justify-around">

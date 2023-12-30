@@ -2,7 +2,8 @@
 import React, {useContext, useEffect} from "react";
 import Image from "next/image";
 import Redirect from "@/components/ui/homeComp/Redirect";
-import { Toaster, toast } from "react-hot-toast";
+import {  Toaster, toast } from "react-hot-toast";
+import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/navigation";
 import { SocketContext, ModeContext } from "@/components/game/tools/Contexts";
 
@@ -12,13 +13,14 @@ const Page = () => {
   const router = useRouter();
   const socket = useContext(SocketContext);
   const mode = useContext(ModeContext);
-
+  // toast.configure();
   useEffect(() => {
     socket.off('acceptedInvite').on('acceptedInvite', (pyload: string) => {
-      toast.success(`${pyload} accepted your invitation , let's play !`)
-      setTimeout
+      toast.success(`${pyload} accepted your invitation , let's play !`, )
+      // setTimeout
       mode.updateContextValue('friend');
       router.push('/game/board');
+      toast.remove();
       });
     },[]);
 
@@ -38,13 +40,16 @@ const Page = () => {
           >
             Dismiss
           </button>
-          <button onClick={() => handleAccept(data[1])}
+          <button onClick={
+            () => 
+            handleAccept(data[1])
+          }
           className="border bg-green-500 rounded-ls  px-5 py-1"
           >
             Accept
           </button>
         </span>
-      ));
+      ), {duration: 5000});
     });
     
   }, []);

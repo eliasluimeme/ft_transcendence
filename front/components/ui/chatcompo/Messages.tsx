@@ -8,6 +8,7 @@ import { format } from 'date-fns';
 type Message = {
   userId: number
   content: string
+  sender: string
   createdAt: Date
 }
 
@@ -21,20 +22,23 @@ type  user = {
 interface MessagesProps {
     initialMessages: Message[]
     me: user | undefined
-    roomId: any
+    roomType: any
+    blocked: any
   }
 
   const Messages: FC<MessagesProps> = ({
     initialMessages,
     me,
-    roomId,
+    roomType,
+    blocked
   }) => {
     const scrollDownRef = useRef<HTMLDivElement | null>(null)
-  
+
+    
     const formatTimestamp = (timestamp: Date) => {
       return format(timestamp, 'HH:mm')
     }
-  
+    
     useEffect(() => {
       if (scrollDownRef.current) {
         scrollDownRef.current.scrollIntoView()
@@ -47,7 +51,13 @@ interface MessagesProps {
     <div >
       {
       initialMessages?.map((message) => {
-      const isCurrentUser = message.userId === me?.id;
+        console.log("blicked ", blocked)
+        console.log("sender ID " , me?.id)
+        const isCurrentUser = message.userId === me?.id;
+        console.log("includes", blocked.find((u: any) => u.userId1 === message.userId)?.userId2)
+      if (blocked.includes(message.userId)) 
+        return null
+      else {
   
       return (
         <div
@@ -56,6 +66,11 @@ interface MessagesProps {
         
           key={`${message.createdAt}`}
         >
+          {
+            roomType !== 'DM' ? (
+              <div> {message.sender} </div>
+            ) : null
+          }
           <div
             className={cn("flex items-end", {
               "justify-end": isCurrentUser,
@@ -109,7 +124,7 @@ interface MessagesProps {
           </div>
         </div>
       );
-    })
+    } } )
       }
       </div>
       </div>
