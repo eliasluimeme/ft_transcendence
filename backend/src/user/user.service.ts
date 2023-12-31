@@ -984,8 +984,6 @@ export class UserService {
 
   async setAchievements(winner: any, looser: any) {
     try {
-      console.log('setAchievements', winner)
-      console.log('looser', looser)
       const w = await this.prisma.user.findUnique({
         where: {
           intraId: winner.id,
@@ -1003,8 +1001,6 @@ export class UserService {
         }
       })
   
-      console.log(w, l)
-  
       const wr = w.achievements.map((a: boolean, index) => {
         if (a === false && winner.achievs[index] === true)
           return true;
@@ -1019,7 +1015,6 @@ export class UserService {
         else return false
       })
 
-      console.log(w, l)
       await this.prisma.user.update({
         where: {
           intraId: winner.id,

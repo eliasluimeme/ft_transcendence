@@ -94,7 +94,6 @@ async handleConnection(client: Socket) {
   handleDisconnect(client: Socket) {
     delete this.userToClient[client.id];
     this.disconnect(client);
-    console.log('disconnected', client.id);
   }
 
   private disconnect(client: Socket) {

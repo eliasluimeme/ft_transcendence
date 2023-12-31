@@ -1,8 +1,8 @@
 import React from 'react'
 import { useRouter } from 'next/navigation';
+import { socket } from '@/components/game/tools/SocketCtxProvider';
 
 const Loading = (props:any) => {
-  const socket = props.socket;
   const router = useRouter();
 
   const cancelMatching = () => {

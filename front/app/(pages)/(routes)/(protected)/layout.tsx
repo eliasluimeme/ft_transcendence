@@ -5,7 +5,7 @@ import { useState,useEffect, useContext } from "react";
 import { useRouter } from "next/navigation";
 import { usePathname } from 'next/navigation'
 import { ModeCtxProvider } from "@/components/game/tools/ModeCtxProvider";
-import { SocketContext } from "@/components/game/tools/Contexts";
+import { socket} from "@/components/game/tools/SocketCtxProvider";
 
 
 export default function StartLayout({
@@ -45,10 +45,8 @@ export default function StartLayout({
         router.push('/users/notfound');
     }
   };
-  const socket = useContext(SocketContext);
   useEffect( () => {
     return(() => {
-      socket?.disconnect();
     });
   }, []);
 

@@ -12,7 +12,6 @@ import {socket} from "@/components/game/tools/SocketCtxProvider"
 export default function Page() {
   const [status, setStatus] = useState(0);
   const modectx = useContext(ModeContext);
-  const ismounted = useRef(false);
   const [data, setData] = useState<any>();
   const [self, setSelf] = useState<any>();
   const me = useRef({side: 'left', userName: "", photo: ""});
