@@ -95,7 +95,7 @@ const ChatInput = (id: any) => {
   };
   
   useEffect(()=> {
-    socket.off('reciecved').on('reciecved', (pyload) => {
+    socket?.off('reciecved').on('reciecved', (pyload) => {
       setOldMessages((prevMessages) => [...prevMessages, pyload]);
 
     });

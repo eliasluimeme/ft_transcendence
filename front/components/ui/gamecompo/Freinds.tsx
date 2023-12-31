@@ -4,9 +4,10 @@ import * as React from "react";
 import "@/components/ui/CSS/game.css";
 import axios from "axios";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { SocketContext, ModeContext } from "@/components/game/tools/Contexts";
+import { ModeContext } from "@/components/game/tools/Contexts";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import {socket} from "@/components/game/tools/SocketCtxProvider"
 
 type freind = {
   intraId: string;
@@ -18,8 +19,6 @@ const GetFriends = () => {
   const router = useRouter();
   const [freind, setfreind] = useState<freind[]>([]);
   const [me, setMe] = useState<freind>()
-
-  const socket = useContext(SocketContext);
   const mode = useContext(ModeContext);
 
   //////////////////////// Invit Friend to play with  ///////////////////////////////
@@ -30,7 +29,7 @@ const GetFriends = () => {
     };
     
     useEffect(() => {
-      socket.off('acceptedInvite').on('acceptedInvite', (pyload: string) => {
+      socket?.off('acceptedInvite').on('acceptedInvite', (pyload: string) => {
         toast.success(`${pyload} accepted your invitation , let's play !`)
         mode.updateContextValue('friend');
         router.push('/game/board');
@@ -53,7 +52,7 @@ const GetFriends = () => {
       } 
       
     useEffect(() => {
-      socket.off('inviteEvent').on('inviteEvent', (data : any) => {
+      socket?.off('inviteEvent').on('inviteEvent', (data : any) => {
         console.log('Im here inside useEffect !', data);
          toast(() => (
           <span>

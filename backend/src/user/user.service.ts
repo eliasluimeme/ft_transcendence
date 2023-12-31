@@ -71,11 +71,26 @@ export class UserService {
     }
   }
 
+  async getStatus(userId: number) {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
+      });
+
+      if (user) return user.status;
+    } catch (error) {
+      console.error('Error getting user level: ', error);
+    }
+  }
+
   async getProfile(user: any): Promise<any> {
     try {
       const userLevel = await this.getUserLevel(user.id);
       const userRank = await this.getUserRank(userLevel);
       const matchs = await this.getMatchHistory(user.id);
+      const status = await this.getStatus(user.id);
 
       const matchHistory = await Promise.all(
         matchs.map(async (match) => {
@@ -121,6 +136,7 @@ export class UserService {
         level: userLevel,
         achievements,
         match: matchHistory,
+        status: status,
       };
     } catch (error) {
       console.log('error getting profile: ', error);
@@ -280,6 +296,20 @@ export class UserService {
         }
     }
 
+    async updateIntraUser(id: string, newData: any ): Promise<any> {
+      try {
+          const user = await this.prisma.user.update({
+              where: {
+                  intraId: id,
+              },
+              data: newData,
+          });
+          return user;
+      } catch (error) {
+          console.error('Error updating user: ', error);
+      }
+  }
+
     async findUserByIntraId(userId: string): Promise<any> {
         try {
             const user = await this.prisma.user.findUnique({
@@ -407,6 +437,7 @@ export class UserService {
 
         if (foundUser) {
           const rank = await this.getUserRank(user.level.level);
+          const status = await this.getStatus(user.id);
 
           if (foundUser.id === user.id)
             return {
@@ -416,6 +447,7 @@ export class UserService {
               photo: foundUser.photo,
               rank: rank,
               self: true,
+              status: status, 
             };
           // else if (foundUser.blocker.find(block => block.blockedId === foundUser.id))
           //     return { id: foundUser.id, userName: foundUser.userName, fullName: foundUser.fullName, photo: foundUser.photo, rank: rank, block: true };
@@ -434,6 +466,7 @@ export class UserService {
               photo: foundUser.photo,
               rank: rank,
               friend: foundUser.sentRequests[0].status,
+              status: status, 
             };
           else if (
             foundUser.receivedRequests &&
@@ -448,6 +481,7 @@ export class UserService {
               photo: foundUser.photo,
               rank: rank,
               friend: foundUser.receivedRequests[0].status,
+              status: status,
             };
           else
             return {
@@ -457,6 +491,7 @@ export class UserService {
               photo: foundUser.photo,
               rank: rank,
               friend: 'NONE',
+              status: status,
             };
         } else throw new NotFoundException('User not found');
       } catch (error) {

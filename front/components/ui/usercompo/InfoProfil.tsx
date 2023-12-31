@@ -223,7 +223,7 @@ const InfoProfil = (id: any) => {
   };
   return (
     <div className="w-full h-full grid grid-cols-12">
-      <div className="w-full h-full col-start-1 col-span-4">
+      <div className="w-full h-full col-start-1 col-span-4 ">
         <ImageStatu data={data} />
       </div>
       <div className="w-full h-full col-start-5 flex items-center justify-center">

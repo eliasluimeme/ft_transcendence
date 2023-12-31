@@ -71,16 +71,16 @@ export class GameGateway implements OnGatewayInit{
     const online = this.online.get(client.data);
     const looser: Player = this.players.get(client.data);
     this.online.delete(client.data);
+    this.userservice.updateIntraUser(client.data, {
+      status: 'OFFLINE',
+    });
     if (!looser)
       return;
     if (looser)
     {
       this.rooms.get(looser.roomid).clearTimers();
-      this.removeRoom(looser.roomid, true);
+      this.removeRoom(looser.roomid, true, looser.id);
     }
-    // this.userservice.updateUser(parseInt(client.data), {
-    //   status: 'OFFLINE',
-    // });
   }
   async handleConnection(client: Socket) {
 
@@ -93,9 +93,9 @@ export class GameGateway implements OnGatewayInit{
       return;
     this.online.set(client.data, client.id);
     this.logger.warn("Player: ", client.data, "is connected");
-    // this.userservice.updateUser(parseInt(client.data), {
-    //   status: 'ONLINE',
-    // })
+    this.userservice.updateIntraUser(client.data, {
+      status: 'ONLINE',
+    })
   }
 
 // add new room functions
@@ -125,6 +125,9 @@ export class GameGateway implements OnGatewayInit{
     };
     this.rooms.set(player.id,new GameService(room));
     this.server.to(player.sock).emit('roomCreated', {side: 'left', oppName: "Bot", oppPhoto: "http://localhost:3001/bg.png"});
+    this.userservice.updateIntraUser(player.id, {
+      status: 'INGAME',
+    });
     this.rooms.get(player.id).resetBoard();
   }
   @SubscribeMessage('newRandomGame')
@@ -169,6 +172,12 @@ export class GameGateway implements OnGatewayInit{
     this.rooms.set(player1.id,new GameService(room));
     this.server.to(player1.sock).emit('roomCreated', {side: 'left', oppName: (await user2).userName, oppPhoto: (await user2).photo});
     this.server.to(player2.sock).emit('roomCreated', {side: 'right', oppName: (await user1).userName, oppPhoto: (await user1).photo});
+    this.userservice.updateIntraUser(player1.id, {
+      status: 'INGAME',
+    });
+    this.userservice.updateIntraUser(player2.id, {
+      status: 'INGAME',
+    });
     this.rooms.get(player1.id).resetBoard();
   }
   @SubscribeMessage('joinGame')
@@ -177,19 +186,21 @@ export class GameGateway implements OnGatewayInit{
     if (!online1 || online1 != client.id)
       return;
     const pready = this.players.get(client.data);
-    if (this.rooms.has(pready.roomid))
-      console.log("Ys room kayna");
     const startgame = this.rooms.get(pready.roomid).isReady(client.data);
-    console.log(startgame);
     if (startgame === false)
       return;
     const player1 = this.players.get(startgame.player1);
     const player2 = this.players.get(startgame.player2);
     const user1 = this.findUserByIntraId(player1.id);
     const user2 = this.findUserByIntraId(player2.id);
-    console.log(player1.sock, player2.sock);
     this.server.to(player1.sock).emit('roomCreated', {side: 'left', oppName: (await user2).userName, oppPhoto: (await user2).photo});
     this.server.to(player2.sock).emit('roomCreated', {side: 'right', oppName: (await user1).userName, oppPhoto: (await user1).photo});
+    this.userservice.updateIntraUser(player1.id, {
+      status: 'INGAME',
+    });
+    this.userservice.updateIntraUser(player2.id, {
+      status: 'INGAME',
+    });
     this.rooms.get(player1.id).resetBoard();
   }
 
@@ -202,7 +213,7 @@ export class GameGateway implements OnGatewayInit{
       return;
     }
     if(this.rooms.get(player.roomid).getRoomStatus() == "closed") {
-      this.removeRoom(player.roomid, false);
+      this.removeRoom(player.roomid, false, '');
       return;
     }
     const board = this.rooms.get(player.roomid).updateBoard(player.id, y);
@@ -221,7 +232,7 @@ export class GameGateway implements OnGatewayInit{
     if (!looser)
       return;
     this.rooms.get(looser.roomid).clearTimers();
-    this.removeRoom(looser.roomid, true);
+    this.removeRoom(looser.roomid, true, looser.id);
   }
 
 // Invite functions
@@ -259,31 +270,24 @@ handelAccept(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
 }
 
 // remove room and update db function
-  async removeRoom(roomid: string, disconnect: boolean) {
+  async removeRoom(roomid: string, disconnect: boolean, looserid: string) {
       
-    const rslts = this.rooms.get(roomid).roomRslts();
-    // this.logger.error("room is removed.");
+    const rslts = this.rooms.get(roomid).roomRslts(disconnect, looserid);
     if (rslts.winner.id)
     {
       this.players.delete(rslts.winner.id);
-      if (disconnect)
-        this.server.to(rslts.winner.sock).emit('goback', "win");
-      else
-        this.server.to(rslts.winner.sock).emit('goback', "win");
-      // this.userservice.updateUser(parseInt(rslts.winner.id), {
-      //   status: 'ONLINE',
-      // });
+      this.server.to(rslts.winner.sock).emit('goback', "win");
+      this.userservice.updateIntraUser(rslts.winner.id, {
+        status: 'ONLINE',
+      });
     }
     if (rslts.looser.id)
     {
       this.players.delete(rslts.looser.id);
-      if (disconnect)
-        this.server.to(rslts.looser.sock).emit('goback', "lost");
-      else
-        this.server.to(rslts.looser.sock).emit('goback', "lost");
-      // this.userservice.updateUser(parseInt(rslts.looser.id), {
-      //   status: 'ONLINE',
-      // });
+      this.server.to(rslts.looser.sock).emit('goback', "lost");
+      this.userservice.updateIntraUser(rslts.looser.id, {
+        status: 'ONLINE',
+      });
     }
     if (rslts.looser.id && rslts.winner.id) {
       this.userservice.addToGameHistory({

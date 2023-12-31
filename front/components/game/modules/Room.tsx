@@ -2,9 +2,9 @@ import React, { useEffect, useRef, useState} from 'react'
 import BoardLeftSide from '../elements/BoardLeftSide';
 import BoardRightSide from '../elements/BoardRightSide';
 import {BoardInfo} from '@/components/game/interfaces/data';
+import {socket} from "@/components/game/tools/SocketCtxProvider"
 
 const Room = (props:any) => {
-  const socket = props.socket;
   const opp = {userName: props.data.oppName, photo: props.data.oppPhoto};
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const parentRef = useRef<HTMLDivElement | null>(null);
@@ -15,17 +15,18 @@ const Room = (props:any) => {
   const [isChanged, newChange] = useState(0);
   const [scores, setScores] = useState({lscore:0, rscore:0});
 
-  const setBoardSize = () => {
+  const setBoardSize = async () => {
     const canvas = canvasRef.current!;
     const parent = parentRef.current!;
     const { width, height } = parent.getBoundingClientRect();
     boardSize.current = {width:Math.round(width), height: Math.round(height)};
     canvas.width = boardSize.current.width;
     canvas.height = boardSize.current.height;
-    if (props.me.side == 'left')
-      oppadel.current.x = boardSize.current.width - 15;
-    else
-      mypadel.current.x = boardSize.current.width - 15;
+    // if (props.me.side == 'left')
+    // x  oppadel.current.x = boardSize.current.width - ((5 * boardSize.current.width) / 500);
+    // else
+    //   mypadel.current.x = boardSize.current.width - ((5 * boardSize.current.width) / 500);
+    // console.log(boardSize.current, oppadel, mypadel);
     //newChange(prev => prev + 1);
   };
 
@@ -34,8 +35,12 @@ const Room = (props:any) => {
     const ctx = canvas.getContext('2d')!;
     ctx.clearRect(0, 0, boardSize.current.width, boardSize.current.height);
     ctx.fillStyle = "Gray";
-    ctx.fillRect(mypadel.current.x, mypadel.current.y, 15, 100);
-    ctx.fillRect(oppadel.current.x, oppadel.current.y, 15, 100);
+    if (props.me.side == 'left')
+      oppadel.current.x = boardSize.current.width - ((5 * boardSize.current.width) / 500);
+    else
+      mypadel.current.x = boardSize.current.width - ((5 * boardSize.current.width) / 500);
+    ctx.fillRect(mypadel.current.x, mypadel.current.y, (5 * boardSize.current.width) / 500, (100 * boardSize.current.height) / 500);
+    ctx.fillRect(oppadel.current.x, oppadel.current.y, (5 * boardSize.current.width) / 500, (100 * boardSize.current.height) / 500);
     drawCircle(ball.current.x, ball.current.y, 10);
   }
 
@@ -60,29 +65,30 @@ const Room = (props:any) => {
         mypadel.current.y = 0;
       //newChange(prev => prev + 1);
     }
-    else if(event.key == 'ArrowDown' && mypadel.current.y + 100 != boardSize.current.height)
+    else if(event.key == 'ArrowDown' && mypadel.current.y + (100 * boardSize.current.height) / 500 != boardSize.current.height)
     {
-      if(mypadel.current.y + 150 < boardSize.current.height)
+      if(mypadel.current.y + 50 < boardSize.current.height)
         mypadel.current.y += 50;
       else
-        mypadel.current.y = boardSize.current.height - 100;
+        mypadel.current.y = boardSize.current.height - ((100 * boardSize.current.height) / 500);
       //newChange(prev => prev + 1);
     }
   }
 
 
   useEffect( () => {
+    setBoardSize();
+    console.log(boardSize.current.width,oppadel.current.x);
     var timer:any;
     const updateCanvas = () => {newChange(prev => prev + 1)};
-    setBoardSize();
     window.addEventListener('resize', setBoardSize);
     window.addEventListener('keydown', handleArrowKeys);
     if(props.me.side == 'left') {
       mypadel.current.x = 0;
-      oppadel.current.x = boardSize.current.width - 15;
+      oppadel.current.x = boardSize.current.width - 5;
     }
     else {
-      mypadel.current.x = boardSize.current.width - 15;
+      mypadel.current.x = boardSize.current.width - 5;
       oppadel.current.x = 0;
     }
     const sendData = () => {

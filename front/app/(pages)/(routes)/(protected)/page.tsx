@@ -5,16 +5,16 @@ import Redirect from "@/components/ui/homeComp/Redirect";
 import { Toaster, toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { SocketContext, ModeContext } from "@/components/game/tools/Contexts";
+import {socket} from "@/components/game/tools/SocketCtxProvider"
 
 
 
 const Page = () => {
   const router = useRouter();
-  const socket = useContext(SocketContext);
   const mode = useContext(ModeContext);
 
   useEffect(() => {
-    socket.off('acceptedInvite').on('acceptedInvite', (pyload: string) => {
+    socket?.off('acceptedInvite').on('acceptedInvite', (pyload: string) => {
       toast.success(`${pyload} accepted your invitation , let's play !`)
       setTimeout
       mode.updateContextValue('friend');
@@ -29,7 +29,7 @@ const Page = () => {
   };
 
   useEffect(() => {
-    socket.off('inviteEvent').on('inviteEvent', (data : any) => {
+    socket?.off('inviteEvent').on('inviteEvent', (data : any) => {
        toast(() => (
         <span>
           <b>{data[0].senderName} invited you to play Pong ! </b>
