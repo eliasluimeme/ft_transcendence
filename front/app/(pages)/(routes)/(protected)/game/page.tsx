@@ -4,7 +4,6 @@ import "@/components/ui/CSS/game.css";
 import Random from "@/components/ui/gamecompo/Random";
 import Freinds from "@/components/ui/gamecompo/Freinds";
 import Bot from "@/components/ui/gamecompo/Bot";
-import Map from "@/components/ui/gamecompo/Map";
 
 const page = () => {
   return (
@@ -23,9 +22,6 @@ const page = () => {
                 <Bot />
               </div>
             </div>
-            {/* <div className="w-[94%] h-[91%] border rounded-lg col-start-6  row-start-3 row-span-4">
-              <Map></Map>
-            </div> */}
           </div>
         </div>
       </div>

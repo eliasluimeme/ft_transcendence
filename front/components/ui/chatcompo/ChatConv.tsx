@@ -15,7 +15,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import 'react-toastify/dist/ReactToastify.css';
-import { SocketContext } from "@/components/game/tools/Contexts";
+import {socket} from "@/components/game/tools/SocketCtxProvider"
 
 interface Members {
   id: number;
@@ -26,7 +26,6 @@ interface Members {
 
 function ChatConv(oldeId: any) {
   const [update, toupdate] = useState<number>(0);
-  const socket = useContext(SocketContext);
   const router = useRouter();
   const [roomName, setRoomName] = useState<string>('');
   const [senderInvit, setSenderInvit] = useState<any>({});

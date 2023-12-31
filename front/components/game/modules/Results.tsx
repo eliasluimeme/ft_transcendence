@@ -4,7 +4,6 @@ import { Lose } from '../elements/Lose'
 import { Disco } from '../elements/Disco'
 
 const Results = (props:any) => {
-  console.log(props.rslt);
   if (props.rslt === "win")
     return (
       <div className='w-full h-full'>

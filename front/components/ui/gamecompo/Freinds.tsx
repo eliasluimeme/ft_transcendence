@@ -4,7 +4,9 @@ import * as React from "react";
 import "@/components/ui/CSS/game.css";
 import axios from "axios";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { SocketContext, ModeContext } from "@/components/game/tools/Contexts";
+;
+import {socket} from "@/components/game/tools/SocketCtxProvider"
+import { ModeContext } from "@/components/game/tools/Contexts";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -20,7 +22,6 @@ const GetFriends = () => {
   const [freind, setfreind] = useState<freind[]>([]);
   const [me, setMe] = useState<freind>()
 
-  const socket = useContext(SocketContext);
   const mode = useContext(ModeContext);
 
   //////////////////////// Invit Friend to play with  ///////////////////////////////
