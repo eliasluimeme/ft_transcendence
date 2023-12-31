@@ -55,6 +55,7 @@ export default function Page() {
         }
 
         socket.on('goback', (reason: string) => {
+          console.log(reason);
           gameRslts.current = reason;
           setStatus(2);
         });

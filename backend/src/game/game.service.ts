@@ -24,7 +24,7 @@ export class GameService {
     vec: {x: 0, y: 0},
     rad: 10,
     speed: 2,
-    repete: 12,
+    repete: 16,
     timer: '',
     dir: 'left',
   }
@@ -107,7 +107,7 @@ export class GameService {
     this.ball.cords = {x: 250, y: 250};
     this.lplayer.padely = 0;
     this.rplayer.padely = 5;
-    this.ball.repete = 12;
+    this.ball.repete = 16;
     this.clearTimers();
     this.resetTimers();
   }
@@ -221,17 +221,17 @@ export class GameService {
     if (this.ball.dir == 'left')
     {
       this.calculVecs(angle);
-      if (this.ball.repete < 5)
+      if (this.ball.repete < 6)
         this.lplayer.quickRef++;
     }
     else
     {
       this.calculVecs(180 - angle);
-      if (this.ball.repete < 10)
+      if (this.ball.repete < 6)
         this.rplayer.quickRef++;
     }
-    if (this.ball.repete > 10)
-      this.ball.repete-= 1;
+    if (this.ball.repete > 5)
+      this.ball.repete-= 2;
     clearInterval(this.ball.timer);
     this.ball.timer = setInterval(this.moveBall.bind(this), this.ball.repete);
     clearInterval(this.colTimers.padel);

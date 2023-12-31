@@ -106,7 +106,7 @@ const Room = (props:any) => {
       setScores({lscore:board.lscore, rscore: board.rscore});
       //newChange(prev => prev + 1);
     });
-    var updater = setInterval(updateCanvas, 16);
+    var updater = setInterval(updateCanvas, 5);
     timer = setInterval(sendData, 16);
     return () => {
       window.removeEventListener('resize', setBoardSize);
