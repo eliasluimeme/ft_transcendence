@@ -28,9 +28,9 @@ function ChatConv(oldeId: any) {
   const [update, toupdate] = useState<number>(0);
   const socket = useContext(SocketContext);
   const router = useRouter();
-  const [roomName , setRoomName] = useState<string>('');
+  const [roomName, setRoomName] = useState<string>('');
   const [senderInvit, setSenderInvit] = useState<any>({});
-  const [recieverInvit , setRecieverInvit] = useState<any>({});
+  const [recieverInvit, setRecieverInvit] = useState<any>({});
 
   const id = oldeId['id']
   // console.log("id", id);
@@ -117,8 +117,8 @@ function ChatConv(oldeId: any) {
       if (response.status === 200) {
         setTypofRoom(response.data.visibility);
         setRoomName(response.data.roomName);
-        const reciever  = response.data.users.find((u: any)  => u.self === false)
-        const me = response.data.users.find((u: any)  => u.self === true);
+        const reciever = response.data.users.find((u: any) => u.self === false)
+        const me = response.data.users.find((u: any) => u.self === true);
         if (reciever)
           setRecieverInvit(reciever);
         if (me)
@@ -132,7 +132,7 @@ function ChatConv(oldeId: any) {
   }
   useEffect(() => {
     fetchRoomData();
-  },[id])
+  }, [id])
 
   const [muteStatue, setMuteStatu] = useState<boolean | undefined>(false);
   const [admine, setAdmine] = useState<boolean>(false);
@@ -495,212 +495,216 @@ function ChatConv(oldeId: any) {
     }
   };
 
-    //////////////////////// Invit Friend to play with  ///////////////////////////////
+  //////////////////////// Invit Friend to play with  ///////////////////////////////
 
-      const invitToPlay = () => {
-        const send = {
-          recieverId : recieverInvit.intraId,
-          senderName: senderInvit.name,
-        }
+  const invitToPlay = () => {
+    const send = {
+      recieverId: recieverInvit.intraId,
+      senderName: senderInvit.name,
+    }
 
-        const recieve = {
-          senderId : senderInvit.intraId, 
-          accepterName: recieverInvit.name,
-        }
-        socket.emit('inviteEvent', send , recieve);
-      } 
+    const recieve = {
+      senderId: senderInvit.intraId,
+      accepterName: recieverInvit.name,
+    }
+    socket.emit('inviteEvent', send, recieve);
+  }
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   return (
-    <div className="h-full w-full  grid grid-rows-6 ">
-      <div className="w-full h-full row-start-1 row-span-1  flex items-center justify-center space-x-4">
-        <div className=" w-[90%] h-[30%] bg-[#F87B3F] rounded-lg grid grid-cols-3">
+    <div className="h-full w-full  grid grid-rows-6">
+      <div className="w-full h-full row-start-1 row-span-1 flex items-center justify-center px-4 md:px-8">
+        <div className="w-full h-[30%] bg-[#F87B3F] rounded-lg grid grid-cols-3 px-4">
           <div className="text-xl text-[12px] col-start-1 col-span-1 flex items-center">
             {typeofRoom == "DM" ? (
-                <button className="ml-[5px] text-opacity-[30%] hover:text-opacity-[100%]" // TODO fetch data 
-                onClick={ () => 
-                  router.push('/users?search=' + roomName) }
-                  >
+              <button className="capitalize ml-[5px] text-opacity-[30%] hover:text-opacity-[100%]" // TODO fetch data 
+                onClick={() =>
+                  router.push('/users?search=' + roomName)}
+              >
                 {roomName}
-                </button>
-            ):(
+              </button>
+            ) : (
               <div className="ml-[5px] text-opacity-[30%] hover:text-opacity-[100%]" > {roomName} </div>
             )}
           </div>
           <div className="col-start-3 col-span-1 flex justify-end space-x-5 items-center mr-[8px]">
-            <button 
-              className="w-[50px] border flex items-center justify-center rounded-lg bg-[#36393E] bg-opacity-25 hover:bg-opacity-60"
-              onClick={() => {
-                invitToPlay()
-              }}
-              >
-              <FaGamepad />
-            </button>
-            <Popover>
-              <PopoverTrigger className="w-[20px] flex items-center justify-center  ">
-                <HiDotsVertical className="" />
-              </PopoverTrigger>
-              <PopoverContent className="w-[500px]  bg-[#1E2124] text-white">
-                {rol ? (
-                  <div className="space-y-4">
-                    {/* ///////////////////room owner/////////////////// */}
-                    <div className="flex items-center justify-center space-x-6 border bg-[#F87B3F] rounded-lg">
-                      <div>Owner :</div>
-                      <Avatar className="">
-                        <AvatarImage src={Owner} />
-                        <AvatarFallback>owner image</AvatarFallback>
-                      </Avatar>
-                    </div>
-                    {/* ///////////////////////////////////////////// */}
-                    {/* ///////////////room Admines////////////////////////////// */}
-                    <div className="flex justify-center items-center space-x-3  border-b h-[80px]">
-                      <div>Admins :</div>
-                      {admins?.map((adminImageUrl, index) => (
-                        <div key={index}>
-                          <Avatar className="">
-                            <AvatarImage src={adminImageUrl} />
-                            <AvatarFallback>{`Admin ${
-                              index + 1
-                            }`}</AvatarFallback>
-                          </Avatar>
-                        </div>
-                      ))}
-                    </div>
-                    <div>
-                      <div className="flex items-center justify-center mb-[4px]">
-                        <Popover>
-                          <PopoverTrigger className="border w-[30%] h-[30px] rounded-lg text-[10px] text-white">
-                            Members
-                          </PopoverTrigger>
-                          <PopoverContent className=" w-[100px]">
-                            {members.map((memberdata, index) => (
-                              <button
-                                key={index}
-                                onClick={() => makeModifications(memberdata)}
-                              >
-                                {memberdata.nickname}
-                              </button>
-                            ))}
-                          </PopoverContent>
-                        </Popover>
+            {
+              typeofRoom == "DM" ? (
+
+                <button
+                  className="py-3 w-[50px] border flex items-center justify-center rounded-lg bg-[#36393E] bg-opacity-25 hover:bg-opacity-40"
+                  onClick={() => {
+                    invitToPlay()
+                  }}
+                >
+                  <FaGamepad />
+                </button>
+              ) : (<Popover>
+                <PopoverTrigger className="w-[20px] flex items-center justify-center  ">
+                  <HiDotsVertical className="" />
+                </PopoverTrigger>
+                <PopoverContent className="w-[500px]  bg-[#1E2124] text-white">
+                  {rol ? (
+                    <div className="space-y-4">
+                      {/* ///////////////////room owner/////////////////// */}
+                      <div className="flex items-center justify-center space-x-6 border bg-[#F87B3F] rounded-lg">
+                        <div>Owner :</div>
+                        <Avatar className="">
+                          <AvatarImage src={Owner} />
+                          <AvatarFallback>owner image</AvatarFallback>
+                        </Avatar>
                       </div>
-                      {exist ? (
-                        <div className="flex flex-col space-y-4 items-center justify-center">
-                          <div className="w-[70px] h-[70px] flex items-center justify-center">
+                      {/* ///////////////////////////////////////////// */}
+                      {/* ///////////////room Admines////////////////////////////// */}
+                      <div className="flex justify-center items-center space-x-3  border-b h-[80px]">
+                        <div>Admins :</div>
+                        {admins?.map((adminImageUrl, index) => (
+                          <div key={index}>
                             <Avatar className="">
-                              <AvatarImage src={data?.memberImage} />
-                              <AvatarFallback>{data?.id}</AvatarFallback>
+                              <AvatarImage src={adminImageUrl} />
+                              <AvatarFallback>{`Admin ${index + 1
+                                }`}</AvatarFallback>
                             </Avatar>
                           </div>
-                          <div className="flex  space-x-1 items-center justify-around">
-                            <button
-                              onClick={() => postmute()}
-                              className="w-[80px] bg-[#F87B3F] rounded-lg bg-opacity-50 hover:bg-opacity-100"
-                            >
-                              {muteStatue ? <div>unmute</div> : <div>mute</div>}
-                            </button>
-                            <button
-                              onClick={() => postkick()}
-                              className="w-[80px] bg-[#F87B3F] rounded-lg bg-opacity-50 hover:bg-opacity-100"
-                            >
-                              kick
-                            </button>
-                            <button
-                              onClick={() => postban()}
-                              className="w-[80px] bg-[#F87B3F] rounded-lg bg-opacity-50 hover:bg-opacity-100"
-                            >
-                              ban
-                            </button>
-                            {admine ? (
-                              <div></div>
-                            ) : (
+                        ))}
+                      </div>
+                      <div>
+                        <div className="flex items-center justify-center mb-[4px]">
+                          <Popover>
+                            <PopoverTrigger className="border w-[30%] h-[30px] rounded-lg text-[10px] text-white">
+                              Members
+                            </PopoverTrigger>
+                            <PopoverContent className=" w-[100px]">
+                              {members.map((memberdata, index) => (
+                                <button
+                                  key={index}
+                                  onClick={() => makeModifications(memberdata)}
+                                >
+                                  {memberdata.nickname}
+                                </button>
+                              ))}
+                            </PopoverContent>
+                          </Popover>
+                        </div>
+                        {exist ? (
+                          <div className="flex flex-col space-y-4 items-center justify-center">
+                            <div className="w-[70px] h-[70px] flex items-center justify-center">
+                              <Avatar className="">
+                                <AvatarImage src={data?.memberImage} />
+                                <AvatarFallback>{data?.id}</AvatarFallback>
+                              </Avatar>
+                            </div>
+                            <div className="flex  space-x-1 items-center justify-around">
                               <button
-                                onClick={() => postadmine()}
+                                onClick={() => postmute()}
                                 className="w-[80px] bg-[#F87B3F] rounded-lg bg-opacity-50 hover:bg-opacity-100"
                               >
-                                admine
+                                {muteStatue ? <div>unmute</div> : <div>mute</div>}
                               </button>
-                            )}
+                              <button
+                                onClick={() => postkick()}
+                                className="w-[80px] bg-[#F87B3F] rounded-lg bg-opacity-50 hover:bg-opacity-100"
+                              >
+                                kick
+                              </button>
+                              <button
+                                onClick={() => postban()}
+                                className="w-[80px] bg-[#F87B3F] rounded-lg bg-opacity-50 hover:bg-opacity-100"
+                              >
+                                ban
+                              </button>
+                              {admine ? (
+                                <div></div>
+                              ) : (
+                                <button
+                                  onClick={() => postadmine()}
+                                  className="w-[80px] bg-[#F87B3F] rounded-lg bg-opacity-50 hover:bg-opacity-100"
+                                >
+                                  admine
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        ) : (
+                          <div></div>
+                        )}
+                      </div>
+                      {/* ///////////////////////////////////////////// */}
+                      <div className="flex items-center justify-center space-x-4 border h-[50px] rounded-lg">
+                        <div className="text-[14px]">ADD friend : </div>
+                        <input
+                          type="text"
+                          value={frdName}
+                          onChange={handleFrNme}
+                          className="border-color: rgb(255 255 255) bg-transparent border rounded-full text-[15px]  border-gray-500 text-gray-500"
+                        />
+                        <div className="flex h-[30px] w-[100px] bg-[#F77B3F] bg-opacity-50 hover:bg-opacity-100 rounded-lg ">
+                          <button
+                            onClick={() => send_data()}
+                            className="w-full h-full text-[13px]  "
+                          >
+                            ADD
+                          </button>
+                        </div>
+                      </div>
+                      {typeofRoom === 'PROTECTED' ? (
+                        <div className="flex items-center justify-center space-x-4 border h-[50px] rounded-lg p-2px">
+                          <div className="text-[10px]">change password : </div>
+                          <input
+                            type="text"
+                            value={newPassword}
+                            onChange={handleNewPassword}
+                            className="border-color: rgb(255 255 255) bg-transparent border rounded-full text-[15px]  border-gray-500 text-gray-500"
+                          />
+                          <div className="flex h-[30px] w-[100px] bg-[#F77B3F] bg-opacity-50 hover:bg-opacity-100 rounded-lg ">
+                            <button
+                              onClick={() => sendNewPassword()}
+                              className="w-full h-full text-[9px]"
+                            >
+                              change
+                            </button>
+                          </div>
+                          <div className="flex h-[30px] w-[100px] bg-[#F77B3F] bg-opacity-50 hover:bg-opacity-100 rounded-lg ">
+                            <button
+                              onClick={() => deleatPassword()}
+                              className="w-full h-full text-[9px]"
+                            >
+                              delete password
+                            </button>
                           </div>
                         </div>
                       ) : (
                         <div></div>
                       )}
-                    </div>
-                    {/* ///////////////////////////////////////////// */}
-                    <div className="flex items-center justify-center space-x-4 border h-[50px] rounded-lg">
-                      <div className="text-[14px]">ADD friend : </div>
-                      <input
-                        type="text"
-                        value={frdName}
-                        onChange={handleFrNme}
-                        className="border-color: rgb(255 255 255) bg-transparent border rounded-full text-[15px]  border-gray-500 text-gray-500"
-                      />
-                      <div className="flex h-[30px] w-[100px] bg-[#F77B3F] bg-opacity-50 hover:bg-opacity-100 rounded-lg ">
+                      <div className="flex items-center justify-center">
                         <button
-                          onClick={() => send_data()}
-                          className="w-full h-full text-[13px]  "
+                          onClick={() => posleave()}
+                          className="w-[80px]  rounded-lg bg-red-500 bg-opacity-50 hover:bg-opacity-100"
                         >
-                          ADD
+                          Leave
                         </button>
                       </div>
                     </div>
-                    {typeofRoom === 'PROTECTED' ? (
-                      <div className="flex items-center justify-center space-x-4 border h-[50px] rounded-lg p-2px">
-                        <div className="text-[10px]">change password : </div>
-                        <input
-                          type="text"
-                          value={newPassword}
-                          onChange={handleNewPassword}
-                          className="border-color: rgb(255 255 255) bg-transparent border rounded-full text-[15px]  border-gray-500 text-gray-500"
-                        />
-                        <div className="flex h-[30px] w-[100px] bg-[#F77B3F] bg-opacity-50 hover:bg-opacity-100 rounded-lg ">
-                          <button
-                            onClick={() => sendNewPassword()}
-                            className="w-full h-full text-[9px]"
-                          >
-                            change
-                          </button>
-                        </div>
-                        <div className="flex h-[30px] w-[100px] bg-[#F77B3F] bg-opacity-50 hover:bg-opacity-100 rounded-lg ">
-                          <button
-                            onClick={() => deleatPassword()}
-                            className="w-full h-full text-[9px]"
-                          >
-                            delete password
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <div></div>
-                    )}
+                  ) : (
                     <div className="flex items-center justify-center">
                       <button
                         onClick={() => posleave()}
-                        className="w-[80px]  rounded-lg bg-red-500 bg-opacity-50 hover:bg-opacity-100"
+                        className="w-[80px]  border rounded-lg bg-red-500"
                       >
                         Leave
                       </button>
                     </div>
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-center">
-                    <button
-                      onClick={() => posleave()}
-                      className="w-[80px]  border rounded-lg bg-red-500"
-                    >
-                      Leave
-                    </button>
-                  </div>
-                )}
-              </PopoverContent>
-            </Popover>
+                  )}
+                </PopoverContent>
+              </Popover>)
+
+            }
           </div>
         </div>
       </div>
       <div className="w-full h-full row-start-2 row-span-5 flex items-center justify-center">
-        <div className="w-full h-full  rounded-lg ">
+        <div className="w-full h-full rounded-lg ">
           <ChatInput id={id} />
         </div>
       </div>

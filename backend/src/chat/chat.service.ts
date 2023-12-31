@@ -233,29 +233,25 @@ export class ChatService {
             const blocked = messages.map(msg => {
                 if (msg.messages.find(m => m.sender.user.blocker.find(user => user.blockedId === userId))) {
                     const id = msg.messages.find(m => m.sender.user.blocker.find(user => user.blockedId === userId)).sender.user.id
-                    return {userId1: userId, userId2: id}
+                    return id
                 }
                 if (msg.messages.find(m => m.sender.user.blocked.find(user => user.blockerId === userId))) {
                     const id = msg.messages.find(m => m.sender.user.blocked.find(user => user.blockerId === userId)).sender.user.id
-                    return {userId1: userId, userId2: id}
+                    return  id
                 }
             });
-            console.log("bbbbb: ", blocked);
-
             const filtredMessages = await Promise.all(messages.map( async msg => {
                 const { id, name, photo, group, visibility, messages } = msg;
 
                 const msgs = messages.map(msg => {
                     const { content, createdAt, sender } = msg;
                     const { userName, photo } = sender.user;
-                    // console.log("messagessss: ", msg.sender.user.blocked, msg.sender.user.blocker);
 
                     if (msg.sender.user.blocker.find(user => user.blockedId === userId) || msg.sender.user.blocked.find(user => user.blockerId === userId))
                         return null
-                    // if (msg.sender.user.blocked.find(user => user.blockerId === userId))
-                    //     return null
 
-                    return { userId: msg.sender.user.id , sender: userName, photo, role: sender.role , content, createdAt,  }
+
+                    return { roomId: id, userId: msg.sender.user.id , sender: userName, photo, role: sender.role , content, createdAt,  }
                 }).filter(msg => msg !== null)
 
                 if (visibility === VISIBILITY.DM) {

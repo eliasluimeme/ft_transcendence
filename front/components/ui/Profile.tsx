@@ -207,8 +207,9 @@ const Pic = () => {
   ///////////////////////////////////////////////////////////////////
   const [uploadModalAvatarOpen, setUploadModalAvatarOpen] = useState(false);
   const [avatarOptions, setAvatarOptions] = useState([
-    "https://media.istockphoto.com/id/517188688/photo/mountain-landscape.jpg?s=612x612&w=0&k=20&c=A63koPKaCyIwQWOTFBRWXj_PwCrR4cEoOw2S9Q7yVl8=",
-    "https://img.freepik.com/free-photo/digital-painting-mountain-with-colorful-tree-foreground_1340-25699.jpg",
+    "/avatars/avatar1.png",
+    "/avatars/avatar2.png",
+    "/avatars/avatar3.png",
   ]);
 
   // Update this function to handle the selection of the avatar
@@ -387,9 +388,8 @@ const Pic = () => {
                 (max-width: 1200px) 800px,
                 1200px"
                   fill
-                  className={`w-[20%] border cursor-pointer ${
-                    selectedImage === avatar ? "border-2 border-blue-500" : ""
-                  }`}
+                  className={`w-[20%] border cursor-pointer ${selectedImage === avatar ? "border-2 border-blue-500" : ""
+                    }`}
                   onClick={() => handleAvatarSelection(avatar)}
                 />
               </div>
