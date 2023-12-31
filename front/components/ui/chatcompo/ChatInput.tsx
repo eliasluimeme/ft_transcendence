@@ -6,7 +6,7 @@ import axios from "axios";
 import Messages from "./Messages";
 import { User } from "lucide-react";
 
-const socket = io('http://localhost:3001/chat', {
+const socket = io(process.env.BACK_END_URL + 'chat', {
   withCredentials: true,
 });
 
@@ -42,7 +42,7 @@ const ChatInput = (id: any) => {
 
   const fetHistoric = async () => {
     try {
-      const response = await axios.get('http://localhost:3001/chat/conversations/messages',
+      const response = await axios.get(process.env.BACK_END_URL + 'chat/conversations/messages',
         {
           withCredentials: true,
           params: id
@@ -55,19 +55,19 @@ const ChatInput = (id: any) => {
         return undefined;
       }
     } catch (error) {
-      console.error(error);
+      //ror(error);
       return undefined;
     }
   }
   useEffect(() => {
     fetHistoric();
-    console.log(" blocked array ", blocked)
+    //(" blocked array ", blocked)
   }, [id])
 
 
   const fetchParticipants = async () => {
     try {
-      const response = await axios.get('http://localhost:3001/chat/conversations/members',
+      const response = await axios.get(process.env.BACK_END_URL + 'chat/conversations/members',
         {
           withCredentials: true,
           params: id
@@ -88,7 +88,7 @@ const ChatInput = (id: any) => {
         return undefined;
       }
     } catch (error) {
-      console.error(error);
+      //ror(error);
       return undefined;
     }
   }

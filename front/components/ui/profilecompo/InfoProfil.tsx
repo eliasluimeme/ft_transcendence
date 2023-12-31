@@ -22,7 +22,7 @@ const GetInitialData = (): Data => {
   });
   const fetchData = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/profile", {
+      const response = await axios.get(process.env.BACK_END_URL + "profile", {
         withCredentials: true,
       });
       if (response.status === 200) {
@@ -34,10 +34,10 @@ const GetInitialData = (): Data => {
           rank: response.data.rank,
         });
       } else {
-        console.log("failed to fetchdata");
+        //("failed to fetchdata");
       }
     } catch (error) {
-      console.error("An error occurred while fetching user data:", error);
+      //ror("An error occurred while fetching user data:", error);
     }
   };
   useEffect(() => {

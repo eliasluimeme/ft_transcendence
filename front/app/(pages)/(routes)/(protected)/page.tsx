@@ -5,13 +5,13 @@ import Redirect from "@/components/ui/homeComp/Redirect";
 import { Toaster, toast } from "react-hot-toast";
 import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/navigation";
-import { SocketContext, ModeContext } from "@/components/game/tools/Contexts";
+import { ModeContext } from "@/components/game/tools/Contexts";
+import { socket } from "@/components/game/tools/SocketCtxProvider"
 
 
 
 const Page = () => {
   const router = useRouter();
-  const socket = useContext(SocketContext);
   const mode = useContext(ModeContext);
   // toast.configure();
   useEffect(() => {

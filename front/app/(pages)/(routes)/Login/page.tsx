@@ -25,10 +25,10 @@ const LandingPage = () => {
       >
         <div className=" text-2xl font-bold mb-9">Login</div>
         <Button variant="default" className='font-bold  hover:opacity-[100%] bg-[#d2d7db]'>
-          <Link href="http://localhost:3001/auth/42/login">Login With Intra</Link>
-        </Button>
-      </div>
+          <Link href=process.env.BACK_END_URL + "auth/42/login">Login With Intra</Link>
+      </Button>
     </div>
+    </div >
   );
 };
 

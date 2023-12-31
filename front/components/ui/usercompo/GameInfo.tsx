@@ -29,7 +29,7 @@ const GetAchivment = (indice: string) => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:3001/users/achievement",
+          process.env.BACK_END_URL + "users/achievement",
           {
             withCredentials: true,
             params: {
@@ -58,10 +58,10 @@ const GetAchivment = (indice: string) => {
           ];
           setAchievements(newAchievements);
         } else {
-          console.log("failed to fetch data");
+          //("failed to fetch data");
         }
       } catch (error) {
-        console.error("An error occurred while fetching user data:", error);
+        //ror("An error occurred while fetching user data:", error);
       }
     };
 
@@ -150,7 +150,7 @@ const GetMatchHistory = (indice: string): MatchHistory[] => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/users/matchs", {
+      const response = await axios.get(process.env.BACK_END_URL + "users/matchs", {
         withCredentials: true,
         params: {
           user: indice,
@@ -170,10 +170,10 @@ const GetMatchHistory = (indice: string): MatchHistory[] => {
 
         setMatchHistory(newMatchHistory);
       } else {
-        console.log("Failed to fetch data");
+        //("Failed to fetch data");
       }
     } catch (error) {
-      console.error("An error occurred while fetching user data:", error);
+      //ror("An error occurred while fetching user data:", error);
     }
   };
 
@@ -203,9 +203,8 @@ const GameInfo = (id: any) => {
             {matchHistory.map((historyItem, index) => (
               <WinLose
                 key={index}
-                className={`w-full h-full row-start-${
-                  index + 1
-                } col-start-2 col-span-9 `}
+                className={`w-full h-full row-start-${index + 1
+                  } col-start-2 col-span-9 `}
                 opo1={historyItem.opo1}
                 opo2={historyItem.opo2}
                 result={historyItem.result}

@@ -14,23 +14,23 @@ const GetLeader = () => {
   ]);
   const takeleader = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/ladderboard", {
+      const response = await axios.get(process.env.BACK_END_URL + "ladderboard", {
         withCredentials: true,
       });
       if (response.status === 200) {
         const newleader: Leader[] = response.data.map(
           (l: any) => ({
             rank: l.rank,
-            image : l.photo,
-            name : l.user
+            image: l.photo,
+            name: l.user
           })
-          );
-          setleader(newleader)
+        );
+        setleader(newleader)
       } else {
-        console.log("Failed to fetch friendship data");
+        //("Failed to fetch friendship data");
       }
     } catch (error) {
-      console.error("An error occurred while fetching friendship data:", error);
+      //ror("An error occurred while fetching friendship data:", error);
     }
   };
   useEffect(() => {
@@ -42,16 +42,16 @@ const GetRank = () => {
   const [rank, getRank] = useState("");
   const takerank = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/ladderboard/rank", {
+      const response = await axios.get(process.env.BACK_END_URL + "ladderboard/rank", {
         withCredentials: true,
       });
       if (response.status === 200) {
         getRank(response.data.rank)
       } else {
-        console.log("Failed to fetch friendship data");
+        //("Failed to fetch friendship data");
       }
     } catch (error) {
-      console.error("An error occurred while fetching friendship data:", error);
+      //ror("An error occurred while fetching friendship data:", error);
     }
   };
   useEffect(() => {

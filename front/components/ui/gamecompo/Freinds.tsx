@@ -4,7 +4,8 @@ import * as React from "react";
 import "@/components/ui/CSS/game.css";
 import axios from "axios";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { SocketContext, ModeContext } from "@/components/game/tools/Contexts";
+import { ModeContext } from "@/components/game/tools/Contexts";
+import { socket } from "@/components/game/tools/SocketCtxProvider"
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -20,7 +21,7 @@ const GetFriends = () => {
   const [freind, setfreind] = useState<freind[]>([]);
   const [me, setMe] = useState<freind>()
 
-  const socket = useContext(SocketContext);
+
   const mode = useContext(ModeContext);
 
   //////////////////////// Invit Friend to play with  ///////////////////////////////
@@ -55,7 +56,7 @@ const GetFriends = () => {
 
   useEffect(() => {
     socket.off('inviteEvent').on('inviteEvent', (data: any) => {
-      console.log('Im here inside useEffect !', data);
+      //('Im here inside useEffect !', data);
       toast(() => (
         <span>
           <b>{data[0].senderName} invited you to play Pong ! </b>
@@ -78,7 +79,7 @@ const GetFriends = () => {
 
   const takefreind = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/friends", {
+      const response = await axios.get(process.env.BACK_END_URL + "friends", {
         withCredentials: true,
       });
       if (response.status === 200) {
@@ -91,10 +92,10 @@ const GetFriends = () => {
         setfreind(newfreind)
         setMe(response.data.me)
       } else {
-        console.log("Failed to fetch friendship data");
+        //("Failed to fetch friendship data");
       }
     } catch (error) {
-      console.error("An error occurred while fetching friendship data:", error);
+      //ror("An error occurred while fetching friendship data:", error);
     }
   };
   useEffect(() => {

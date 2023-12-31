@@ -78,7 +78,7 @@ export class ChatService {
             }).filter(conv => conv !== null);
             return conv
         } catch(error) {
-            console.log(error);
+            //(error);
         }
     }
 
@@ -130,7 +130,7 @@ export class ChatService {
         } catch(error) {
             if (error instanceof ForbiddenException)
                 throw error;
-            console.log(error);
+            //(error);
         }
     }
 
@@ -149,7 +149,7 @@ export class ChatService {
         } catch(error) {
             if (error instanceof NotFoundException)
                 throw error;
-            console.log(error);
+            //(error);
         }
     }
 
@@ -193,7 +193,7 @@ export class ChatService {
         } catch (error) {
             if ( error instanceof ForbiddenException)
             throw error;
-            console.log(error);
+            //(error);
         }
     }
 
@@ -261,7 +261,7 @@ export class ChatService {
             }))
             return filtredMessages;
         } catch(error) {
-            console.log(error);
+            //(error);
         }
     }
 
@@ -336,7 +336,7 @@ export class ChatService {
         } catch (error) {
             if (error instanceof NotFoundException || error instanceof ForbiddenException)
                 throw error;
-          console.log(error);
+          //(error);
         }
       }
 
@@ -391,7 +391,7 @@ export class ChatService {
         } catch (error) {
             if ( error instanceof NotFoundException)
                 throw error;
-            console.log(error);
+            //(error);
         }
     }
 
@@ -411,7 +411,7 @@ export class ChatService {
         } catch (error) {
             if ( error instanceof NotFoundException )
                 throw error;
-            console.log(error);
+            //(error);
         }
     }
 
@@ -459,7 +459,7 @@ export class ChatService {
         } catch (error) {
             if ( error instanceof NotFoundException )
                 throw error;
-            console.log(error);
+            //(error);
         }
     }
 
@@ -510,7 +510,7 @@ export class ChatService {
         } catch (error) {
             if ( error instanceof NotFoundException)
                 throw error;
-            console.log(error);
+            //(error);
         }
     }
 
@@ -546,7 +546,7 @@ export class ChatService {
         } catch (error) {
             if ( error instanceof NotFoundException)
                 throw error;
-            console.log(error);
+            //(error);
         }
     }
     
@@ -604,7 +604,7 @@ export class ChatService {
         }).catch( (error) => {
             if (error instanceof ForbiddenException || error instanceof NotFoundException)
                 throw error;
-            console.log(error);
+            //(error);
         })
 
         return user;
@@ -632,7 +632,7 @@ export class ChatService {
               },
             });
             
-            console.log(`User ${user.id} has been unmuted.`);
+            //(`User ${user.id} has been unmuted.`);
         }
     }
     }
@@ -673,7 +673,7 @@ export class ChatService {
         } catch (error) {
             if ( error instanceof NotFoundException || error instanceof ForbiddenException )
                 throw error;
-            console.log(error);
+            //(error);
         }
     }
     
@@ -712,14 +712,14 @@ export class ChatService {
             }).then(() => {
                 return { success: true, message: 'Member banned' }
             }).catch((error) => {
-                console.log(error);
+                //(error);
                 throw new BadRequestException('Something went wrong')
             })
 
         }).catch( (error) => {
             if (error instanceof ForbiddenException || error instanceof NotFoundException)
                 throw error;
-            console.log(error);
+            //(error);
         })
         
         return user;
@@ -760,14 +760,14 @@ export class ChatService {
     //         }).then(() => {
     //             return { success: true, message: 'Member unbanned' }
     //         }).catch((error) => {
-    //             console.log(error);
+    //             //(error);
     //             throw new BadRequestException('Something went wrong')
     //         })
     
     //     }).catch( (error) => {
     //         if (error instanceof ForbiddenException || error instanceof NotFoundException)
     //             throw error;
-    //         console.log(error);
+    //         //(error);
     //     })
 
     //     return user;
@@ -823,7 +823,7 @@ export class ChatService {
         }).catch( (error) => {
             if (error instanceof ForbiddenException || error instanceof NotFoundException)
                 throw error;
-            console.log(error);
+            //(error);
         })
 
         return user;
@@ -901,7 +901,7 @@ export class ChatService {
         } catch (error) {
             if (error instanceof BadRequestException || error instanceof ForbiddenException || error instanceof NotFoundException)
                 throw error
-            console.log(error)
+            //(error)
         }
     }
 
@@ -947,7 +947,7 @@ export class ChatService {
         } catch (error) {
             if (error instanceof BadRequestException)
                 throw error;
-            console.log(error)
+            //(error)
         }
     }
 
@@ -1001,7 +1001,7 @@ export class ChatService {
         } catch (error) {
             if (error instanceof BadRequestException || error instanceof ForbiddenException)
                 throw error
-            console.log(error)
+            //(error)
         }
     }
     async getAllUserRooms(user_id: number): Promise<any> {
@@ -1030,7 +1030,7 @@ export class ChatService {
         if (room_user)
             return room_user
         else{
-            console.error('Error retrieving room user')
+            //ror('Error retrieving room user')
             return null;
         }
     }
@@ -1051,7 +1051,7 @@ export class ChatService {
         } catch (error) {
             if (error instanceof BadRequestException)
                 throw error;
-            console.log(error)
+            //(error)
         }
     }
 
@@ -1066,7 +1066,7 @@ export class ChatService {
 
               if (!userInChatroom)
                 throw new Error('User not found in the chat room.');
-            // console.log("chataat: ", userInChatroom)
+            // //("chataat: ", userInChatroom)
           
               const newMessage = await this.prisma.message.create({
                 data: {
@@ -1086,14 +1086,14 @@ export class ChatService {
               });
               
             if (newMessage){
-                console.log('message saved successfully');
+                //('message saved successfully');
                 return { success: true, message: 'Message sent' }
             }
             else throw new BadRequestException('Something went wrong. Please try again');
         } catch (error) {
             if (error instanceof BadRequestException)
                 throw error;
-            console.log(error)
+            //(error)
         }
     }
 
@@ -1114,7 +1114,7 @@ export class ChatService {
         } catch (error) {
             if (error instanceof NotFoundException)
                 throw error;
-            console.log(error)
+            //(error)
         }
     }
 }

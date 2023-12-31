@@ -6,7 +6,7 @@ import { PrismaClientKnownRequestError, PrismaClientValidationError } from '@pri
 export class HttpExceptionFilter implements ExceptionFilter {
   catch(exception: HttpException, response) {
     if (exception) {
-      console.log('filter')
+      //('filter')
         response.status(HttpStatus.UNAUTHORIZED).json({
           statusCode: HttpStatus.UNAUTHORIZED,
           message: 'Unauthorized access mn filter',

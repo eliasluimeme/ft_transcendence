@@ -1,17 +1,21 @@
 "use client";
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { SocketContext } from './Contexts';
-import io from 'socket.io-client';
+// import io from 'socket.io-client';
+import { Socket, io } from "socket.io-client"
 
+export let socket: Socket;
 export const SocketCtxProvider = ({ children }: {
   children: JSX.Element;
 }) => {
-  const socket = io('http://localhost:3001/game', {
-    withCredentials: true,
-  });
-
-  useEffect( () => {
-    return(() => {
+  const initialSocket = async () => {
+    socket = io(process.env.BACK_END_URL + 'game', {
+      withCredentials: true,
+    });
+  }
+  useEffect(() => {
+    initialSocket();
+    return (() => {
       socket.disconnect();
     });
   }, []);

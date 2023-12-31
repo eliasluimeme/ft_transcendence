@@ -43,7 +43,7 @@ const Pic = () => {
   const router = useRouter();
   const fetchData = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/settings", {
+      const response = await axios.get(process.env.BACK_END_URL + "settings", {
         withCredentials: true,
       });
       if (response.status === 200) {
@@ -52,11 +52,11 @@ const Pic = () => {
           toFAStatu: response.data.isTwoFactorAuthEnabled,
         });
       } else {
-        console.log("failed to fetchdata");
+        //("failed to fetchdata");
       }
     } catch (error) {
       router.push("/Login");
-      console.error("An error occurred while fetching user data:", error);
+      //ror("An error occurred while fetching user data:", error);
     }
   };
   useEffect(() => {
@@ -73,7 +73,7 @@ const Pic = () => {
     try {
       // Fetch QR code data when the user clicks on "Enable 2FA"
       const response = await axios.get(
-        "http://localhost:3001/auth/2fa/generate",
+        process.env.BACK_END_URL + "auth/2fa/generate",
         {
           withCredentials: true,
         }
@@ -84,16 +84,16 @@ const Pic = () => {
         setIsOpen(true); // Open the modal after fetching QR code
         router.push('/settings')
       } else {
-        console.log("Unexpected response status:", response.status);
+        //("Unexpected response status:", response.status);
       }
     } catch (error) {
-      console.error("An error occurred while fetching QR code:", error);
+      //ror("An error occurred while fetching QR code:", error);
     }
   };
   const handleDisable2FA = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:3001/auth/2fa/turn-off",
+        process.env.BACK_END_URL + "auth/2fa/turn-off",
         {
           withCredentials: true,
         }
@@ -104,13 +104,13 @@ const Pic = () => {
         if (response.data.off === true)
           router.push('/Login')
       } else {
-        console.log("Unexpected response status:", response.status);
+        //("Unexpected response status:", response.status);
       }
     } catch (error: any) {
       if (error.response) {
         toast.error(error.response.data.message || 'An error occurred');
       }
-      console.error("An error occurred while fetching QR code:", error);
+      //ror("An error occurred while fetching QR code:", error);
     }
   };
 
@@ -138,7 +138,7 @@ const Pic = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:3001/auth/2fa/turn-on",
+        process.env.BACK_END_URL + "auth/2fa/turn-on",
         code,
         {
           withCredentials: true,
@@ -153,13 +153,13 @@ const Pic = () => {
         if (response.data.on === true)
           router.refresh();
       } else {
-        console.error("Failed to send data.");
+        //ror("Failed to send data.");
       }
     } catch (error: any) {
       if (error.response) {
         toast.error(error.response.data.message || 'An error occurred');
       }
-      console.error("An error occurred while sending data:", error);
+      //ror("An error occurred while sending data:", error);
     }
   };
 
@@ -178,7 +178,7 @@ const Pic = () => {
       formData.append("photo", selectedFile);
       try {
         const response = await axios.post(
-          "http://localhost:3001/photo/upload",
+          process.env.BACK_END_URL + "photo/upload",
           formData,
           {
             withCredentials: true,
@@ -195,10 +195,10 @@ const Pic = () => {
             photo: response.data.photo,
           });
         } else {
-          console.log("Unexpected response status:", response.status);
+          //("Unexpected response status:", response.status);
         }
       } catch (error) {
-        console.error("An error occurred while uploading the image:", error);
+        //ror("An error occurred while uploading the image:", error);
       }
     }
   };
@@ -221,7 +221,7 @@ const Pic = () => {
   const handleSaveAvatar = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:3001/settings/avatar",
+        process.env.BACK_END_URL + "settings/avatar",
         { photo: selectedImage },
         {
           withCredentials: true,
@@ -240,11 +240,11 @@ const Pic = () => {
         setUploadModalAvatarOpen(false); // Close the modal if needed
       } else {
         // Handle failure (e.g., show error message)
-        console.error("Failed to send image URL.");
+        //ror("Failed to send image URL.");
       }
     } catch (error) {
       // Handle the error
-      console.error("An error occurred while sending image URL:", error);
+      //ror("An error occurred while sending image URL:", error);
     }
   };
   ///////////////////////////////////////////////////////////////////

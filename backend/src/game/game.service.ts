@@ -9,7 +9,7 @@ export class GameService {
   private logger: Logger = new Logger(GameService.name);
   private readonly board = {width: 500, height: 500};
   private roomstatus: string = "onhold";
-  private readonly padel = {width: 15, height: 100, speed: 20};
+  private readonly padel = {width: 5, height: 100, speed: 20};
   private vsBot: boolean = false;
   private bot: Bot = {speed: 0, timer: ''};
   private started: boolean = false;
@@ -40,7 +40,7 @@ export class GameService {
   private rplayer = {
     id: '' ,
     sock: '',
-    padelx: this.board.width - 15,
+    padelx: this.board.width - 5,
     padely: 0,
     score: 0,
     quickRef: 0,
@@ -51,7 +51,7 @@ export class GameService {
     if (newroom.vsbot)
     {
       this.vsBot = true;
-      this.bot.speed = newroom.mode * 500;
+      this.bot.speed = newroom.mode * 50;
     }
     this.roomstatus = "open";
     this.rplayer.id = newroom.id2;
@@ -71,7 +71,7 @@ export class GameService {
     }
   }
   moveBall() {
-    //this.logger.error(this.ball.repete);
+    ////ger.error(this.ball.repete);
     this.ball.cords.x += this.ball.vec.x;
     this.ball.cords.y += this.ball.vec.y;
   }
@@ -92,7 +92,7 @@ export class GameService {
       this.resetBoard();
     }
     if (this.lplayer.score == 5 || this.rplayer.score == 5) {
-      this.logger.error("The game finish");
+      //ger.error("The game finish");
       this.clearTimers();
       this.roomstatus = "closed";
     }
@@ -101,7 +101,7 @@ export class GameService {
   resetBoard()
   {
     const angle = this.getRandomNumber(-45, 45);
-    // this.logger.error(angle);
+    // //ger.error(angle);
     this.calculVecs(angle);
     this.ball.speed = 2;
     this.ball.cords = {x: 250, y: 250};
@@ -255,7 +255,22 @@ export class GameService {
     return board;
   }
 
-  roomRslts() {
+  roomRslts(disconnect:boolean, looserid:string) {
+
+    if(disconnect)
+    {
+      if(this.lplayer.id == looserid)
+        return ({
+          winner: {id: this.rplayer.id, sock: this.rplayer.sock, score: this.rplayer.score, achievs: this.rachiev},
+          looser: {id: this.lplayer.id, sock: this.lplayer.sock, score: this.lplayer.score, achievs: this.lachiev}
+        });
+      else
+        return ({
+          winner: {id: this.lplayer.id, sock: this.lplayer.sock, score: this.lplayer.score, achievs: this.lachiev},
+          looser: {id: this.rplayer.id, sock: this.rplayer.sock, score: this.rplayer.score, achievs: this.rachiev}
+        });
+    }
+
     if (this.lplayer.score > this.rplayer.score) {
       if (this.lplayer.quickRef >= 5)
         this.lachiev[1] = true;

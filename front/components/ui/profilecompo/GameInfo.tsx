@@ -24,7 +24,7 @@ const GetAchivment = () => {
   ]);
   const fetchData = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/profile", {
+      const response = await axios.get(process.env.BACK_END_URL + "profile", {
         withCredentials: true,
       });
       if (response.status === 200) {
@@ -48,10 +48,10 @@ const GetAchivment = () => {
         ];
         setAchievements(newAchievements);
       } else {
-        console.log("failed to fetchdata");
+        //("failed to fetchdata");
       }
     } catch (error) {
-      console.error("An error occurred while fetching user data:", error);
+      //ror("An error occurred while fetching user data:", error);
     }
   };
   useEffect(() => {
@@ -136,7 +136,7 @@ const GetMatchHistory = (): MatchHistory[] => {
   const [matchHistory, setmatchHistory] = useState<MatchHistory[]>([]);
   const fetchData = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/profile", {
+      const response = await axios.get(process.env.BACK_END_URL + "profile", {
         withCredentials: true,
       });
       if (response.status === 200) {
@@ -152,10 +152,10 @@ const GetMatchHistory = (): MatchHistory[] => {
 
         setmatchHistory(newMatchHistory);
       } else {
-        console.log("failed to fetchdata");
+        //("failed to fetchdata");
       }
     } catch (error) {
-      console.error("An error occurred while fetching user data:", error);
+      //ror("An error occurred while fetching user data:", error);
     }
   };
   useEffect(() => {
@@ -183,9 +183,8 @@ const GameInfo: React.FC = () => {
             {matchHistory.map((historyItem, index) => (
               <WinLose
                 key={index}
-                className={`w-full h-full row-start-${
-                  index + 1
-                } col-start-2 col-span-9 `}
+                className={`w-full h-full row-start-${index + 1
+                  } col-start-2 col-span-9 `}
                 opo1={historyItem.opo1}
                 opo2={historyItem.opo2}
                 result={historyItem.result}
