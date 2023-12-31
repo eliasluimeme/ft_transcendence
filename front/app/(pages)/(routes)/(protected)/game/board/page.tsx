@@ -4,9 +4,9 @@ import Results from "@/components/game/modules/Results";
 import Room from "@/components/game/modules/Room";
 import { useEffect, useState, useRef, useContext} from "react";
 import { SocketContext, ModeContext } from "@/components/game/tools/Contexts";
-import {socket} from "@/components/game/tools/SocketCtxProvider"
 import { useRouter } from 'next/navigation'
 import axios from "axios";
+import {socket} from "@/components/game/tools/SocketCtxProvider"
 
 
 export default function Page() {
@@ -39,7 +39,6 @@ export default function Page() {
     }
   };
 
-  
   useEffect(() => {
     if (modectx.mode == "")
       router.push("/game")
@@ -49,44 +48,40 @@ export default function Page() {
         else if (modectx.mode == "bot")
         {
           socket.emit("newBotGame", "1");
-          console.log("dkhlt");
         }
         else if(modectx.mode == "random")
         {
           socket.emit("newRandomGame", '');
-          console.log("ah dkhlt hna");
         }
-        
+
         socket.on('goback', (reason: string) => {
+          console.log(reason);
           gameRslts.current = reason;
           setStatus(2);
         });
-        
+
         socket.on('roomCreated', (data:any) => {
           fetchData();
-          console.log("bdat lgame");
           me.current.side = data.side;
           setSelf(me.current);
           setData(data);
           setStatus(1);
         });
-        
+
         return (() => {
-          console.log("ah dkhlt hna");
         });
     }
-    return;
   }, []);
 
   if (!socket)
-  return;
-else if(status == 0)
+    return;
+  else if(status == 0)
     return(<Loading socket={socket} setStatus={(msg:number) => changeModule(msg)}/>);
-    else if(status == 1)
+  else if(status == 1)
     return(<Room socket={socket} data={data} me={self}/>);
-    else if (status == 2)
+  else if (status == 2)
     return(<Results rslt={gameRslts.current} setStatus={(msg:number) => changeModule(msg)} />);
-      else {
-        return <div>Unexpected state</div>;
-    }
+  else {
+      return <div>Unexpected state</div>;
+  }
 };

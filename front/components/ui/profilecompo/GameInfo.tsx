@@ -180,12 +180,14 @@ const GameInfo: React.FC = () => {
             <div className="row-start-1 row-span-6 col-start-1 w-full h-full flex items-center justify-center ">
               <div className="w-[2px] h-[80%] bg-[#445E86] rounded-full"></div>
             </div>
+            <div className="w-full h-[500px] row-start-0 row-span-6 col-start-2 col-span-9 overflow-auto border-red-700">
             {matchHistory.map((historyItem, index) => (
               <WinLose
                 key={index}
-                className={`w-full h-full row-start-${
-                  index + 1
-                } col-start-2 col-span-9 `}
+                className=""
+                // className={`w-full h-full row-start-${
+                //   index + 1
+                // } col-start-2 col-span-9 `}
                 opo1={historyItem.opo1}
                 opo2={historyItem.opo2}
                 result={historyItem.result}
@@ -193,6 +195,7 @@ const GameInfo: React.FC = () => {
                 opo2image={historyItem.opo2image}
               />
             ))}
+            </div>
           </div>
         </div>
       </div>

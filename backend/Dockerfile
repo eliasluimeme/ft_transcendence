@@ -6,6 +6,6 @@ COPY . .
 
 RUN npm install
 
-RUN script.sh
+RUN sh script.sh
 
 CMD ["npm", "run", "start:dev"]

@@ -10,6 +10,9 @@ CREATE TYPE "ROLE" AS ENUM ('OWNER', 'ADMIN', 'USER');
 -- CreateEnum
 CREATE TYPE "VISIBILITY" AS ENUM ('DM', 'PUBLIC', 'PRIVATE', 'PROTECTED');
 
+-- CreateEnum
+CREATE TYPE "STATUS" AS ENUM ('ONLINE', 'OFFLINE', 'INGAME');
+
 -- CreateTable
 CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
@@ -23,6 +26,7 @@ CREATE TABLE "User" (
     "twoFactorAuthSecret" TEXT,
     "isTwoFactorAuthEnabled" BOOLEAN NOT NULL DEFAULT false,
     "photo" TEXT,
+    "status" "STATUS" NOT NULL DEFAULT 'OFFLINE',
     "achievements" BOOLEAN[] DEFAULT ARRAY[false, false, false, false, false]::BOOLEAN[],
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -56,8 +60,8 @@ CREATE TABLE "Blocks" (
 -- CreateTable
 CREATE TABLE "MatchHistory" (
     "id" SERIAL NOT NULL,
-    "player1Id" INTEGER NOT NULL,
-    "player2Id" INTEGER NOT NULL,
+    "winnerId" INTEGER NOT NULL,
+    "looserId" INTEGER NOT NULL,
     "score1" INTEGER NOT NULL DEFAULT 0,
     "score2" INTEGER NOT NULL DEFAULT 0,
     "mode" "MODE" NOT NULL,
@@ -70,8 +74,8 @@ CREATE TABLE "MatchHistory" (
 CREATE TABLE "LadderLevel" (
     "id" SERIAL NOT NULL,
     "userId" INTEGER NOT NULL,
-    "wins" INTEGER[] DEFAULT ARRAY[0, 0]::INTEGER[],
-    "losses" INTEGER[] DEFAULT ARRAY[0, 0]::INTEGER[],
+    "wins" INTEGER NOT NULL DEFAULT 0,
+    "losses" INTEGER NOT NULL DEFAULT 0,
     "level" DOUBLE PRECISION NOT NULL DEFAULT 0.0,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -95,8 +99,9 @@ CREATE TABLE "Message" (
 CREATE TABLE "Chatroom" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
+    "photo" TEXT,
     "group" BOOLEAN NOT NULL DEFAULT false,
-    "visibility" "VISIBILITY" NOT NULL DEFAULT 'PUBLIC',
+    "visibility" "VISIBILITY" NOT NULL DEFAULT 'DM',
     "password" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -112,6 +117,7 @@ CREATE TABLE "ChatroomUsers" (
     "chatroomId" INTEGER NOT NULL,
     "isMuted" BOOLEAN NOT NULL DEFAULT false,
     "isBanned" BOOLEAN NOT NULL DEFAULT false,
+    "muteExpiration" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -149,10 +155,10 @@ ALTER TABLE "Blocks" ADD CONSTRAINT "Blocks_blockerId_fkey" FOREIGN KEY ("blocke
 ALTER TABLE "Blocks" ADD CONSTRAINT "Blocks_blockedId_fkey" FOREIGN KEY ("blockedId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "MatchHistory" ADD CONSTRAINT "MatchHistory_player1Id_fkey" FOREIGN KEY ("player1Id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "MatchHistory" ADD CONSTRAINT "MatchHistory_winnerId_fkey" FOREIGN KEY ("winnerId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "MatchHistory" ADD CONSTRAINT "MatchHistory_player2Id_fkey" FOREIGN KEY ("player2Id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "MatchHistory" ADD CONSTRAINT "MatchHistory_looserId_fkey" FOREIGN KEY ("looserId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "LadderLevel" ADD CONSTRAINT "LadderLevel_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
