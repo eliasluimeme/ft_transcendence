@@ -48,8 +48,7 @@ export default function StartLayout({
   const socket = useContext(SocketContext);
   useEffect( () => {
     return(() => {
-      console.log("Dazt mn hnra");
-      socket.disconnect();
+      socket?.disconnect();
     });
   }, []);
 

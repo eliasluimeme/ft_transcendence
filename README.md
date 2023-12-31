@@ -26,6 +26,11 @@ TO DO LIST:
     -Monster: win a game against Hard mode bot.
     -impossible win a game against Hard mode bot with clean score;
 
+    -Quick reflexes: Successfully return five consecutive fast serves
+    -super reflex: Successfully return five consecutive fast serves
+    -comeback kid: win a game with a comeback
+    -no mercy: win a game with clean score
+
 
     [Suggestions]
     -Rookie: Win 10 games.

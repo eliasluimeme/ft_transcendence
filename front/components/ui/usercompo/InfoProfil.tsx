@@ -34,10 +34,12 @@ const InfoProfil = (id: any) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const timestamp = new Date().getTime();
         const response = await axios.get("http://localhost:3001/users/profile", {
           withCredentials: true,
           params: {
             user: indice,
+            date: timestamp,
           },
         });
         if (response.status === 200) {

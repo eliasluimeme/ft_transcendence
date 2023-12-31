@@ -67,7 +67,6 @@ export class AuthController {
         );
 
     if (!is2FACodeValid) throw new UnauthorizedException('Invalid 2FA code');
-
         const token = await this.authService.generateToken(req.user, true);
         res.clearCookie('access_token');
         const activated = this.authService.activate2FA(req.user.id);
@@ -88,7 +87,8 @@ export class AuthController {
     @Get('logout')
     @HttpCode(200)
     @UseGuards(Jwt2faAuthGuard)
-    logout(@Res() res: Response) {
+    logout(@Req() req, @Res() res: Response) {
+        this.authService.logout(req.user.intraId);
         res.clearCookie('access_token');
         return res.status(200).json({});
     }

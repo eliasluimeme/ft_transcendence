@@ -160,10 +160,10 @@ const GetMatchHistory = (indice: string): MatchHistory[] => {
       if (response.status === 200) {
         const newMatchHistory: MatchHistory[] = response.data.map(
           (match: any) => ({
-            opo1: match.player1.userName,
-            opo2: match.player2.userName,
-            opo2image: match.player1.photo,
-            opo1image: match.player2.photo,
+            opo1: match.winner.userName,
+            opo2: match.looser.userName,
+            opo1image: match.winner.photo,
+            opo2image: match.looser.photo,
             result: match.score,
           })
         );

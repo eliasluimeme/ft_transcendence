@@ -30,19 +30,19 @@ const GetAchivment = () => {
       if (response.status === 200) {
         const newAchievements: Achievement[] = [
           {
-            description: "First achievement",
+            description: "Quick Reflex",
             achieved: response.data.achievements[0],
           },
           {
-            description: "Second achievement",
+            description: "Super Reflex",
             achieved: response.data.achievements[1],
           },
           {
-            description: "Third achievement",
+            description: "ComeBack Kid",
             achieved: response.data.achievements[2],
           },
           {
-            description: "Fourth achievement",
+            description: "No Mercy",
             achieved: response.data.achievements[3],
           },
         ];
@@ -142,10 +142,10 @@ const GetMatchHistory = (): MatchHistory[] => {
       if (response.status === 200) {
         const newMatchHistory: MatchHistory[] = response.data.match.map(
           (match: any) => ({
-            opo1: match.player1.userName,
-            opo2: match.player2.userName,
-            opo2image: match.player1.photo,
-            opo1image: match.player2.photo,
+            opo1: match.winner.userName,
+            opo2: match.looser.userName,
+            opo1image: match.winner.photo,
+            opo2image: match.looser.photo,
             result: match.result,
           })
         );

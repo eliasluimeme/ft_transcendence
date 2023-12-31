@@ -1,7 +1,6 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { settingsDTO } from './dto/settings.dto';
-// import { ChatGateway } from 'src/chat/chat.gateway';
 
 @Injectable()
 export class UserService {
@@ -19,8 +18,8 @@ export class UserService {
           level: {
             create: {
               level: 0,
-              wins: [0, 0],
-              losses: [0, 0],
+              wins: 0,
+              losses: 0,
             },
           },
         },
@@ -62,7 +61,7 @@ export class UserService {
     try {
       const matchHistory = await this.prisma.matchHistory.findMany({
         where: {
-          OR: [{ player1Id: userId }, { player2Id: userId }],
+          OR: [{ winnerId: userId }, { looserId: userId }],
         },
       });
       return matchHistory;
@@ -77,8 +76,10 @@ export class UserService {
         where: {
           id: userId,
         },
+        select: {
+          status: true,
+        },
       });
-
       if (user) return user.status;
     } catch (error) {
       console.error('Error getting user level: ', error);
@@ -94,11 +95,11 @@ export class UserService {
 
       const matchHistory = await Promise.all(
         matchs.map(async (match) => {
-          if (match.player1Id === user.id) {
+          if (match.winnerId === user.id) {
             const { id, userName, photo } = user;
-            match.player1 = { id, userName, photo };
-            match.player2 = await this.prisma.user.findUnique({
-              where: { id: match.player2Id },
+            match.winner = { id, userName, photo };
+            match.looser = await this.prisma.user.findUnique({
+              where: { id: match.looserId },
               select: {
                 id: true,
                 userName: true,
@@ -107,9 +108,9 @@ export class UserService {
             });
           } else {
             const { id, userName, photo } = user;
-            match.player2 = { id, userName, photo };
-            match.player1 = await this.prisma.user.findUnique({
-              where: { id: match.player1Id },
+            match.looser = { id, userName, photo };
+            match.winner = await this.prisma.user.findUnique({
+              where: { id: match.winnerId },
               select: {
                 id: true,
                 userName: true,
@@ -117,16 +118,15 @@ export class UserService {
               },
             });
           }
-          const { player1, player2, score1, score2, mode } = match;
+          const { winner, looser, score1, score2, mode } = match;
           return {
-            player1,
-            player2,
+            winner,
+            looser,
             result: score1.toString() + ' - ' + score2.toString(),
             mode,
           };
         }),
       );
-      // console.log('matchHistory: ', matchHistory);
       const { photo, userName, fullName, achievements } = user;
       return {
         userName,
@@ -222,16 +222,17 @@ export class UserService {
         if (existingFullName[0] && existingFullName[0].intraId !== id)
             throw new ForbiddenException('Full name already in use');
 
+        if (data.number.length != 10)
+          throw new ForbiddenException('Invalid phone number');
+
         const existingNumber = await this.prisma.user.findMany({
             where: {
                 number: data.number,
             },
         });
 
-        if (existingNumber[0] && existingNumber[0].number && existingNumber[0].intraId !== id)
+        if (existingNumber[0] && existingNumber[0].intraId !== id)
           throw new ForbiddenException('Number already in use');
-        else if (existingNumber[0] && existingNumber[0].number.length < 10)
-          throw new ForbiddenException('Invalid phone number');
     }
 
     async updateProfile(intraId: string , newData: settingsDTO ): Promise<any> {
@@ -297,16 +298,18 @@ export class UserService {
     }
 
     async updateIntraUser(id: string, newData: any ): Promise<any> {
-      try {
-          const user = await this.prisma.user.update({
-              where: {
-                  intraId: id,
-              },
-              data: newData,
-          });
-          return user;
-      } catch (error) {
-          console.error('Error updating user: ', error);
+      if (id) {
+        try {
+            const user = await this.prisma.user.update({
+                where: {
+                    intraId: id,
+                },
+                data: newData,
+            });
+            return user;
+        } catch (error) {
+            console.error('Error updating user: ', error);
+        }
       }
   }
 
@@ -409,19 +412,8 @@ export class UserService {
                 level: true,
               },
             },
-            // achievements: true,
-            player1: true,
-            player2: true,
-            // blocker: {
-            //     where: {
-            //         blockedId: user.id,
-            //     }
-            // },
-            // blocked: {
-            //     where: {
-            //         blockerId: user.id,
-            //     }
-            // },
+            winner: true,
+            looser: true,
             sentRequests: {
               where: {
                 receiverId: user.id,
@@ -436,8 +428,8 @@ export class UserService {
         });
 
         if (foundUser) {
-          const rank = await this.getUserRank(user.level.level);
-          const status = await this.getStatus(user.id);
+          const rank = await this.getUserRank(foundUser.level.level);
+          const status = await this.getStatus(foundUser.id);
 
           if (foundUser.id === user.id)
             return {
@@ -511,7 +503,6 @@ export class UserService {
           achievements: true,
         },
       });
-      // console.log('userrr', userAchievements);
       return userAchievements;
     } catch (error) {
       console.log('error finding users: ', error);
@@ -526,8 +517,8 @@ export class UserService {
           id: true,
           userName: true,
           photo: true,
-          player1: true,
-          player2: true,
+          winner: true,
+          looser: true,
         },
       });
 
@@ -535,11 +526,11 @@ export class UserService {
 
       const matchHistory = await Promise.all(
         matchs.map(async (match) => {
-          if (match.player1Id === user.id) {
+          if (match.winnerId === user.id) {
             const { id, userName, photo } = user;
 
             const user2 = await this.prisma.user.findUnique({
-              where: { id: match.player2Id },
+              where: { id: match.looserId },
               select: {
                 id: true,
                 userName: true,
@@ -547,8 +538,8 @@ export class UserService {
               },
             });
 
-            match.player1 = { id, userName, photo };
-            match.player2 = {
+            match.winner = { id, userName, photo };
+            match.looser = {
               id: user2.id,
               userName: user2.userName,
               photo: user2.photo,
@@ -559,7 +550,7 @@ export class UserService {
             const { id, userName, photo } = user;
 
             const user2 = await this.prisma.user.findUnique({
-              where: { id : match.player1Id },
+              where: { id : match.winnerId },
               select: {
                 id: true,
                 userName: true,
@@ -567,8 +558,8 @@ export class UserService {
               },
             });
 
-            match.player2 = { id, userName, photo };
-            match.player1 = {
+            match.looser = { id, userName, photo };
+            match.winner = {
               id: user2.id,
               userName: user2.userName,
               photo: user2.photo,
@@ -576,8 +567,8 @@ export class UserService {
             match.score =
               match.score1.toString() + ' - ' + match.score2.toString();
           }
-          const { player1, player2, score, mode } = match;
-          return { player1, player2, score, mode };
+          const { winner, looser, score, mode } = match;
+          return { winner, looser, score, mode };
         }),
       );
 
@@ -646,7 +637,6 @@ export class UserService {
       throw new BadRequestException('Bad request no friendShip found');
 
     try {
-      // search in friends table
       const friendship = await this.prisma.friends.findFirst({
         where: {
           OR: [
@@ -703,8 +693,6 @@ export class UserService {
           receiver: true,
         },
       });
-      // check if room already exists
-      // create chat room
       const room = await this.prisma.chatroom.create({
         data: {
           name: 'DM',
@@ -721,9 +709,6 @@ export class UserService {
           ChatroomUsers: true,
         },
       });
-      // console.log('room: ', room);
-
-      // send notification to receiver
       return { status: friendShip.status };
     } catch (error) {
       console.log('error adding friend: ', error);
@@ -760,8 +745,6 @@ export class UserService {
             status: 'ACCEPTED',
           },
         });
-        // send notification to sender
-        // create chat room
         sender.sentRequests[0] = newFriendShip;
         return sender;
       } else throw new BadRequestException('Bad request no friendShip found');
@@ -871,7 +854,6 @@ export class UserService {
         },
       });
 
-      // console.log('block: ', block);
       if (block[0]) return { block: true };
       else return { block: false };
     } catch (error) {
@@ -945,8 +927,6 @@ export class UserService {
         }
     }
 
-    // accept game invite
-
   // async createLocalUser(dto: AuthDto): Promise<any> {
   //     try {
   //         const user = await this.prisma.user.create({
@@ -967,19 +947,100 @@ export class UserService {
 
   async addToGameHistory(room: any) {
     try {
-        // const game = await this.prisma.gameHistory.create({
-        //     data: {
-        //         winner: {connect: { id: room.winnerId } },
-        //         winnerScore: room.winnerScore,
-        //         looser: {connect: { id: room.looserId } },
-        //         looserScore: room.winnerScore,
-        //         disconnect: room.disconnect,
-        //     }
-        // });
-        // if (game)
-        //     return game;
+        const game = await this.prisma.matchHistory.create({
+            data: {
+                winner: {connect: { intraId: room.winnerId } },
+                score1: room.winnerScore,
+                looser: {connect: { intraId: room.looserId } },
+                score2: room.looserScore,
+                mode: 'CLASSIC',
+            }
+        });
+
+        const winner = await this.prisma.user.findUnique({
+          where: {
+            intraId: room.winnerId,
+          },
+          select: { id: true }
+        });
+
+        const level = await this.prisma.ladderLevel.update({
+          where: {
+            id: winner.id,
+          },
+          data: {
+            level: {
+              increment: 0.5,
+            }
+          }
+        });
+
+        if (game)
+            return game;
     } catch (error) {
         console.error('Error adding game to the games history: ', error);
     }
 }
+
+  async setAchievements(winner: any, looser: any) {
+    try {
+      console.log('setAchievements', winner)
+      console.log('looser', looser)
+      const w = await this.prisma.user.findUnique({
+        where: {
+          intraId: winner.id,
+        },
+        select: {
+          achievements: true,
+        }
+      })
+      const l = await this.prisma.user.findUnique({
+        where: {
+          intraId: looser.id,
+        },
+        select: {
+          achievements: true,
+        }
+      })
+  
+      console.log(w, l)
+  
+      const wr = w.achievements.map((a: boolean, index) => {
+        if (a === false && winner.achievs[index] === true)
+          return true;
+        else if (a === true) return true
+        else return false
+      })
+
+      const lr = l.achievements.map((a: boolean, index) => {
+        if (a === false && winner.achievs[index] === true)
+          return true;
+        else if (a === true) return true
+        else return false
+      })
+
+      console.log(w, l)
+      await this.prisma.user.update({
+        where: {
+          intraId: winner.id,
+        },
+        data: {
+          achievements: wr
+        }
+      })
+  
+      await this.prisma.user.update({
+        where: {
+          intraId: looser.id,
+        },
+        data: {
+          achievements: lr
+        }
+      })
+
+    } catch (error){
+      console.log(error)
+    }
+  }
+
 }

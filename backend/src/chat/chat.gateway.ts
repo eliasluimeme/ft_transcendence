@@ -65,7 +65,7 @@ async join_chat_rooms(socket: Socket, user_id: number) {
     all_user_rooms.forEach((room) => {
       socket.join(room.chatroom.id + "_room")
     });
-    console.log("All Rooms joined ",socket.rooms)
+    // console.log("All Rooms joined ",socket.rooms)
   }
 
 async handleConnection(client: Socket) {
@@ -83,7 +83,6 @@ async handleConnection(client: Socket) {
       return this.disconnect(client);
 
     this.userToClient.set(user.id, client.id);
-    console.log(client.id, 'successfully connected ');
     client.data.user = verifiedToken
     await this.join_chat_rooms(client, user.id)
     } catch (error) {
@@ -128,7 +127,6 @@ async handleConnection(client: Socket) {
       createdAt : new Date(),
       roomId: data.roomId,
     }
-      console.log("my room  : ", data.roomId  + "_room");
       this.server.to(data.roomId  + "_room").emit('reciecved', pyload);
       await this.chatService.addMessage(data.senderId, newId, data.messageContent);
   }

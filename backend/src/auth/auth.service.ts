@@ -1,11 +1,9 @@
-import { ForbiddenException, Injectable, Res, UnauthorizedException } from '@nestjs/common';
+import { Injectable, } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as argon from 'argon2';
-import { AuthDto } from './dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { UserService } from 'src/user/user.service';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
 
@@ -130,8 +128,17 @@ export class AuthService {
         return user;
     }
 
-    async logout(token: string) {
-        this.blacklistToken.push(token);
+    async logout(id: string) {
+        try {
+            await this.prisma.user.update({
+                where: {
+                    intraId: id,
+                },
+                data: {
+                    status: 'OFFLINE',
+                },
+            });
+        } catch (error) {}
     }
 
 // async signup(dto: AuthDto) {

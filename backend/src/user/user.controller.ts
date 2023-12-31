@@ -1,18 +1,14 @@
-import { BadRequestException, Body, Controller, FileTypeValidator, Get, Post, Query, Req, Res, UnauthorizedException, UploadedFile, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Req, Res, UploadedFile, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
 import { UserService } from './user.service';
 import { Jwt2faAuthGuard } from 'src/auth/guards/jwt-2fa.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { Express, Request, Response } from 'express';
+import { Express } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { settingsDTO } from './dto/settings.dto';
 import { userIdDTO } from './dto/userId.dto';
 import { userNameDTO } from './dto/userName.dto';
-
-// interface fileParams {
-//     fileName: string;
-// }
 
 @Controller()
 export class UserController {
@@ -91,7 +87,6 @@ export class UserController {
     @UseGuards(Jwt2faAuthGuard)
     @UsePipes(ValidationPipe)
     async getUserProfile(@Req() req: any, @Query() params: userNameDTO, @Res() res): Promise<any> {
-      // console.log('users profile:', params.user)
       res.json( await this.userService.searchUser( req.user, params.user ) );
     }
 
@@ -130,13 +125,6 @@ export class UserController {
       res.json( await this.userService.unblockUser(req.user.id, parseInt(param.id)) );
     }
 
-    // @Get('photo')
-    // @UseGuards(Jwt2faAuthGuard)
-    // async getPhoto(@Req() req: any): Promise<any>: Promise<any> {
-    //   const user = await this.userService.findUserByIntraId(req.user.id);
-    //   return user.photo;
-    // }
-
     @Get('settings')
     @UseGuards(Jwt2faAuthGuard)
     async getSettingsData(@Req() req: any): Promise<any> {
@@ -145,7 +133,7 @@ export class UserController {
     
     @Post('settings/update') 
     @UseGuards(Jwt2faAuthGuard)
-    // @UsePipes(ValidationPipe) /// recheck
+    // @UsePipes(ValidationPipe)
     async updateProfile(@Req() req, @Body() body: any): Promise<settingsDTO> {
       return await this.userService.updateProfile(req.user.intraId, body);
     }

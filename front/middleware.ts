@@ -16,7 +16,6 @@ export async function middleware(request: NextRequest) {
 
         return NextResponse.next();
       } catch (error) {
-        console.log(error);
         return NextResponse.redirect('http://localhost:3000/Login');
       }
   }
@@ -26,7 +25,6 @@ export async function middleware(request: NextRequest) {
       await jwtVerify(token!, new TextEncoder().encode(process.env.JWT_SECRET));
       return NextResponse.redirect('http://localhost:3000/');
     } catch (error) {
-        console.log(error);
         return NextResponse.next();
     }
   }

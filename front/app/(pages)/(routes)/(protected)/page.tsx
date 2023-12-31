@@ -3,7 +3,6 @@ import React, { useContext, useEffect } from "react";
 import Image from "next/image";
 import Redirect from "@/components/ui/homeComp/Redirect";
 import { Toaster, toast } from "react-hot-toast";
-import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/navigation";
 import { ModeContext } from "@/components/game/tools/Contexts";
 import {socket} from "@/components/game/tools/SocketCtxProvider"
@@ -13,7 +12,6 @@ import {socket} from "@/components/game/tools/SocketCtxProvider"
 const Page = () => {
   const router = useRouter();
   const mode = useContext(ModeContext);
-  // toast.configure();
   useEffect(() => {
     socket.off('acceptedInvite').on('acceptedInvite', (pyload: string) => {
       toast.success(`${pyload} accepted your invitation , let's play !`,)

@@ -8,7 +8,6 @@ export class GameService {
   //Room attributes
   private logger: Logger = new Logger(GameService.name);
   private readonly board = {width: 500, height: 500};
-  // private readonly board = {width: 500, height: 500};
   private roomstatus: string = "onhold";
   private readonly padel = {width: 5, height: 100, speed: 20};
   private vsBot: boolean = false;
@@ -20,22 +19,19 @@ export class GameService {
   private rachiev: boolean[] = [false, false, false, false, false];
   private leftReady: boolean = false;
   private rightReady: boolean = false;
-  // private leftReady: boolean = false;
-  // private rightReady: boolean = false;
   private ball: Ball = {
     cords:  {x: 500, y: 250},
     vec: {x: 0, y: 0},
     rad: 10,
     speed: 2,
-    repete: 12,
-    // repete: 12,
+    repete: 16,
     timer: '',
     dir: 'left',
   }
   private lplayer = {
     id: '',
     sock: '',
-    padelx: this.board.width - 5,
+    padelx: 0,
     padely: 0,
     score: 0,
     quickRef: 0,
@@ -111,7 +107,7 @@ export class GameService {
     this.ball.cords = {x: 250, y: 250};
     this.lplayer.padely = 0;
     this.rplayer.padely = 5;
-    this.ball.repete = 12;
+    this.ball.repete = 16;
     this.clearTimers();
     this.resetTimers();
   }
@@ -225,17 +221,17 @@ export class GameService {
     if (this.ball.dir == 'left')
     {
       this.calculVecs(angle);
-      if (this.ball.repete < 5)
+      if (this.ball.repete < 6)
         this.lplayer.quickRef++;
     }
     else
     {
       this.calculVecs(180 - angle);
-      if (this.ball.repete < 10)
+      if (this.ball.repete < 6)
         this.rplayer.quickRef++;
     }
-    if (this.ball.repete > 10)
-      this.ball.repete-= 1;
+    if (this.ball.repete > 5)
+      this.ball.repete-= 2;
     clearInterval(this.ball.timer);
     this.ball.timer = setInterval(this.moveBall.bind(this), this.ball.repete);
     clearInterval(this.colTimers.padel);

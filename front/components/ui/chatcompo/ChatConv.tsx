@@ -14,7 +14,6 @@ import { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import 'react-toastify/dist/ReactToastify.css';
 import {socket} from "@/components/game/tools/SocketCtxProvider"
 
 interface Members {

@@ -1086,7 +1086,6 @@ export class ChatService {
               });
               
             if (newMessage){
-                console.log('message saved successfully');
                 return { success: true, message: 'Message sent' }
             }
             else throw new BadRequestException('Something went wrong. Please try again');
