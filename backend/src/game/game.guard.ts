@@ -24,7 +24,7 @@ export class GameGuard implements CanActivate {
     const cookieHeader = client.handshake.headers.cookie;
     if (!cookieHeader)
       return false;
-    logger.error(cookieHeader);
+    // logger.error(cookieHeader);
     const cookies = require('cookie').parse(cookieHeader);
     const token = cookies['access_token'];
     if (!token) return false;

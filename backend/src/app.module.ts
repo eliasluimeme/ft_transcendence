@@ -11,7 +11,6 @@ import { ChatService } from './chat/chat.service';
 import { ChatController } from './chat/chat.controller';
 import { ChatModule } from './chat/chat.module';
 import { join } from 'path';
-import { AppGateway } from './app.gateway';
 import { ScheduleModule } from '@nestjs/schedule';
 import { GameModule } from './game/game.module';
 import { JwtService } from '@nestjs/jwt';
@@ -27,7 +26,7 @@ import { JwtService } from '@nestjs/jwt';
       isGlobal: true,
   })],
   controllers: [AppController, ChatController],
-  providers: [ AppService, ChatService,JwtService, AppGateway, ]
+  providers: [ AppService, ChatService,JwtService, ]
 
 
 })

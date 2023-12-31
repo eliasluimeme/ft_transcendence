@@ -214,7 +214,7 @@ export class UserService {
 
         if (existingNumber[0] && existingNumber[0].number && existingNumber[0].intraId !== id)
           throw new ForbiddenException('Number already in use');
-        else if (existingNumber[0] && existingNumber[0].number.length < 10)
+        else if (existingNumber[0] && existingNumber[0].number.length !== 10)
           throw new ForbiddenException('Invalid phone number');
     }
 

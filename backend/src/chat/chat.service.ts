@@ -1168,7 +1168,7 @@ export class ChatService {
               const newMessage = await this.prisma.message.create({
                 data: {
                     content: message,
-                    senderId: userId,
+                    senderId:  userId,
                     chatroomId: roomId,
                 },
               });
