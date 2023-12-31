@@ -568,6 +568,7 @@ export class UserService {
                 id: friend.receiverId,
               },
               select: {
+                intraId: true,
                 userName: true,
                 photo: true,
               },
@@ -578,15 +579,28 @@ export class UserService {
                 id: friend.senderId,
               },
               select: {
+                intraId: true,
                 userName: true,
                 photo: true,
               },
             });
           }
-          return { userName: user.userName, photo: user.photo };
+          return { intraId: user.intraId, userName: user.userName, photo: user.photo };
         }),
       );
-      return friends;
+
+      const me = await this.prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
+        select: {
+          intraId: true,
+          userName: true,
+          photo: true,
+        },
+      })
+
+      return {me, friends};
     } catch (error) {
       console.log('error getting friends: ', error);
     }
