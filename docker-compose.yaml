@@ -13,6 +13,7 @@ services:
       - ./front/src:/src/src
     depends_on:
       - backend
+    restart: always
 
   backend:
     build:
@@ -26,6 +27,7 @@ services:
       - ./backend/.env
     volumes:
       - ./backend/src:/src/src
+    restart: always
 
   database:
     image: postgres:13
