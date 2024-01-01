@@ -35,10 +35,8 @@ services:
 
   database:
     image: postgres:13
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 123
-      POSTGRES_DB: nest
+    env_file:
+      - ./backend/.env
     ports:
       - "5432:5432"
       - '5555:5555'

@@ -14,7 +14,7 @@ const FillSet: React.FC = () => {
   const router = useRouter();
   const fetchData = async () => {
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}settings`, {
+      const response = await axios.get(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/settings`, {
         withCredentials: true,
       });
       if (response.status === 200) {
@@ -51,7 +51,7 @@ const FillSet: React.FC = () => {
     try {
     if(!checkEmpty(inputValues.fullName, inputValues.userName)) {
       const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}settings/update`,
+      `http://${process.env.NEXT_PUBLIC_BACKEND_URL}/settings/update`,
           inputValues,
           {
             withCredentials: true,

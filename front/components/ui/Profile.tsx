@@ -43,7 +43,7 @@ const Pic = () => {
   const router = useRouter();
   const fetchData = async () => {
     try {
-      const response = await axios.get(process.env.NEXT_PUBLIC_BACKEND_URL + "settings", {
+      const response = await axios.get(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/settings`, {
         withCredentials: true,
       });
       if (response.status === 200) {
@@ -71,7 +71,7 @@ const Pic = () => {
     try {
       // Fetch QR code data when the user clicks on "Enable 2FA"
       const response = await axios.get(
-        process.env.NEXT_PUBLIC_BACKEND_URL + "auth/2fa/generate",
+        `http://${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/2fa/generate`,
         {
           withCredentials: true,
         }
@@ -89,7 +89,7 @@ const Pic = () => {
   const handleDisable2FA = async () => {
     try {
       const response = await axios.get(
-        process.env.NEXT_PUBLIC_BACKEND_URL + "auth/2fa/turn-off",
+        `http://${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/2fa/turn-off`,
         {
           withCredentials: true,
         }
@@ -132,7 +132,7 @@ const Pic = () => {
 
     try {
       const response = await axios.post(
-        process.env.NEXT_PUBLIC_BACKEND_URL + "auth/2fa/turn-on",
+        `http://${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/2fa/turn-on`,
         code,
         {
           withCredentials: true,
@@ -170,7 +170,7 @@ const Pic = () => {
       formData.append("photo", selectedFile);
       try {
         const response = await axios.post(
-          process.env.NEXT_PUBLIC_BACKEND_URL + "photo/upload",
+          `http://${process.env.NEXT_PUBLIC_BACKEND_URL}/photo/upload`,
           formData,
           {
             withCredentials: true,
@@ -213,7 +213,7 @@ const Pic = () => {
   const handleSaveAvatar = async () => {
     try {
       const response = await axios.post(
-        process.env.NEXT_PUBLIC_BACKEND_URL +"settings/avatar",
+        `http://${process.env.NEXT_PUBLIC_BACKEND_URL}/settings/avatar`,
         { photo: selectedImage },
         {
           withCredentials: true,

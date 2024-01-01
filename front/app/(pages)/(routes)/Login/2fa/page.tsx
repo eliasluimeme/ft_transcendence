@@ -23,7 +23,7 @@ const Page = () => {
 
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}auth/2fa/login`,
+        `http://${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/2fa/login`,
         code,
         {
           withCredentials: true,

@@ -16,14 +16,14 @@ export async function middleware(request: NextRequest) {
 
         return NextResponse.next();
       } catch (error) {
-        return NextResponse.redirect('http://localhost:3000/Login');
+        return NextResponse.redirect(`http://${process.env.NEXT_PUBLIC_FRONTEND_URL}/Login`);
       }
   }
 
   if (request.nextUrl.pathname === '/Login') {
     try {
       await jwtVerify(token!, new TextEncoder().encode(process.env.JWT_SECRET));
-      return NextResponse.redirect('http://localhost:3000/');
+      return NextResponse.redirect(`http://${process.env.NEXT_PUBLIC_FRONTEND_URL}/`);
     } catch (error) {
         return NextResponse.next();
     }

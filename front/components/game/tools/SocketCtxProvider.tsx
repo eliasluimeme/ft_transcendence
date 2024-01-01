@@ -9,7 +9,7 @@ export const SocketCtxProvider = ({ children }: {
   children: JSX.Element;
 }) => {
   const initialSocket = async ()=>{
-    socket = io(process.env.NEXT_PUBLIC_BACKEND_URL + 'game', {
+    socket = io(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/game`, {
       withCredentials: true, 
     });
   }

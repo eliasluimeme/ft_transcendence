@@ -29,7 +29,7 @@ const GetAchivment = (indice: string) => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          process.env.NEXT_PUBLIC_BACKEND_URL + "users/achievement",
+          `http://${process.env.NEXT_PUBLIC_BACKEND_URL}/users/achievement`,
           {
             withCredentials: true,
             params: {
@@ -150,7 +150,7 @@ const GetMatchHistory = (indice: string): MatchHistory[] => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get(process.env.NEXT_PUBLIC_BACKEND_URL +"users/matchs", {
+      const response = await axios.get(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/users/matchs`, {
         withCredentials: true,
         params: {
           user: indice,

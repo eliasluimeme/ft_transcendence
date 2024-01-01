@@ -26,7 +26,7 @@ export default function NavBar() {
   const router = useRouter();
   const logout = async () => {
     try {
-      const response = await axios.get(process.env.NEXT_PUBLIC_BACKEND_URL + "logout", {
+      const response = await axios.get(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/logout`, {
         withCredentials: true,
       });
 

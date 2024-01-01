@@ -16,8 +16,7 @@ import { idMessageDto } from './dto/id.dto';
 @Injectable()
 @WebSocketGateway({
   cors: {
-    origin: 
-    'http://localhost:3000',
+    origin: `http://${process.env.FRONTEND_URL}`,
     credentials: true,
   },
   namespace: 'chat',

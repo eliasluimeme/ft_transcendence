@@ -5,10 +5,8 @@ services:
     restart: always
     ports:
       - 5434:5432
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 123
-      POSTGRES_DB: nest
+    env_file:
+      - ./.env
     networks:
       - postgres
 networks:

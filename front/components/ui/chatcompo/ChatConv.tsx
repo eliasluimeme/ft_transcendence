@@ -39,7 +39,7 @@ function ChatConv(oldeId: any) {
   const fetchrol = async () => {
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}chat/settings/role`,
+        `http://${process.env.NEXT_PUBLIC_BACKEND_URL}/chat/settings/role`,
         {
           withCredentials: true,
           params: {
@@ -70,7 +70,7 @@ function ChatConv(oldeId: any) {
   const fetchownerimage = async () => {
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}chat/settings/staff`,
+        `http://${process.env.NEXT_PUBLIC_BACKEND_URL}/chat/settings/staff`,
         {
           withCredentials: true,
           params: {
@@ -105,7 +105,7 @@ function ChatConv(oldeId: any) {
   const fetchRoomData = async () => {
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}chat/conversations/members`,
+        `http://${process.env.NEXT_PUBLIC_BACKEND_URL}/chat/conversations/members`,
         {
           withCredentials: true,
           params: {
@@ -143,7 +143,7 @@ function ChatConv(oldeId: any) {
   const fetchmemberdata = async () => {
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}chat/settings/members`,
+        `http://${process.env.NEXT_PUBLIC_BACKEND_URL}/chat/settings/members`,
         {
           withCredentials: true,
           params: {
@@ -178,7 +178,7 @@ function ChatConv(oldeId: any) {
   const fetchMuteAndAdmine = async () => {
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}chat/settings/members/infos`,
+        `http://${process.env.NEXT_PUBLIC_BACKEND_URL}/chat/settings/members/infos`,
         {
           withCredentials: true,
           params: {
@@ -226,7 +226,7 @@ function ChatConv(oldeId: any) {
           return;
         }
         const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}chat/settings/mute`,
+          `http://${process.env.NEXT_PUBLIC_BACKEND_URL}/chat/settings/mute`,
           {
             roomId: id,
             userId: data.id,
@@ -263,7 +263,7 @@ function ChatConv(oldeId: any) {
           return;
         }
         const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}chat/settings/kick`,
+          `http://${process.env.NEXT_PUBLIC_BACKEND_URL}/chat/settings/kick`,
           {
             roomId: id,
             userId: data.id,
@@ -296,7 +296,7 @@ function ChatConv(oldeId: any) {
     const sendban = async () => {
       try {
         const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}chat/settings/ban`,
+          `http://${process.env.NEXT_PUBLIC_BACKEND_URL}/chat/settings/ban`,
           {
             id,
             userId: data?.id,
@@ -329,7 +329,7 @@ function ChatConv(oldeId: any) {
       }
       try {
         const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}chat/settings/add/admin`,
+          `http://${process.env.NEXT_PUBLIC_BACKEND_URL}/chat/settings/add/admin`,
           {
             roomId: id,
             userId: data.id,
@@ -363,7 +363,7 @@ function ChatConv(oldeId: any) {
       try {
         console.log("id === ", id)
         const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}chat/settings/leave`,
+          `http://${process.env.NEXT_PUBLIC_BACKEND_URL}/chat/settings/leave`,
           {
             roomId: id,
           },
@@ -397,7 +397,7 @@ function ChatConv(oldeId: any) {
   const send_data = async () => {
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}chat/settings/add/member`,
+        `http://${process.env.NEXT_PUBLIC_BACKEND_URL}/chat/settings/add/member`,
         {
           roomId: id,
           userName: frdName,
@@ -428,7 +428,7 @@ function ChatConv(oldeId: any) {
   const sendNewPassword = async () => {
     try {
       const response = await axios.post(
-        process.env.NEXT_PUBLIC_BACKEND_URL + "chat/settings/update",
+        `http://${process.env.NEXT_PUBLIC_BACKEND_URL}/chat/settings/update`,
         {
           roomId: id,
           newPassword: newPassword,
@@ -453,7 +453,7 @@ function ChatConv(oldeId: any) {
   const deleatPassword = async () => {
     try {
       const response = await axios.post(
-        process.env.NEXT_PUBLIC_BACKEND_URL + "chat/settings/delete",
+        `http://${process.env.NEXT_PUBLIC_BACKEND_URL}/chat/settings/delete`,
         {
           roomId: id,
         },

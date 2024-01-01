@@ -14,7 +14,7 @@ const GetLeader = () => {
   ]);
   const takeleader = async () => {
     try {
-      const response = await axios.get(process.env.NEXT_PUBLIC_BACKEND_URL + "ladderboard", {
+      const response = await axios.get(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/ladderboard`, {
         withCredentials: true,
       });
       if (response.status === 200) {
