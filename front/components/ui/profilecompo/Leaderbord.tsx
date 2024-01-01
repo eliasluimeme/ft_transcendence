@@ -27,10 +27,10 @@ const GetLeader = () => {
           );
           setleader(newleader)
       } else {
-        console.log("Failed to fetch friendship data");
+
       }
     } catch (error) {
-      console.error("An error occurred while fetching friendship data:", error);
+
     }
   };
   useEffect(() => {
@@ -48,10 +48,10 @@ const GetRank = () => {
       if (response.status === 200) {
         getRank(response.data.rank)
       } else {
-        console.log("Failed to fetch friendship data");
+
       }
     } catch (error) {
-      console.error("An error occurred while fetching friendship data:", error);
+
     }
   };
   useEffect(() => {

@@ -48,10 +48,8 @@ const GetAchivment = () => {
         ];
         setAchievements(newAchievements);
       } else {
-        console.log("failed to fetchdata");
       }
     } catch (error) {
-      console.error("An error occurred while fetching user data:", error);
     }
   };
   useEffect(() => {
@@ -152,10 +150,8 @@ const GetMatchHistory = (): MatchHistory[] => {
 
         setmatchHistory(newMatchHistory);
       } else {
-        console.log("failed to fetchdata");
       }
     } catch (error) {
-      console.error("An error occurred while fetching user data:", error);
     }
   };
   useEffect(() => {

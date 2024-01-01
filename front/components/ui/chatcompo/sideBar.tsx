@@ -50,13 +50,8 @@ function SideBar() {
             }));
             setFriends(newFriends);
           } else {
-            console.log("Failed to fetch friendship data");
           }
         } catch (error) {
-          console.error(
-            "An error occurred while fetching friendship data:",
-            error
-          );
         }
       };
 

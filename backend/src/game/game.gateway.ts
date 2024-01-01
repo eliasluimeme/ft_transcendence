@@ -190,6 +190,7 @@ export class GameGateway {
   }
   @SubscribeMessage('quitGame')
   quitGame(client: Socket) {
+    console.log("khrijt");
     const looser: Player = this.players.get(client.data);
     if (!looser)
       return;
@@ -252,5 +253,6 @@ handelAccept(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
     }
     this.userservice.setAchievements(rslts.winner, rslts.looser)
     this.rooms.delete(roomid);
+    console.log("sdit room");
   }
 }

@@ -45,7 +45,6 @@ export class AuthService {
         try {
             await this.userService.updateUser(userId, { twoFactorAuthSecret: secret });
         } catch (error) {
-            console.error('Error setting 2FA secret: ', error);
         }
     }
 
@@ -73,7 +72,6 @@ export class AuthService {
             if (update)
                 return { success: true }
         } catch (error) {
-            console.error('Error enabling 2FA: ', error);
         }
     }
 
@@ -83,7 +81,7 @@ export class AuthService {
             if (update)
                 return { success: true }
         } catch (error) {
-            console.error('Error disabling 2FA: ', error);
+
         }
     }
 

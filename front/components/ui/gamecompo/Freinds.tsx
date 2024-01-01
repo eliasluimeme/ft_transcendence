@@ -26,18 +26,6 @@ const GetFriends = () => {
 
   //////////////////////// Invit Friend to play with  ///////////////////////////////
 
-  const handleAccept = (pyload: any) => {
-    socket.emit('acceptedInvite', pyload);
-    router.push('/game');
-  };
-
-  useEffect(() => {
-    socket.off('acceptedInvite').on('acceptedInvite', (pyload: string) => {
-      toast.success(`${pyload} accepted your invitation , let's play !`)
-      mode.updateContextValue('friend');
-      router.push('/game/board');
-    });
-  }, []);
 
   const invitToPlay = (friend: freind) => {
 
@@ -54,26 +42,6 @@ const GetFriends = () => {
     socket.emit('inviteEvent', send, recieve);
   }
 
-  useEffect(() => {
-    socket.off('inviteEvent').on('inviteEvent', (data: any) => {
-      console.log('Im here inside useEffect !', data);
-      toast(() => (
-        <span>
-          <b>{data[0].senderName} invited you to play Pong ! </b>
-          <button onClick={() => toast.dismiss()}
-            className="border bg-red-500 rounded-ls px-5 py-1"
-          >
-            Dismiss
-          </button>
-          <button onClick={() => handleAccept(data[1])}
-            className="border bg-green-500 rounded-ls  px-5 py-1"
-          >
-            Accept
-          </button>
-        </span>
-      ));
-    });
-  }, []);
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -92,10 +60,8 @@ const GetFriends = () => {
         setfreind(newfreind)
         setMe(response.data.me)
       } else {
-        console.log("Failed to fetch friendship data");
       }
     } catch (error) {
-      console.error("An error occurred while fetching friendship data:", error);
     }
   };
   useEffect(() => {

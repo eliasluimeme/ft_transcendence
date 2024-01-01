@@ -78,7 +78,6 @@ const Room = (props:any) => {
 
   useEffect( () => {
     setBoardSize();
-    console.log(boardSize.current.width,oppadel.current.x);
     var timer:any;
     const updateCanvas = () => {newChange(prev => prev + 1)};
     window.addEventListener('resize', setBoardSize);
@@ -113,6 +112,7 @@ const Room = (props:any) => {
       window.removeEventListener('keydown', handleArrowKeys);
       clearInterval(timer);
       clearInterval(updater);
+      console.log("called");
       socket.emit('quitGame');
     }
   }, []);

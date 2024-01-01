@@ -36,16 +36,13 @@ const CreateRoom = () => {
         withCredentials: true,
       });
       if (response.status === 201) {
-        console.log("success");
         toast.success("Room Created Successfuly");
       } else {
-        console.log("Failed to fetch group data");
       }
     } catch (error: any) {
       if (error.response) {
         toast.error(error.response.data.message || 'An error occurred');
       }
-      console.error("An error occurred while fetching group data:", error);
     }
   };
 

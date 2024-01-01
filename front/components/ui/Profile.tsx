@@ -52,11 +52,9 @@ const Pic = () => {
           toFAStatu: response.data.isTwoFactorAuthEnabled,
         });
       } else {
-        console.log("failed to fetchdata");
       }
     } catch (error) {
       router.push("/Login");
-      console.error("An error occurred while fetching user data:", error);
     }
   };
   useEffect(() => {
@@ -84,10 +82,8 @@ const Pic = () => {
         setIsOpen(true); // Open the modal after fetching QR code
         router.push('/settings')
       } else {
-        console.log("Unexpected response status:", response.status);
       }
     } catch (error) {
-      console.error("An error occurred while fetching QR code:", error);
     }
   };
   const handleDisable2FA = async () => {
@@ -104,13 +100,11 @@ const Pic = () => {
         if (response.data.off === true)
           router.push('/Login')
       } else {
-        console.log("Unexpected response status:", response.status);
       }
     } catch (error: any) {
       if (error.response) {
         toast.error(error.response.data.message || 'An error occurred');
       }
-      console.error("An error occurred while fetching QR code:", error);
     }
   };
 
@@ -153,13 +147,11 @@ const Pic = () => {
         if (response.data.on === true)
           router.refresh();
       } else {
-        console.error("Failed to send data.");
       }
     } catch (error: any) {
       if (error.response) {
         toast.error(error.response.data.message || 'An error occurred');
       }
-      console.error("An error occurred while sending data:", error);
     }
   };
 
@@ -195,10 +187,10 @@ const Pic = () => {
             photo: response.data.photo,
           });
         } else {
-          console.log("Unexpected response status:", response.status);
+
         }
       } catch (error) {
-        console.error("An error occurred while uploading the image:", error);
+
       }
     }
   };
@@ -240,11 +232,9 @@ const Pic = () => {
         setUploadModalAvatarOpen(false); // Close the modal if needed
       } else {
         // Handle failure (e.g., show error message)
-        console.error("Failed to send image URL.");
       }
     } catch (error) {
       // Handle the error
-      console.error("An error occurred while sending image URL:", error);
     }
   };
   ///////////////////////////////////////////////////////////////////

@@ -56,7 +56,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
             return user;
         } else return user;
     } catch (error) {
-        console.error('Error finding user: ', error);
     }
 }
 
@@ -86,7 +85,7 @@ async handleConnection(client: Socket) {
     client.data.user = verifiedToken
     await this.join_chat_rooms(client, user.id)
     } catch (error) {
-        console.log('erroooor: ', error);
+        // console.log('erroooor: ', error);
       return this.disconnect(client);
     }
   }

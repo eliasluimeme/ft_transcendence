@@ -35,12 +35,9 @@ const Page = () => {
 
       if (response.status === 201) {
         router.push("/");
-        console.log("Data sent successfully!");
       } else {
-        console.error("Failed to send data.");
       }
     } catch (error) {
-      console.error("An error occurred while sending data:", error);
     }
   };
 

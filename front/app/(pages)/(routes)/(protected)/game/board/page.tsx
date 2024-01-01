@@ -30,11 +30,9 @@ export default function Page() {
         me.current.userName = response.data.userName;
         me.current.photo = response.data.photo;
       } else {
-        console.log("failed to fetchdata");
       }
     } catch (error) {
       router.push("/Login");
-      console.error("An error occurred while fetching user data:", error);
     }
   };
 
@@ -54,7 +52,6 @@ export default function Page() {
         }
 
         socket.on('goback', (reason: string) => {
-          console.log(reason);
           gameRslts.current = reason;
           setStatus(2);
         });
@@ -80,7 +77,4 @@ export default function Page() {
     return(<Room socket={socket} data={data} me={self}/>);
   else if (status == 2)
     return(<Results rslt={gameRslts.current} setStatus={(msg:number) => changeModule(msg)} />);
-  else {
-      return <div>Unexpected state</div>;
-  }
 };

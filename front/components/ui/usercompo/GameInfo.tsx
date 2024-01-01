@@ -58,10 +58,10 @@ const GetAchivment = (indice: string) => {
           ];
           setAchievements(newAchievements);
         } else {
-          console.log("failed to fetch data");
+
         }
       } catch (error) {
-        console.error("An error occurred while fetching user data:", error);
+
       }
     };
 
@@ -170,10 +170,9 @@ const GetMatchHistory = (indice: string): MatchHistory[] => {
 
         setMatchHistory(newMatchHistory);
       } else {
-        console.log("Failed to fetch data");
+
       }
     } catch (error) {
-      console.error("An error occurred while fetching user data:", error);
     }
   };
 

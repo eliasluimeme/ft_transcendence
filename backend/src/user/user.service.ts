@@ -27,7 +27,6 @@ export class UserService {
 
       return user;
     } catch (error) {
-      console.error('Error creating user: ', error);
     }
   }
 
@@ -39,7 +38,6 @@ export class UserService {
 
       return higherLevels + 1;
     } catch (error) {
-      console.error('Error getting user rank: ', error);
     }
   }
 
@@ -53,7 +51,6 @@ export class UserService {
 
       if (userLevel) return userLevel.level;
     } catch (error) {
-      console.error('Error getting user level: ', error);
     }
   }
 
@@ -66,7 +63,7 @@ export class UserService {
       });
       return matchHistory;
     } catch (error) {
-      console.log('Error getting match history: ', error);
+
     }
   }
 
@@ -82,7 +79,6 @@ export class UserService {
       });
       if (user) return user.status;
     } catch (error) {
-      console.error('Error getting user level: ', error);
     }
   }
 
@@ -139,7 +135,6 @@ export class UserService {
         status: status,
       };
     } catch (error) {
-      console.log('error getting profile: ', error);
     }
   }
 
@@ -165,7 +160,6 @@ export class UserService {
 
       return topPlayers;
     } catch (error) {
-      console.log('Failed to get ladderboard: ', error);
     }
   }
 
@@ -174,7 +168,6 @@ export class UserService {
       const rank = await this.getUserRank(userlevel);
       return { rank: rank };
     } catch (error) {
-      console.log('Failed to get rank: ', error);
     }
   }
 
@@ -193,11 +186,14 @@ export class UserService {
                     isTwoFactorAuthEnabled: true
                 }
             });
+            if (user.number === null)
+              user.number = '';
+            if (user.country === null)
+              user.country = '';
             if (user)
                 return user;
             else throw new NotFoundException('User not found');
         } catch (error) {
-            console.error('Error getting user settings: ', error);
             if (error instanceof NotFoundException)
                 throw error;
         }
@@ -260,7 +256,6 @@ export class UserService {
 
             return user;
         } catch (error) {
-            console.error('Error updating user: ', error);
         }
     }
 
@@ -279,7 +274,6 @@ export class UserService {
             });
             return user;
         } catch (error) {
-            console.error('Error updating user avatar: ', error);
         }
     }
 
@@ -293,7 +287,6 @@ export class UserService {
             });
             return user;
         } catch (error) {
-            console.error('Error updating user: ', error);
         }
     }
 
@@ -308,7 +301,6 @@ export class UserService {
             });
             return user;
         } catch (error) {
-            console.error('Error updating user: ', error);
         }
       }
   }
@@ -329,7 +321,6 @@ export class UserService {
             } else return user;
         } catch (error) {
             // check prisma error status code
-            console.error('Error finding user: ', error);
         }
     }
 
@@ -345,7 +336,6 @@ export class UserService {
             return user;
         } catch (error) {
             // check prisma error status code
-            console.error('Error finding user: ', error);
         }
     }
 
@@ -356,9 +346,7 @@ export class UserService {
                     id: id,
                 }
             });
-            console.log('User deleted');
         } catch (error) {
-            console.error('Error deleting user: ', error);
         }
     }
 
@@ -391,7 +379,6 @@ export class UserService {
       else return { user: query };
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
-      console.log(error);
     }
   }
 
@@ -488,7 +475,6 @@ export class UserService {
         } else throw new NotFoundException('User not found');
       } catch (error) {
         if (error instanceof NotFoundException) throw error;
-        console.log('error finding users: ', error);
       }
     } else throw new BadRequestException('Invalid input');
   }
@@ -505,7 +491,6 @@ export class UserService {
       });
       return userAchievements;
     } catch (error) {
-      console.log('error finding users: ', error);
     }
   }
 
@@ -574,7 +559,6 @@ export class UserService {
 
       return matchHistory;
     } catch (error) {
-      console.log('error searching users: ', error);
     }
   }
 
@@ -628,7 +612,6 @@ export class UserService {
 
       return {me, friends};
     } catch (error) {
-      console.log('error getting friends: ', error);
     }
   }
 
@@ -655,7 +638,6 @@ export class UserService {
       if (!friendship) return { status: 'NONE' };
       else return { status: friendship.status };
     } catch (error) {
-      console.log('error getting friendship: ', error);
     }
   }
 
@@ -711,7 +693,6 @@ export class UserService {
       });
       return { status: friendShip.status };
     } catch (error) {
-      console.log('error adding friend: ', error);
       throw error;
     }
   }
@@ -749,7 +730,6 @@ export class UserService {
         return sender;
       } else throw new BadRequestException('Bad request no friendShip found');
     } catch (error) {
-      console.log('error accepting friend: ', error);
       throw error;
     }
   }
@@ -778,7 +758,6 @@ export class UserService {
         return newFriendShip;
       } else throw new BadRequestException('Bad request no friendShip found');
     } catch (error) {
-      console.log('error accepting friend: ', error);
       throw error;
     }
   }
@@ -833,7 +812,6 @@ export class UserService {
       else throw new BadRequestException('No friendShip found');
     } catch (error) {
       if (error instanceof BadRequestException) throw error;
-      console.log('error accepting friend: ', error);
     }
   }
 
@@ -857,7 +835,6 @@ export class UserService {
       if (block[0]) return { block: true };
       else return { block: false };
     } catch (error) {
-      console.log('error getting friendship: ', error);
     }
   }
 
@@ -879,7 +856,6 @@ export class UserService {
           ],
         },
       });
-      console.log('in block', user);
       if (!user[0]) {
         await this.prisma.blocks.create({
           data: {
@@ -890,7 +866,6 @@ export class UserService {
         return { block: true };
       } else throw new BadRequestException('User already blocked');
     } catch (error) {
-      console.log('error blocking user: ', error);
       throw error;
     }
   }
@@ -908,7 +883,6 @@ export class UserService {
       if (unblock.count) return { unblock: true };
       else throw new BadRequestException('Cannot unblock user');
     } catch (error) {
-      console.log('error blocking user: ', error);
       throw error;
     }
   }
@@ -922,7 +896,6 @@ export class UserService {
             // });
             // console.log(invite);
         } catch(error) {
-            console.log('error inviting user: ', error);
             throw error;
         }
     }
@@ -978,7 +951,6 @@ export class UserService {
         if (game)
             return game;
     } catch (error) {
-        console.error('Error adding game to the games history: ', error);
     }
 }
 
@@ -1034,7 +1006,6 @@ export class UserService {
       })
 
     } catch (error){
-      console.log(error)
     }
   }
 

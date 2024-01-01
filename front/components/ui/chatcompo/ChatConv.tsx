@@ -51,10 +51,10 @@ function ChatConv(oldeId: any) {
           setrol(true);
         else setrol(false);
       } else {
-        console.log("Failed to fetch member data");
+
       }
     } catch (error) {
-      console.error("An error occurred while fetching member data:", error);
+
     }
   };
 
@@ -88,10 +88,10 @@ function ChatConv(oldeId: any) {
           setAdmines(null);
         }
       } else {
-        console.log("Failed to fetch member data");
+
       }
     } catch (error) {
-      console.error("An error occurred while fetching member data:", error);
+
     }
   };
   useEffect(() => {
@@ -122,10 +122,10 @@ function ChatConv(oldeId: any) {
         if (me)
           setSenderInvit(me);
       } else {
-        console.log("Failed to fetch member data");
+
       }
     } catch (error) {
-      console.error("An error occurred while fetching member data:", error);
+
     }
   }
   useEffect(() => {
@@ -159,10 +159,9 @@ function ChatConv(oldeId: any) {
         }));
         setMembers(newMembers);
       } else {
-        console.log("Failed to fetch member data");
+
       }
     } catch (error) {
-      console.error("An error occurred while fetching member data:", error);
     }
   };
   useEffect(() => {
@@ -191,10 +190,10 @@ function ChatConv(oldeId: any) {
         setMuteStatu(response.data.isMuted);
         if (rol === true && response.data.role === "USER") setAdmine(false);
       } else {
-        console.log("Failed to fetch member data");
+
       }
     } catch (error) {
-      console.error("An error occurred while fetching member data:", error);
+
     }
   };
 
@@ -243,16 +242,12 @@ function ChatConv(oldeId: any) {
           setMuteStatu(response.data);
           router.push("/chat/chatconv?id=" + id);
         } else {
-          console.log("Failed to fetch friendship data");
+
         }
       } catch (error: any) {
         if (error.response) {
           toast.error(error.response.data.message || 'An error occurred');
         }
-        console.error(
-          "An error occurred while fetching friendship data:",
-          error
-        );
       }
     };
     sendmute();
@@ -281,16 +276,13 @@ function ChatConv(oldeId: any) {
           router.push("/chat/chatconv?id=" + id);
           toast.success("Admin Kicked Successfuly");
         } else {
-          console.log("Failed to fetch friendship data");
+
         }
       } catch (error: any) {
         if (error.response) {
           toast.error(error.response.data.message || 'An error occurred');
         }
-        console.error(
-          "An error occurred while fetching friendship data:",
-          error
-        );
+  
       }
     };
     sendkick();
@@ -315,16 +307,13 @@ function ChatConv(oldeId: any) {
         if (response.status === 201) {
           toast.success("Admin Banned Successfuly");
         } else {
-          console.log("Failed to fetch friendship data");
+
         }
       } catch (error: any) {
         if (error.response) {
           toast.error(error.response.data.message || 'An error occurred');
         }
-        console.error(
-          "An error occurred while fetching friendship data:",
-          error
-        );
+
       }
     };
     sendban();
@@ -354,16 +343,12 @@ function ChatConv(oldeId: any) {
           else if (response.data.role === "USER")
             toast.success("Admin Removed Successfuly");
         } else {
-          console.log("Failed to fetch friendship data");
+
         }
       } catch (error: any) {
         if (error.response) {
           toast.error(error.response.data.message || 'An error occurred');
         }
-        console.error(
-          "An error occurred while fetching friendship data:",
-          error
-        );
       }
     };
     sendadmine();
@@ -388,16 +373,12 @@ function ChatConv(oldeId: any) {
           router.push("/chat/");
           toast.success("Room Left");
         } else {
-          console.log("Failed to fetch friendship data");
+
         }
       } catch (error: any) {
         if (error.response) {
           toast.error(error.response.data.message || 'An error occurred');
         }
-        console.error(
-          "An error occurred while fetching friendship data:",
-          error
-        );
       }
     };
     sendleave();
@@ -428,13 +409,11 @@ function ChatConv(oldeId: any) {
         router.push("/chat/chatconv?id=" + id);
         toast.success("Member Added Successfuly");
       } else {
-        console.log("Failed to fetch friendship data");
       }
     } catch (error: any) {
       if (error.response) {
         toast.error(error.response.data.message || 'An error occurred');
       }
-      console.error("An error occurred while fetching friendship data:", error);
     }
     toupdate(update + 1);
   };
@@ -459,13 +438,13 @@ function ChatConv(oldeId: any) {
       if (response.status === 201) {
         toast.success("Password Changed Successfuly");
       } else {
-        console.log("Failed to fetch friendship data");
+
       }
     } catch (error: any) {
       if (error.response) {
         toast.error(error.response.data.message || 'An error occurred');
       }
-      console.error("An error occurred while fetching friendship data:", error);
+
     }
   };
 
@@ -483,13 +462,13 @@ function ChatConv(oldeId: any) {
       if (response.status === 201) {
         toast.success("Password Deleted Successfuly");
       } else {
-        console.log("Failed to fetch friendship data");
+
       }
     } catch (error: any) {
       if (error.response) {
         toast.error(error.response.data.message || 'An error occurred');
       }
-      console.error("An error occurred while fetching friendship data:", error);
+
     }
   };
 

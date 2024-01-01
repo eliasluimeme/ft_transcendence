@@ -33,7 +33,6 @@ export default function NavBar() {
       if (response.status === 200)
         router.push("http://localhost:3000/Login");
     } catch (error) {
-      console.error("Error during logout:", error);
     }
   };
   return (

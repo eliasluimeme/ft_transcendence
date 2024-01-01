@@ -25,10 +25,8 @@ const FillSet: React.FC = () => {
           number: response.data.number,
         });
       } else {
-        console.log("failed to fetchdata");
       }
     } catch (error) {
-      console.error("An error occurred while fetching user data:", error);
     }
   };
 
@@ -63,7 +61,6 @@ const FillSet: React.FC = () => {
           }
           );
           if (response.status === 201) {
-            console.log("Data sent successfully!");
             toast.success('Data sent successfully!');
           } else if (response.status === 403) {
             toast.error(response.data.message || 'An error occurred');
@@ -74,7 +71,6 @@ const FillSet: React.FC = () => {
         if (error.response && error.response.status === 403) {
           toast.error(error.response.data.message || 'An error occurred');
         }
-      console.error("An error occurred while sending data:", error);
     }
   };
 

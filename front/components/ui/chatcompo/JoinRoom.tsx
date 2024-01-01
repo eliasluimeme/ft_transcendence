@@ -33,13 +33,11 @@ const JoinRoom = () => {
         router.push('/chat/chatconv?id=' + response.data.id);
         toast.success("Room Joined Successfuly");
       } else {
-        console.log("Failed to fetch group data");
       }
     } catch (error: any) {
       if (error.response) {
         toast.error(error.response.data.message || 'An error occurred');
       }
-      console.error("An error occurred while fetching group data:", error);
     }
   };
 

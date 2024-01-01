@@ -55,13 +55,11 @@ const ChatInput = (id: any) => {
         return undefined;
       }
     } catch (error) {
-      console.error(error);
       return undefined;
     }
   }
   useEffect(() => {
     fetHistoric();
-    console.log(" blocked array ", blocked)
   }, [id])
 
 
@@ -88,7 +86,6 @@ const ChatInput = (id: any) => {
         return undefined;
       }
     } catch (error) {
-      console.error(error);
       return undefined;
     }
   }

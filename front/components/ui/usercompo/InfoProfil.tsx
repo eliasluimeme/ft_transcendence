@@ -55,10 +55,8 @@ const InfoProfil = (id: any) => {
           takeFrLogic(fetchedData);
           takeblockLogic (fetchedData);
         } else {
-          console.log("Failed to fetch data");
         }
       } catch (error) {
-        console.error("An error occurred while fetching user data:", error);
       }
     };
 
@@ -79,10 +77,10 @@ const InfoProfil = (id: any) => {
         else if (response.data.status === "ACCEPTED")
           setFr("Unfriend");
       } else {
-        console.log("Failed to fetch friendship data");
+
       }
     } catch (error) {
-      console.error("An error occurred while fetching friendship data:", error);
+
     }
   };
 
@@ -99,10 +97,10 @@ const InfoProfil = (id: any) => {
           setblock("unblock")
         else  setblock("block")
       } else {
-        console.log("Failed to fetch friendship data");
+
       }
     } catch (error) {
-      console.error("An error occurred while fetching friendship data:", error);
+
     }
   };
 
@@ -121,10 +119,10 @@ const InfoProfil = (id: any) => {
           toast.success("Friend added successfully");
           setFr("Unfriend");
         } else {
-          console.log("Failed to add friend");
+
         }
       } catch (error) {
-        console.error("An error occurred while adding friend:", error);
+
       }
     } else if (fr === "Unfriend") {
       try {
@@ -138,13 +136,12 @@ const InfoProfil = (id: any) => {
           setFr("Add friend");
           toast.success("Friend removed successfully");
         } else {
-          console.log("Failed to reject friend");
+
         }
       } catch (error: any) {
         if (error.response) {
           toast.error(error.response.data.message || 'An error occurred');
         }
-        console.error("An error occurred while rejecting friend:", error);
       }
     }
   };
@@ -162,13 +159,13 @@ const InfoProfil = (id: any) => {
           setblock("unblock")
           toast.success("Friend blocked successfully");
         } else {
-          console.log("Failed to add friend");
+
         }
       } catch (error: any) {
         if (error.response) {
           toast.error(error.response.data.message || 'An error occurred');
         }
-        console.error("An error occurred while adding friend:", error);
+
       }
     } else if (block === "unblock") {
       try {
@@ -182,13 +179,12 @@ const InfoProfil = (id: any) => {
           setblock("block");
           toast.success("Friend blocked successfully");
         } else {
-          console.log("Failed to reject friend");
+
         }
       } catch (error: any) {
         if (error.response) {
           toast.error(error.response.data.message || 'An error occurred');
         }
-        console.error("An error occurred while rejecting friend:", error);
       }
     }
   };
