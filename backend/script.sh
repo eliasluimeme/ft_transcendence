@@ -4,6 +4,6 @@ npx prisma generate
 npx prisma migrate dev
 npm install argon2
 
-# sleep 30
+sleep 10
 
 npm run start:dev

@@ -1,25 +1,16 @@
-import { ExceptionFilter, Catch, HttpStatus, HttpException, BadRequestException } from '@nestjs/common';
-import { UnauthorizedException } from '@nestjs/common';
-import { PrismaClientKnownRequestError, PrismaClientValidationError } from '@prisma/client/runtime/library';
+import { ExceptionFilter, Catch, HttpStatus, HttpException } from '@nestjs/common';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
   catch(exception: HttpException, response) {
     if (exception) {
-      //console.log('filter')
         response.status(HttpStatus.UNAUTHORIZED).json({
           statusCode: HttpStatus.UNAUTHORIZED,
           message: 'Unauthorized access mn filter',
         });
         return response;
     }
-
-    // else if (exception instanceof BadRequestException) {
-    //     response.status(HttpStatus.UNAUTHORIZED).json({
-    //         statusCode: HttpStatus.UNAUTHORIZED,
-    //         message: 'Login Unauthorized access mn filter',
-    //       });
-    // }
   }
 }
 

@@ -64,7 +64,6 @@ async join_chat_rooms(socket: Socket, user_id: number) {
     all_user_rooms.forEach((room) => {
       socket.join(room.chatroom.id + "_room")
     });
-    // //console.log("All Rooms joined ",socket.rooms)
   }
 
 async handleConnection(client: Socket) {
@@ -85,7 +84,6 @@ async handleConnection(client: Socket) {
     client.data.user = verifiedToken
     await this.join_chat_rooms(client, user.id)
     } catch (error) {
-        // //console.log('erroooor: ', error);
       return this.disconnect(client);
     }
   }
@@ -107,10 +105,6 @@ async handleConnection(client: Socket) {
     if (!room)
       this.server.emit('error', "chat room does not exist");
     const roomUser = await this.chatService.get_room_user(newId, data.senderId)
-    // if (roomUser.isBlocked){
-    //   this.server.emit("Error", "You have been blocked")
-    //   return ;
-    // }
     if (roomUser.isMuted){
       this.server.emit("Error", "You have been muted")
       return ;
@@ -128,11 +122,4 @@ async handleConnection(client: Socket) {
       this.server.to(data.roomId  + "_room").emit('reciecved', pyload);
       await this.chatService.addMessage(data.senderId, newId, data.messageContent);
   }
-
-  // @SubscribeMessage('notifications')
-  // async notifications(@MessageBody() data: any) {
-  //   const { senderId, reciverId, content } = data;
-  //   this.server.to(this.userToClient[reciverId]).emit('notifications', content);
-  // }
-
 }

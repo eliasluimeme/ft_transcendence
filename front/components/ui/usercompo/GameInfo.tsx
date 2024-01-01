@@ -204,9 +204,6 @@ const GameInfo = (id: any) => {
               <WinLose
                 key={index}
                 className=""
-                // className={`w-full h-full row-start-${
-                //   index + 1
-                // } col-start-2 col-span-9 `}
                 opo1={historyItem.opo1}
                 opo2={historyItem.opo2}
                 result={historyItem.result}

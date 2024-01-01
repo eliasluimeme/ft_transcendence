@@ -1,4 +1,4 @@
-import { Logger, UseGuards } from '@nestjs/common';
+import { UseGuards } from '@nestjs/common';
 import {Server, Socket} from 'socket.io';
 import {
   WebSocketGateway,
@@ -12,7 +12,6 @@ import { BoardData, NewRoom, Player } from './interfaces';
 import { GameGuard } from './game.guard'; 
 import { ConfigService } from '@nestjs/config';
 import { UserService } from 'src/user/user.service';
-import { PrismaService } from 'src/prisma/prisma.service';
 
 @WebSocketGateway({cors: {
   origin: process.env.SOCKET_IO_SERVER_URL,

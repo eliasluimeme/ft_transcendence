@@ -5,7 +5,6 @@ import { clearInterval } from 'timers';
 
 @Injectable()
 export class GameService {
-  //Room attributes
   private logger: Logger = new Logger(GameService.name);
   private readonly board = {width: 500, height: 500};
   private roomstatus: string = "onhold";
@@ -71,7 +70,6 @@ export class GameService {
     }
   }
   moveBall() {
-    //this.logger.error(this.ball.repete);
     this.ball.cords.x += this.ball.vec.x;
     this.ball.cords.y += this.ball.vec.y;
   }
@@ -80,19 +78,18 @@ export class GameService {
     if (this.ball.cords.x >= this.board.width)
     {
       this.lplayer.score++;
-      if (this.lplayer.score == 9 && this.rplayer.score == 0)
+      if (this.lplayer.score == 4 && this.rplayer.score == 0)
         this.rplayer.cbTrigger = true;
       this.resetBoard();
     }
     else if (this.ball.cords.x <= 0)
     {
       this.rplayer.score++;
-      if (this.rplayer.score == 9 && this.lplayer.score == 0)
+      if (this.rplayer.score == 4 && this.lplayer.score == 0)
         this.lplayer.cbTrigger = true;
       this.resetBoard();
     }
     if (this.lplayer.score == 5 || this.rplayer.score == 5) {
-      // this.logger.error("The game finish");
       this.clearTimers();
       this.roomstatus = "closed";
     }
@@ -101,7 +98,6 @@ export class GameService {
   resetBoard()
   {
     const angle = this.getRandomNumber(-45, 45);
-    // this.logger.error(angle);
     this.calculVecs(angle);
     this.ball.speed = 2;
     this.ball.cords = {x: 250, y: 250};

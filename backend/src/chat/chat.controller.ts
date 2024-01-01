@@ -91,13 +91,7 @@ export class ChatController {
   async muteMember(@Req() req, @Body() body: any, @Res() res) {
     res.json( await this.chatService.muteMember( req.user.id, parseInt(body.roomId), parseInt(body.userId),) );
   }
-
-  // @Post('/settings/unmute')
-  // @UseGuards(Jwt2faAuthGuard)
-  // async unmuteMember(@Req() req, @Body() body: any, @Res() res) {
-  //   res.json( await this.chatService.unmuteMember(req.user.id, parseInt(body.roomId), parseInt(body.userId)) );
-  // }
-
+  
   @Post('/settings/kick')
   @UseGuards(Jwt2faAuthGuard)
   async kickMember(@Req() req, @Body() body: any, @Res() res) {

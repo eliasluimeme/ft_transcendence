@@ -78,7 +78,6 @@ export class ChatService {
             }).filter(conv => conv !== null);
             return conv
         } catch(error) {
-            // //console.log(error);
         }
     }
 
@@ -130,7 +129,6 @@ export class ChatService {
         } catch(error) {
             if (error instanceof ForbiddenException)
                 throw error;
-            // //console.log(error);
         }
     }
 
@@ -561,9 +559,6 @@ export class ChatService {
                 throw new ForbiddenException('You are not allowed to mute members')
             if (!user.chatroom.ChatroomUsers.find( user => user.userId === memberId))
                 throw new ForbiddenException('Member does not exist')
-            // if (user.chatroom.ChatroomUsers.find( user => user.userId === memberId).isMuted === true)
-            //     throw new ForbiddenException('Member already muted')
-
             const chatRoomUserId = user.chatroom.ChatroomUsers.find( user => user.userId === memberId).id;
             const status = user.chatroom.ChatroomUsers.find( user => user.userId === memberId).isMuted;
 
@@ -706,59 +701,10 @@ export class ChatService {
         }).catch( (error) => {
             if (error instanceof ForbiddenException || error instanceof NotFoundException)
                 throw error;
-            //console.log(error);
         })
         
         return user;
     }
-
-    // async unbanMember(userId: number, roomId: number, memberId: number) {
-        //     const user = await this.prisma.chatroomUsers.findFirst({
-            //         where: {
-                //             userId: userId,
-    //             chatroomId: roomId,
-    //         },
-    //         include: {
-        //             chatroom: {
-            //                 include: {
-                //                     ChatroomUsers: true,
-    //                 }
-    //             },
-    //         }
-    //     }).then( async (user) => {
-    //         if (!user)
-    //             throw new NotFoundException('Room does not exist')
-    //         if (user.role !== 'OWNER' && user.role !== 'ADMIN')
-    //             throw new ForbiddenException('You are not allowed to unban members')
-    //         if (!user.chatroom.ChatroomUsers.find( user => user.userId === memberId))
-    //             throw new ForbiddenException('Member does not exist')
-    //         if (user.chatroom.ChatroomUsers.find( user => user.isBanned === true))
-    //             throw new ForbiddenException('Member already unbanned')
-
-    //         const chatRoomUserId = user.chatroom.ChatroomUsers.find( user => user.userId === memberId).id;
-
-    //         await this.prisma.chatroomUsers.update({
-    //             where: {
-    //                 id: chatRoomUserId,
-    //             },
-    //             data: {
-    //                 isBanned: false,
-    //             }
-    //         }).then(() => {
-    //             return { success: true, message: 'Member unbanned' }
-    //         }).catch((error) => {
-    //             //console.log(error);
-    //             throw new BadRequestException('Something went wrong')
-    //         })
-    
-    //     }).catch( (error) => {
-    //         if (error instanceof ForbiddenException || error instanceof NotFoundException)
-    //             throw error;
-    //         //console.log(error);
-    //     })
-
-    //     return user;
-    // }
     
     async addAdmin(userId: number, roomId: number, memberId: number) {
         const user = await this.prisma.chatroomUsers.findFirst({
@@ -776,8 +722,6 @@ export class ChatService {
         }).then( async (user) => {
             if (!user)
                 throw new NotFoundException('Room does not exist')
-            // if (user.role !== 'OWNER')
-            //     throw new ForbiddenException('You are not allowed to add admins to this room')
             if (!user.chatroom.ChatroomUsers.find( user => user.userId === memberId))
                 throw new ForbiddenException('Member does not exist')
 
@@ -946,8 +890,6 @@ export class ChatService {
                 }
             });
             if (!room) throw new BadRequestException('Room does not exist');
-            // if (room.ChatroomUsers.find(user => user.userId === userId).role !== 'OWNER')
-            //     throw new ForbiddenException('You are not allowed to add members')
 
             const member = await this.prisma.user.findUnique({
                 where: {
@@ -1047,7 +989,6 @@ export class ChatService {
 
               if (!userInChatroom)
                 throw new Error('User not found in the chat room.');
-            // //console.log("chataat: ", userInChatroom)
           
               const newMessage = await this.prisma.message.create({
                 data: {

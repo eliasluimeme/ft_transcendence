@@ -1,8 +1,6 @@
-// Scheduler or Service for Periodic Check (scheduler.service.ts)
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { ChatService } from './chat.service';
-// import { FriendsRepository } from './friends.repository';
 
 @Injectable()
 export class SchedulerService {

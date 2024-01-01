@@ -320,7 +320,6 @@ export class UserService {
                 return user;
             } else return user;
         } catch (error) {
-            // check prisma error status code
         }
     }
 
@@ -335,7 +334,6 @@ export class UserService {
             delete user.hash;
             return user;
         } catch (error) {
-            // check prisma error status code
         }
     }
 
@@ -357,7 +355,6 @@ export class UserService {
 
   async checkUser(userId: number, query: string): Promise<any> {
     try {
-      // check query
       const user = await this.prisma.user.findUnique({
         where: {
           userName: query,
@@ -428,11 +425,7 @@ export class UserService {
               self: true,
               status: status, 
             };
-          // else if (foundUser.blocker.find(block => block.blockedId === foundUser.id))
-          //     return { id: foundUser.id, userName: foundUser.userName, fullName: foundUser.fullName, photo: foundUser.photo, rank: rank, block: true };
-          // else if (foundUser.blocked.find(block => block.blockerId === foundUser.id))
-          //     return { id: foundUser.id, userName: foundUser.userName, fullName: foundUser.fullName, photo: foundUser.photo, rank: rank, block: true };
-          else if (
+            else if (
             foundUser.sentRequests &&
             foundUser.sentRequests.find(
               (request) => request.receiverId === user.id,
@@ -800,7 +793,6 @@ export class UserService {
                     ],
                   },
                 },
-                // messages: { roomId: senderId} // delete messages
               },
             ],
           },
@@ -886,37 +878,6 @@ export class UserService {
       throw error;
     }
   }
-
-    async gameInvite( userId: number, opponentId: number): Promise<any> {
-        try {
-            // const invite = await this.chatGateway.notifications({
-            //     senderId: userId,
-            //     reciverId: opponentId,
-            //     content: 'Game invite',
-            // });
-            // //console.log(invite);
-        } catch(error) {
-            throw error;
-        }
-    }
-
-  // async createLocalUser(dto: AuthDto): Promise<any> {
-  //     try {
-  //         const user = await this.prisma.user.create({
-  //             data: {
-  //                 email: dto.email,
-  //                 userName: dto.userName,
-  //                 fullName: dto.fullName,
-  //                 hash: dto.password,
-  //                 photo: '',
-  //             }
-  //         });
-  //         delete user.hash;
-  //         return user;
-  //     } catch (error) {
-  //         throw error;
-  //     }
-  // }
 
   async addToGameHistory(room: any) {
     try {

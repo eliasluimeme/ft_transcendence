@@ -170,10 +170,10 @@ export class UserController {
         }
     }
   
-    @Post('game/invite')
-    @UseGuards(Jwt2faAuthGuard)
-    async gameInvite(@Req() req, @Body() body: any, @Res() res): Promise<any> {
-      res.json( await this.userService.gameInvite(req.user.id, body) );
-    }
+    // @Post('game/invite')
+    // @UseGuards(Jwt2faAuthGuard)
+    // async gameInvite(@Req() req, @Body() body: any, @Res() res): Promise<any> {
+    //   res.json( await this.userService.gameInvite(req.user.id, body) );
+    // }
 
 }
