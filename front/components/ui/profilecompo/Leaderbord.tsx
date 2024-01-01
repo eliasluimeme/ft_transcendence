@@ -42,7 +42,7 @@ const GetRank = () => {
   const [rank, getRank] = useState("");
   const takerank = async () => {
     try {
-      const response = await axios.get(process.env.NEXT_PUBLIC_BACKEND_URL + "ladderboard/rank", {
+      const response = await axios.get(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/ladderboard/rank`, {
         withCredentials: true,
       });
       if (response.status === 200) {
@@ -86,10 +86,7 @@ const Leaderbord = () => {
   return (
     <div className="w-full h-full grid grid-rows-5 font-Goldman">
       {leaders.map((leader, index) => (
-        <div
-          key={index}
-          className={`w-full h-full flex items-center justify-center`}
-        >
+        <div key={index} className="w-full h-full flex items-center justify-center">
           {displayData(
             leader,
             "w-[98%] h-[80%] border rounded-lg grid grid-cols-6 place-content-center"

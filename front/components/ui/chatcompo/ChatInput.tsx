@@ -6,7 +6,7 @@ import axios from "axios";
 import Messages from "./Messages";
 import { User } from "lucide-react";
 
-const socket = io(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/chat`, {
+const socket = io(`${process.env.NEXT_PUBLIC_SOCKET_IO_SERVER_URL}/chat`, {
   withCredentials: true,
 });
 

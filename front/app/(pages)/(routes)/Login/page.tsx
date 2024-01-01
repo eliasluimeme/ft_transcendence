@@ -25,7 +25,7 @@ const LandingPage = () => {
       >
         <div className=" text-2xl font-bold mb-9">Login</div>
         <Button variant="default" className='font-bold  hover:opacity-[100%] bg-[#d2d7db]'>
-          <Link href={`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/42/login`}>Login With Intra</Link>
+          <Link href={`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/42/Login`}>Login With Intra</Link>
         </Button>
       </div>
     </div>

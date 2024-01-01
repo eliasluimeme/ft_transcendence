@@ -136,7 +136,7 @@ const GetMatchHistory = (): MatchHistory[] => {
   const [matchHistory, setmatchHistory] = useState<MatchHistory[]>([]);
   const fetchData = async () => {
     try {
-      const response = await axios.get(process.env.NEXT_PUBLIC_NEXT_PUBLIC_BACKEND_URL + "profile", {
+      const response = await axios.get(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/profile`, {
         withCredentials: true,
       });
       if (response.status === 200) {

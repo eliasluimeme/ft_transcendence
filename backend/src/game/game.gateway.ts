@@ -15,7 +15,7 @@ import { UserService } from 'src/user/user.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @WebSocketGateway({cors: {
-  origin: `http://${process.env.FRONTEND_URL}` ,
+  origin: process.env.SOCKET_IO_SERVER_URL,
   credentials: true,
 },
 namespace: '/game',})
@@ -93,7 +93,7 @@ export class GameGateway {
       sock2: ''
     };
     this.rooms.set(player.id,new GameService(room));
-    this.server.to(player.sock).emit('roomCreated', {side: 'left', oppName: "Bot", oppPhoto: `http://${process.env.BACKEND_URL}/bg.png`});
+    this.server.to(player.sock).emit('roomCreated', {side: 'left', oppName: "Bot", oppPhoto: `${process.env.BACKEND_URL}bot.jpg`});
     this.userservice.updateIntraUser(player.id, {
       status: 'INGAME',
     });

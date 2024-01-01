@@ -1,4 +1,4 @@
-import React from 'react'
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { socket } from '@/components/game/tools/SocketCtxProvider';
 
@@ -9,7 +9,11 @@ const Loading = (props:any) => {
     socket.emit("cancelMatching");
     router.push("/game");
   };
-
+  useEffect(()=>{
+    return (()=>{
+      socket.emit("cancelMatching");
+    });
+  }, []);
   return (
    <div 
        className="flex items-center justify-center"

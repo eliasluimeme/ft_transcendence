@@ -138,40 +138,4 @@ export class AuthService {
             });
         } catch (error) {}
     }
-
-// async signup(dto: AuthDto) {
-//     try {
-//         dto.password = await argon.hash(dto.password);
-        
-//         const user = await this.userService.createLocalUser(dto);
-
-//         const {hash: _, ...newUser} = user;
-
-//         const token = await this.getToken( newUser.id, newUser.email )
-
-//         return { user: newUser, token: token };
-//     } catch(error) {
-//         if (error instanceof PrismaClientKnownRequestError) {
-//             if (error.code === 'P2002')
-//                 throw new UnauthorizedException("Email or username is already taken");
-//         }
-//         throw error;
-//     }
-// }
-
-// async signin(dto: AuthDto) {
-//     const user = await this.userService.findUserByEmail(dto.email);
-
-//     if (!user)
-//         throw new UnauthorizedException("Invalid credentials");
-    
-//     const pwMatch = await argon.verify(user.hash, dto.password);
-//     if (!pwMatch)
-//         throw new UnauthorizedException("Invalid credentials");
-
-//     delete user.hash;
-
-//     const token = await this.getToken(user.id, user.email);
-//     return { success: true, user: user, token: token };
-// }
 }

@@ -4,7 +4,6 @@ import { IntraAuthGuard } from './guards/intra.guard';
 import { JwtAuthGuard } from './guards/jwt.guard';
 import { Jwt2faAuthGuard } from './guards/jwt-2fa.guard';
 import { ConfigService } from '@nestjs/config';
-import { LocalAuthGuard } from './guards/local.guard';
 import { UserService } from 'src/user/user.service';
 import { Response } from 'express';
 
@@ -24,7 +23,6 @@ export class AuthController {
     @Get('auth/42/callback')
     @UseGuards(IntraAuthGuard)
     async authCallBack(@Req() req, @Res({ passthrough: true }) res): Promise<any> {
-        // handle dont authorize 42 auth
         const token = await this.authService.generateToken(req.user, false);
         res.cookie( 'access_token', `${token}`, { httpOnly: true, maxAge: 60 * 60 * 24 * 1000 });
 
@@ -79,7 +77,6 @@ export class AuthController {
     async turnOff2FA(@Req() req, @Res() res): Promise<any> {
         const token = await this.authService.generateToken(req.user, false);
         res.clearCookie('access_token');
-        // res.cookie( 'access_token', `${token}` , { httpOnly: true, maxAge: 60 * 60 * 24 * 1000 });
         this.authService.desactivate2FA(req.user.id);
         res.status(200).json({off: true});
     }
@@ -92,20 +89,4 @@ export class AuthController {
         res.clearCookie('access_token');
         return res.status(200).json({});
     }
-
-    // @Post('signup')
-    // async signup(@Body() dto: AuthDto, @Res() res) {
-    //     const user = await this.authService.signup(dto);
-    //     res.header('Authorization', `Bearer ${user.token}`);
-    //     //TODO: email confirmation
-    //     return res.status(HttpStatus.CREATED).json(user);
-    // }
-    
-    // @Post('signin')
-    // @UseGuards(LocalAuthGuard)
-    // async signin(@Body() dto: AuthDto, @Res() res) {
-    //     const user = await this.authService.signin(dto);
-    //     res.header('Authorization', `Bearer ${user.token}`);
-    //     return res.status(HttpStatus.OK).json(user);
-    // }
 }

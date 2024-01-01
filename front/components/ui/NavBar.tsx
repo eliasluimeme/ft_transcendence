@@ -31,7 +31,7 @@ export default function NavBar() {
       });
 
       if (response.status === 200)
-        router.push(process.env.FRONTEND_URL + "Login");
+        router.push(`http://${process.env.NEXT_PUBLIC_FRONTEND_URL}/Login`);
     } catch (error) {
     }
   };

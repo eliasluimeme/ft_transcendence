@@ -73,7 +73,7 @@ function SideBar() {
         key={index}
         onClick={() => handleFriendClick(friend.id)}
       >
-        <Avatar className="w-[40px] h-[40px]">
+        <Avatar className="w-[40px] h-[40px] border border-black">
           <AvatarImage src={friend.image} alt="User Avatar" />
           <AvatarFallback></AvatarFallback>
         </Avatar>
@@ -122,7 +122,7 @@ function SideBar() {
               </Popover>
             </div>
           </div>
-          <div className="mt-[20px] overflow-y-auto flex flex-col gap-2 mx-6">
+          <div className="mt-[20px] overflow-y-auto flex flex-col gap-2 mx-6 ">
             {GetFriends()}
           </div>
         </div>

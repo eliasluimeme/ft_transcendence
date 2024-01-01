@@ -69,12 +69,10 @@ export default function Page() {
     }
   }, []);
 
-  if (!socket)
-    return;
-  else if(status == 0)
-    return(<Loading socket={socket} setStatus={(msg:number) => changeModule(msg)}/>);
+  if(status == 0)
+    return(<Loading setStatus={(msg:number) => changeModule(msg)}/>);
   else if(status == 1)
-    return(<Room socket={socket} data={data} me={self}/>);
+    return(<Room data={data} me={self}/>);
   else if (status == 2)
     return(<Results rslt={gameRslts.current} setStatus={(msg:number) => changeModule(msg)} />);
 };

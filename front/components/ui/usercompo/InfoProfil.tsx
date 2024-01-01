@@ -65,7 +65,7 @@ const InfoProfil = (id: any) => {
 
   const takeFrLogic = async (data: Data) => {
     try {
-      const response = await axios.get(process.env.NEXT_PUBLIC_BACKEND_URL + "friends/friendship", {
+      const response = await axios.get(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/friends/friendship`, {
         withCredentials: true,
         params: {
           id: data.id,
@@ -109,7 +109,7 @@ const InfoProfil = (id: any) => {
   const sendFriend = async (id: string) => {
     if (fr === "NONE" || fr === "Add friend") {
       try {
-        const response = await axios.get(process.env.NEXT_PUBLIC_BACKEND_URL + "friends/add", {
+        const response = await axios.get(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/friends/add`, {
           withCredentials: true,
           params: {
             id: id,
