@@ -43,7 +43,7 @@ const Pic = () => {
   const router = useRouter();
   const fetchData = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/settings", {
+      const response = await axios.get(process.env.NEXT_PUBLIC_BACKEND_URL + "settings", {
         withCredentials: true,
       });
       if (response.status === 200) {
@@ -71,7 +71,7 @@ const Pic = () => {
     try {
       // Fetch QR code data when the user clicks on "Enable 2FA"
       const response = await axios.get(
-        "http://localhost:3001/auth/2fa/generate",
+        process.env.NEXT_PUBLIC_BACKEND_URL + "auth/2fa/generate",
         {
           withCredentials: true,
         }
@@ -89,7 +89,7 @@ const Pic = () => {
   const handleDisable2FA = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:3001/auth/2fa/turn-off",
+        process.env.NEXT_PUBLIC_BACKEND_URL + "auth/2fa/turn-off",
         {
           withCredentials: true,
         }
@@ -132,7 +132,7 @@ const Pic = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:3001/auth/2fa/turn-on",
+        process.env.NEXT_PUBLIC_BACKEND_URL + "auth/2fa/turn-on",
         code,
         {
           withCredentials: true,
@@ -170,7 +170,7 @@ const Pic = () => {
       formData.append("photo", selectedFile);
       try {
         const response = await axios.post(
-          "http://localhost:3001/photo/upload",
+          process.env.NEXT_PUBLIC_BACKEND_URL + "photo/upload",
           formData,
           {
             withCredentials: true,
@@ -213,7 +213,7 @@ const Pic = () => {
   const handleSaveAvatar = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:3001/settings/avatar",
+        process.env.NEXT_PUBLIC_BACKEND_URL +"settings/avatar",
         { photo: selectedImage },
         {
           withCredentials: true,

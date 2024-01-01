@@ -51,7 +51,7 @@
 //             return user;
 //         } else return user;
 //     } catch (error) {
-//         console.error('Error finding user: ', error);
+//         //console.logor('Error finding user: ', error);
 //     }
 // }
 
@@ -70,7 +70,7 @@
 //       return this.disconnect(client);
 
 //     this.userToClient.set(client.id, user.id);
-//     console.log(client.id, 'successfully connected ++++++ ');
+//     //console.log(client.id, 'successfully connected ++++++ ');
 //     client.data.user = verifiedToken
     
 //     await this.prisma.user.update({
@@ -83,14 +83,14 @@
 //     })
 
 //     } catch (error) {
-//         console.log('erroooor: ', error);
+//         //console.log('erroooor: ', error);
 //       return this.disconnect(client);
 //     }
 //   }
 
 //   async handleDisconnect(client: Socket) {
 //     const user_id = this.userToClient.get(client.id);
-//     console.log('user ID to disctonnected       ==== ', client.id ,  user_id);
+//     //console.log('user ID to disctonnected       ==== ', client.id ,  user_id);
 //       await this.prisma.user.update({
 //           where: {
 //               id: user_id
@@ -101,7 +101,7 @@
 //         })
 //     delete this.userToClient[client.id];
 //     this.disconnect(client);
-//     console.log('disconnected =++++++++++++', client.id);
+//     //console.log('disconnected =++++++++++++', client.id);
 //   }
 
 //   private disconnect(client: Socket) {

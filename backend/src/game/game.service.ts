@@ -92,7 +92,7 @@ export class GameService {
       this.resetBoard();
     }
     if (this.lplayer.score == 5 || this.rplayer.score == 5) {
-      this.logger.error("The game finish");
+      // this.logger.error("The game finish");
       this.clearTimers();
       this.roomstatus = "closed";
     }

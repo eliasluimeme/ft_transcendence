@@ -22,7 +22,7 @@ const GetInitialData = (): Data => {
   });
   const fetchData = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/profile", {
+      const response = await axios.get(process.env.NEXT_PUBLIC_BACKEND_URL + "profile", {
         withCredentials: true,
       });
       if (response.status === 200) {

@@ -14,7 +14,7 @@ const GetLeader = () => {
   ]);
   const takeleader = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/ladderboard", {
+      const response = await axios.get(process.env.NEXT_PUBLIC_BACKEND_URL + "ladderboard", {
         withCredentials: true,
       });
       if (response.status === 200) {
@@ -42,7 +42,7 @@ const GetRank = () => {
   const [rank, getRank] = useState("");
   const takerank = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/ladderboard/rank", {
+      const response = await axios.get(process.env.NEXT_PUBLIC_BACKEND_URL + "ladderboard/rank", {
         withCredentials: true,
       });
       if (response.status === 200) {

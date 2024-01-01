@@ -163,7 +163,7 @@ export class UserController {
       )
     async uploadPhoto(@UploadedFile() photo: Express.Multer.File, @Req() req: any): Promise<any> {
         try {
-          const user = await this.userService.updateUser(req.user.id, { photo: this.configService.get('BACKEND_URL') + photo.filename });
+          const user = await this.userService.updateUser(req.user.id, { photo: this.configService.get('NEXT_PUBLIC_BACKEND_URL') + photo.filename });
           return { photo: user.photo };
         } catch( error ) {
             throw error;

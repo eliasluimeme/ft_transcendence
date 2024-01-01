@@ -26,12 +26,12 @@ export default function NavBar() {
   const router = useRouter();
   const logout = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/logout", {
+      const response = await axios.get(process.env.NEXT_PUBLIC_BACKEND_URL + "logout", {
         withCredentials: true,
       });
 
       if (response.status === 200)
-        router.push("http://localhost:3000/Login");
+        router.push(process.env.FRONTEND_URL + "Login");
     } catch (error) {
     }
   };

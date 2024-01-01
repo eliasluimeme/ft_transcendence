@@ -78,7 +78,7 @@ export class ChatService {
             }).filter(conv => conv !== null);
             return conv
         } catch(error) {
-            // console.log(error);
+            // //console.log(error);
         }
     }
 
@@ -130,7 +130,7 @@ export class ChatService {
         } catch(error) {
             if (error instanceof ForbiddenException)
                 throw error;
-            // console.log(error);
+            // //console.log(error);
         }
     }
 
@@ -706,7 +706,7 @@ export class ChatService {
         }).catch( (error) => {
             if (error instanceof ForbiddenException || error instanceof NotFoundException)
                 throw error;
-            console.log(error);
+            //console.log(error);
         })
         
         return user;
@@ -747,14 +747,14 @@ export class ChatService {
     //         }).then(() => {
     //             return { success: true, message: 'Member unbanned' }
     //         }).catch((error) => {
-    //             console.log(error);
+    //             //console.log(error);
     //             throw new BadRequestException('Something went wrong')
     //         })
     
     //     }).catch( (error) => {
     //         if (error instanceof ForbiddenException || error instanceof NotFoundException)
     //             throw error;
-    //         console.log(error);
+    //         //console.log(error);
     //     })
 
     //     return user;
@@ -892,6 +892,7 @@ export class ChatService {
 
     async leaveRoom(userId: number, roomId: number) {
         try {
+            console.log(roomId)
             const room = await this.prisma.chatroom.findUnique({
                 where: {
                     id: roomId,
@@ -900,7 +901,6 @@ export class ChatService {
                     ChatroomUsers: true,
                 }
             })
-            
             if (!room)
                 throw new BadRequestException('Room not found')
             if (!room.ChatroomUsers.find(user => user.userId === userId))
@@ -1047,7 +1047,7 @@ export class ChatService {
 
               if (!userInChatroom)
                 throw new Error('User not found in the chat room.');
-            // console.log("chataat: ", userInChatroom)
+            // //console.log("chataat: ", userInChatroom)
           
               const newMessage = await this.prisma.message.create({
                 data: {

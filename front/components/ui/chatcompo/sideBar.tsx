@@ -35,7 +35,7 @@ function SideBar() {
       const fetchFriends = async () => {
         try {
           const response = await axios.get(
-            "http://localhost:3001/chat/conversations",
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}chat/conversations`,
             {
               withCredentials: true,
             }

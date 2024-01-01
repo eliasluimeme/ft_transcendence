@@ -22,7 +22,7 @@ const JoinRoom = () => {
 
   const join = async () => {
     try {
-      const response = await axios.post("http://localhost:3001/chat/join", {
+      const response = await axios.post(process.env.NEXT_PUBLIC_BACKEND_URL + "chat/join", {
         roomName: roomName,
         pw: passwordName,
       }, {

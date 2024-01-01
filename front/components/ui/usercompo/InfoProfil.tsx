@@ -35,7 +35,8 @@ const InfoProfil = (id: any) => {
     const fetchData = async () => {
       try {
         const timestamp = new Date().getTime();
-        const response = await axios.get("http://localhost:3001/users/profile", {
+        console.log("process", process.env.NEXT_PUBLIC_BACKEND_URL)
+        const response = await axios.get(process.env.NEXT_PUBLIC_BACKEND_URL + "users/profile", {
           withCredentials: true,
           params: {
             user: indice,
@@ -65,7 +66,7 @@ const InfoProfil = (id: any) => {
 
   const takeFrLogic = async (data: Data) => {
     try {
-      const response = await axios.get("http://localhost:3001/friends/friendship", {
+      const response = await axios.get(process.env.NEXT_PUBLIC_BACKEND_URL + "friends/friendship", {
         withCredentials: true,
         params: {
           id: data.id,
@@ -86,7 +87,7 @@ const InfoProfil = (id: any) => {
 
   const takeblockLogic = async (data: Data) => {
     try {
-      const response = await axios.get("http://localhost:3001/users/blocks", {
+      const response = await axios.get(process.env.NEXT_PUBLIC_BACKEND_URL + "users/blocks", {
         withCredentials: true,
         params: {
           id: data.id,
@@ -109,7 +110,7 @@ const InfoProfil = (id: any) => {
   const sendFriend = async (id: string) => {
     if (fr === "NONE" || fr === "Add friend") {
       try {
-        const response = await axios.get("http://localhost:3001/friends/add", {
+        const response = await axios.get(process.env.NEXT_PUBLIC_BACKEND_URL + "friends/add", {
           withCredentials: true,
           params: {
             id: id,
@@ -126,7 +127,7 @@ const InfoProfil = (id: any) => {
       }
     } else if (fr === "Unfriend") {
       try {
-        const response = await axios.get("http://localhost:3001/friends/unfriend", {
+        const response = await axios.get(process.env.NEXT_PUBLIC_BACKEND_URL + "friends/unfriend", {
           withCredentials: true,
           params: {
             id: id,
@@ -149,7 +150,7 @@ const InfoProfil = (id: any) => {
   const sendblock = async (id: string) => {
     if (block === "block") {
       try {
-        const response = await axios.get("http://localhost:3001/users/block", {
+        const response = await axios.get(process.env.NEXT_PUBLIC_BACKEND_URL + "users/block", {
           withCredentials: true,
           params: {
             id: id,
@@ -169,7 +170,7 @@ const InfoProfil = (id: any) => {
       }
     } else if (block === "unblock") {
       try {
-        const response = await axios.get("http://localhost:3001/users/unblock", {
+        const response = await axios.get(process.env.NEXT_PUBLIC_BACKEND_URL + "users/unblock", {
           withCredentials: true,
           params: {
             id: id,

@@ -10,47 +10,6 @@ import {socket} from "@/components/game/tools/SocketCtxProvider"
 
 
 const Page = () => {
-  const router = useRouter();
-  const mode = useContext(ModeContext);
-  useEffect(() => {
-    socket.off('acceptedInvite').on('acceptedInvite', (pyload: string) => {
-      toast.success(`${pyload} accepted your invitation , let's play !`,)
-      // setTimeout
-      mode.updateContextValue('friend');
-      router.push('/game/board');
-      toast.remove();
-    });
-  }, []);
-
-  const handleAccept = (pyload: any) => {
-    socket.emit('acceptedInvite', pyload);
-    mode.updateContextValue('friend');
-    router.push('/game/board');
-  };
-
-  useEffect(() => {
-    socket.off('inviteEvent').on('inviteEvent', (data: any) => {
-      toast(() => (
-        <span>
-          <b>{data[0].senderName} invited you to play Pong ! </b>
-          <button onClick={() => toast.dismiss()}
-            className="border bg-red-500 rounded-ls px-5 py-1"
-          >
-            Dismiss
-          </button>
-          <button onClick={
-            () =>
-              handleAccept(data[1])
-          }
-            className="border bg-green-500 rounded-ls  px-5 py-1"
-          >
-            Accept
-          </button>
-        </span>
-      ), { duration: 5000 });
-    });
-
-  }, []);
 
   return (
     <div className="w-full h-full bg-[#36393E] rounded-lg grid grid-cols-2 font-Goldman">

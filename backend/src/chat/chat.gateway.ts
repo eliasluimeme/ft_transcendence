@@ -16,7 +16,8 @@ import { idMessageDto } from './dto/id.dto';
 @Injectable()
 @WebSocketGateway({
   cors: {
-    origin: 'http://localhost:3000',
+    origin: 
+    'http://localhost:3000',
     credentials: true,
   },
   namespace: 'chat',
@@ -64,7 +65,7 @@ async join_chat_rooms(socket: Socket, user_id: number) {
     all_user_rooms.forEach((room) => {
       socket.join(room.chatroom.id + "_room")
     });
-    // console.log("All Rooms joined ",socket.rooms)
+    // //console.log("All Rooms joined ",socket.rooms)
   }
 
 async handleConnection(client: Socket) {
@@ -85,7 +86,7 @@ async handleConnection(client: Socket) {
     client.data.user = verifiedToken
     await this.join_chat_rooms(client, user.id)
     } catch (error) {
-        // console.log('erroooor: ', error);
+        // //console.log('erroooor: ', error);
       return this.disconnect(client);
     }
   }

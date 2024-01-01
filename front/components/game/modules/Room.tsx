@@ -26,7 +26,7 @@ const Room = (props:any) => {
     // x  oppadel.current.x = boardSize.current.width - ((5 * boardSize.current.width) / 500);
     // else
     //   mypadel.current.x = boardSize.current.width - ((5 * boardSize.current.width) / 500);
-    // console.log(boardSize.current, oppadel, mypadel);
+    // //console.log(boardSize.current, oppadel, mypadel);
     //newChange(prev => prev + 1);
   };
 
@@ -112,7 +112,7 @@ const Room = (props:any) => {
       window.removeEventListener('keydown', handleArrowKeys);
       clearInterval(timer);
       clearInterval(updater);
-      console.log("called");
+      //console.log("called");
       socket.emit('quitGame');
     }
   }, []);

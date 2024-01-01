@@ -86,12 +86,12 @@
 //     //       }
 //     //       else 
 //     //       {
-//     //         console.log("failed to fetchdata");
+//     //         //console.log("failed to fetchdata");
 //     //       }
 //     //     } 
 //     //     catch (error) 
 //     //     {
-//     //       console.error("An error occurred while fetching user data:", error);
+//     //       //console.logor("An error occurred while fetching user data:", error);
 //     //     }
 //     //   };
 //     //   useEffect(() => 

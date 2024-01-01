@@ -28,7 +28,7 @@ const CreateRoom = () => {
   //////////////send data////////////////////////////////
   const send_data = async () => {
     try {
-      const response = await axios.post("http://localhost:3001/chat/create", {
+      const response = await axios.post(process.env.NEXT_PUBLIC_BACKEND_URL + "chat/create", {
         roomName: roomName,
         roomType: roomType,
         pw: passwordName,

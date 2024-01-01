@@ -15,6 +15,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import {socket} from "@/components/game/tools/SocketCtxProvider"
+import { ModeContext } from "@/components/game/tools/Contexts";
 
 interface Members {
   id: number;
@@ -31,14 +32,14 @@ function ChatConv(oldeId: any) {
   const [recieverInvit, setRecieverInvit] = useState<any>({});
 
   const id = oldeId['id']
-  // console.log("id", id);
+  // //console.log("id", id);
   /////////////////end point to get rol/////////////////////////////
   const [typeofRoom, setTypofRoom] = useState<string>('');
   const [rol, setrol] = useState(true);
   const fetchrol = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:3001/chat/settings/role",
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}chat/settings/role`,
         {
           withCredentials: true,
           params: {
@@ -69,7 +70,7 @@ function ChatConv(oldeId: any) {
   const fetchownerimage = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:3001/chat/settings/staff",
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}chat/settings/staff`,
         {
           withCredentials: true,
           params: {
@@ -104,7 +105,7 @@ function ChatConv(oldeId: any) {
   const fetchRoomData = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:3001/chat/conversations/members",
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}chat/conversations/members`,
         {
           withCredentials: true,
           params: {
@@ -142,7 +143,7 @@ function ChatConv(oldeId: any) {
   const fetchmemberdata = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:3001/chat/settings/members",
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}chat/settings/members`,
         {
           withCredentials: true,
           params: {
@@ -177,7 +178,7 @@ function ChatConv(oldeId: any) {
   const fetchMuteAndAdmine = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:3001/chat/settings/members/infos",
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}chat/settings/members/infos`,
         {
           withCredentials: true,
           params: {
@@ -225,7 +226,7 @@ function ChatConv(oldeId: any) {
           return;
         }
         const response = await axios.post(
-          "http://localhost:3001/chat/settings/mute",
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}chat/settings/mute`,
           {
             roomId: id,
             userId: data.id,
@@ -262,7 +263,7 @@ function ChatConv(oldeId: any) {
           return;
         }
         const response = await axios.post(
-          "http://localhost:3001/chat/settings/kick",
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}chat/settings/kick`,
           {
             roomId: id,
             userId: data.id,
@@ -295,7 +296,7 @@ function ChatConv(oldeId: any) {
     const sendban = async () => {
       try {
         const response = await axios.post(
-          "http://localhost:3001/chat/settings/ban",
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}chat/settings/ban`,
           {
             id,
             userId: data?.id,
@@ -328,7 +329,7 @@ function ChatConv(oldeId: any) {
       }
       try {
         const response = await axios.post(
-          "http://localhost:3001/chat/settings/add/admin",
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}chat/settings/add/admin`,
           {
             roomId: id,
             userId: data.id,
@@ -360,8 +361,9 @@ function ChatConv(oldeId: any) {
     ////end point need to takke th id os the main user
     const sendleave = async () => {
       try {
+        console.log("id === ", id)
         const response = await axios.post(
-          "http://localhost:3001/chat/settings/leave",
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}chat/settings/leave`,
           {
             roomId: id,
           },
@@ -395,7 +397,7 @@ function ChatConv(oldeId: any) {
   const send_data = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:3001/chat/settings/add/member",
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}chat/settings/add/member`,
         {
           roomId: id,
           userName: frdName,
@@ -426,7 +428,7 @@ function ChatConv(oldeId: any) {
   const sendNewPassword = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:3001/chat/settings/update",
+        process.env.NEXT_PUBLIC_BACKEND_URL + "chat/settings/update",
         {
           roomId: id,
           newPassword: newPassword,
@@ -451,7 +453,7 @@ function ChatConv(oldeId: any) {
   const deleatPassword = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:3001/chat/settings/delete",
+        process.env.NEXT_PUBLIC_BACKEND_URL + "chat/settings/delete",
         {
           roomId: id,
         },
@@ -487,6 +489,46 @@ function ChatConv(oldeId: any) {
     socket.emit('inviteEvent', send, recieve);
   }
 
+  const mode = useContext(ModeContext);
+  useEffect(() => {
+    socket.off('acceptedInvite').on('acceptedInvite', (pyload: string) => {
+      toast.success(`${pyload} accepted your invitation , let's play !`,)
+      // setTimeout
+      mode.updateContextValue('friend');
+      router.push('/game/board');
+      toast.remove();
+    });
+  }, []);
+
+  const handleAccept = (pyload: any) => {
+    socket.emit('acceptedInvite', pyload);
+    mode.updateContextValue('friend');
+    router.push('/game/board');
+  };
+
+  useEffect(() => {
+    socket.off('inviteEvent').on('inviteEvent', (data: any) => {
+      toast(() => (
+        <span>
+          <b>{data[0].senderName} invited you to play Pong ! </b>
+          <button onClick={() => toast.dismiss()}
+            className="border bg-red-500 rounded-ls px-5 py-1"
+          >
+            Dismiss
+          </button>
+          <button onClick={
+            () =>
+              handleAccept(data[1])
+          }
+            className="border bg-green-500 rounded-ls  px-5 py-1"
+          >
+            Accept
+          </button>
+        </span>
+      ), { duration: 5000 });
+    });
+
+  }, []);
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   return (

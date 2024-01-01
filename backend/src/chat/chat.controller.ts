@@ -119,7 +119,8 @@ export class ChatController {
   @Post('/settings/leave')
   @UseGuards(Jwt2faAuthGuard)
   async leaveRoom(@Req() req, @Body() param, @Res() res) {
-    res.json(await this.chatService.leaveRoom(req.user.id, parseInt(param.id)));
+    console.log("param", param)
+    res.json(await this.chatService.leaveRoom(req.user.id, parseInt(param.roomId)));
   }
 
   @Post('/settings/update')

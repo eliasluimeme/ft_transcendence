@@ -47,7 +47,7 @@ const GetFriends = () => {
 
   const takefreind = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/friends", {
+      const response = await axios.get(`http://localhost:3001/friends`, {
         withCredentials: true,
       });
       if (response.status === 200) {

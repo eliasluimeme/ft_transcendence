@@ -29,7 +29,7 @@ export default function StartLayout({
 
   const sendDataToBackend = async () => {
     try {
-      const response = await axios.get('http://localhost:3001/users/search', {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}users/search`, {
         withCredentials: true,
         params: {
           user : inputValue,

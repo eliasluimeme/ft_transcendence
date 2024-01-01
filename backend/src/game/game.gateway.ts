@@ -15,7 +15,7 @@ import { UserService } from 'src/user/user.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @WebSocketGateway({cors: {
-  origin: 'http://localhost:3000',
+  origin: process.env.FRONTEND_URL ,
   credentials: true,
 },
 namespace: '/game',})
@@ -93,7 +93,7 @@ export class GameGateway {
       sock2: ''
     };
     this.rooms.set(player.id,new GameService(room));
-    this.server.to(player.sock).emit('roomCreated', {side: 'left', oppName: "Bot", oppPhoto: "http://localhost:3001/bg.png"});
+    this.server.to(player.sock).emit('roomCreated', {side: 'left', oppName: "Bot", oppPhoto: process.env.NEXT_PUBLIC_BACKEND_URL + "bg.png"});
     this.userservice.updateIntraUser(player.id, {
       status: 'INGAME',
     });
@@ -190,7 +190,7 @@ export class GameGateway {
   }
   @SubscribeMessage('quitGame')
   quitGame(client: Socket) {
-    console.log("khrijt");
+    //console.log("khrijt");
     const looser: Player = this.players.get(client.data);
     if (!looser)
       return;
@@ -253,6 +253,6 @@ handelAccept(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
     }
     this.userservice.setAchievements(rslts.winner, rslts.looser)
     this.rooms.delete(roomid);
-    console.log("sdit room");
+    //console.log("sdit room");
   }
 }
