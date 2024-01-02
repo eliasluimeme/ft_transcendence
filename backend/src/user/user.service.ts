@@ -218,7 +218,7 @@ export class UserService {
         if (existingFullName[0] && existingFullName[0].intraId !== id)
             throw new ForbiddenException('Full name already in use');
 
-        if (data.number.length != 10)
+        if (data.number.length != 0 && data.number.length != 10)
           throw new ForbiddenException('Invalid phone number');
 
         const existingNumber = await this.prisma.user.findMany({

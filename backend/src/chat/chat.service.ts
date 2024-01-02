@@ -836,7 +836,6 @@ export class ChatService {
 
     async leaveRoom(userId: number, roomId: number) {
         try {
-            console.log(roomId)
             const room = await this.prisma.chatroom.findUnique({
                 where: {
                     id: roomId,
