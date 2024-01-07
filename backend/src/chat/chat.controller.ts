@@ -11,9 +11,9 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { ChatService } from './chat.service';
-import { Jwt2faAuthGuard } from 'src/auth/guards/jwt-2fa.guard';
 import { CreateGroupChatDTO } from './dto/createGroupChat.dto';
 import { idDto } from './dto/id.dto';
+import { Jwt2faAuthGuard } from 'src/auth/guards/jwt-2fa.guard';
 
 @Controller('chat')
 export class ChatController {
