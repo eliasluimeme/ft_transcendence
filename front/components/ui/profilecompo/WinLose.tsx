@@ -22,23 +22,6 @@ function WinLose(props: {
           <AvatarFallback>profile</AvatarFallback>
         </Avatar>
       </div>
-      {/* {props.wl ? (
-        <div className="flex space-x-1">
-          <p>
-            Congratulations! You emerged victorious in a thrilling ping pong
-            match against
-          </p>
-          <p className="text-white">{props.opo}</p>
-        </div>
-      ) : (
-        <div className="flex space-x-1">
-          <p>
-            Every game is a chance to learn, grow, and come back stronger. You
-            lost against
-          </p>
-          <p className="text-white">{props.opo}</p>
-        </div>
-      )} */}
     </div>
   );
 }

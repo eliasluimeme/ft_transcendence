@@ -34,7 +34,7 @@ const InfoProfil = (id: any) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/users/profile", {
+        const response = await axios.get(process.env.BACK_END_URL + "users/profile", {
           withCredentials: true,
           params: {
             user: indice,
@@ -51,12 +51,12 @@ const InfoProfil = (id: any) => {
           };
           setData(fetchedData);
           takeFrLogic(fetchedData);
-          takeblockLogic (fetchedData);
+          takeblockLogic(fetchedData);
         } else {
-          console.log("Failed to fetch data");
+          //("Failed to fetch data");
         }
       } catch (error) {
-        console.error("An error occurred while fetching user data:", error);
+        //ror("An error occurred while fetching user data:", error);
       }
     };
 
@@ -65,7 +65,7 @@ const InfoProfil = (id: any) => {
 
   const takeFrLogic = async (data: Data) => {
     try {
-      const response = await axios.get("http://localhost:3001/friends/friendship", {
+      const response = await axios.get(process.env.BACK_END_URL + "friends/friendship", {
         withCredentials: true,
         params: {
           id: data.id,
@@ -77,16 +77,16 @@ const InfoProfil = (id: any) => {
         else if (response.data.status === "ACCEPTED")
           setFr("Unfriend");
       } else {
-        console.log("Failed to fetch friendship data");
+        //("Failed to fetch friendship data");
       }
     } catch (error) {
-      console.error("An error occurred while fetching friendship data:", error);
+      //ror("An error occurred while fetching friendship data:", error);
     }
   };
 
   const takeblockLogic = async (data: Data) => {
     try {
-      const response = await axios.get("http://localhost:3001/users/blocks", {
+      const response = await axios.get(process.env.BACK_END_URL + "users/blocks", {
         withCredentials: true,
         params: {
           id: data.id,
@@ -95,12 +95,12 @@ const InfoProfil = (id: any) => {
       if (response.status === 200) {
         if (response.data.block === true)
           setblock("unblock")
-        else  setblock("block")
+        else setblock("block")
       } else {
-        console.log("Failed to fetch friendship data");
+        //("Failed to fetch friendship data");
       }
     } catch (error) {
-      console.error("An error occurred while fetching friendship data:", error);
+      //ror("An error occurred while fetching friendship data:", error);
     }
   };
 
@@ -109,7 +109,7 @@ const InfoProfil = (id: any) => {
   const sendFriend = async (id: string) => {
     if (fr === "NONE" || fr === "Add friend") {
       try {
-        const response = await axios.get("http://localhost:3001/friends/add", {
+        const response = await axios.get(process.env.BACK_END_URL + "friends/add", {
           withCredentials: true,
           params: {
             id: id,
@@ -119,14 +119,14 @@ const InfoProfil = (id: any) => {
           toast.success("Friend added successfully");
           setFr("Unfriend");
         } else {
-          console.log("Failed to add friend");
+          //("Failed to add friend");
         }
       } catch (error) {
-        console.error("An error occurred while adding friend:", error);
+        //ror("An error occurred while adding friend:", error);
       }
     } else if (fr === "Unfriend") {
       try {
-        const response = await axios.get("http://localhost:3001/friends/unfriend", {
+        const response = await axios.get(process.env.BACK_END_URL + "friends/unfriend", {
           withCredentials: true,
           params: {
             id: id,
@@ -136,21 +136,21 @@ const InfoProfil = (id: any) => {
           setFr("Add friend");
           toast.success("Friend removed successfully");
         } else {
-          console.log("Failed to reject friend");
+          //("Failed to reject friend");
         }
       } catch (error: any) {
         if (error.response) {
           toast.error(error.response.data.message || 'An error occurred');
         }
-        console.error("An error occurred while rejecting friend:", error);
+        //ror("An error occurred while rejecting friend:", error);
       }
     }
   };
-  
+
   const sendblock = async (id: string) => {
     if (block === "block") {
       try {
-        const response = await axios.get("http://localhost:3001/users/block", {
+        const response = await axios.get(process.env.BACK_END_URL + "users/block", {
           withCredentials: true,
           params: {
             id: id,
@@ -160,17 +160,17 @@ const InfoProfil = (id: any) => {
           setblock("unblock")
           toast.success("Friend blocked successfully");
         } else {
-          console.log("Failed to add friend");
+          //("Failed to add friend");
         }
       } catch (error: any) {
         if (error.response) {
           toast.error(error.response.data.message || 'An error occurred');
         }
-        console.error("An error occurred while adding friend:", error);
+        //ror("An error occurred while adding friend:", error);
       }
     } else if (block === "unblock") {
       try {
-        const response = await axios.get("http://localhost:3001/users/unblock", {
+        const response = await axios.get(process.env.BACK_END_URL + "users/unblock", {
           withCredentials: true,
           params: {
             id: id,
@@ -180,13 +180,13 @@ const InfoProfil = (id: any) => {
           setblock("block");
           toast.success("Friend blocked successfully");
         } else {
-          console.log("Failed to reject friend");
+          //("Failed to reject friend");
         }
       } catch (error: any) {
         if (error.response) {
           toast.error(error.response.data.message || 'An error occurred');
         }
-        console.error("An error occurred while rejecting friend:", error);
+        //ror("An error occurred while rejecting friend:", error);
       }
     }
   };
@@ -202,7 +202,7 @@ const InfoProfil = (id: any) => {
       </div>
     );
   };
-  
+
   const Informations: React.FC<{ data: Data }> = ({ data }) => {
     return (
       <div className="w-full h-full grid grid-rows-6 place-content-center">
@@ -235,36 +235,36 @@ const InfoProfil = (id: any) => {
       <div className="w-full h-full col-start-12">
         <div className="w-full h-full grid grid-rows-6">
           <div className="w-full h-full row-start-2 flex items-center ">
-              {block === "block" && (
+            {block === "block" && (
               <div className="w-[75%] h-[50%] rounded-full  flex items-center justify-center bg-[#FFA961] bg-opacity-[50%] text-opacity-[50%] hover:bg-opacity-[100%] ease-in-out duration-300">
-                  <HoverCard>
-                    <HoverCardTrigger>
-                      <button onClick={() => sendFriend(data.id)}>{fr === 'Unfriend' ? '-' : '+'}</button>
-                    </HoverCardTrigger>
-                    <HoverCardContent className="w-[180px] h-[40px] flex items-center justify-center">
-                      {fr}
-                    </HoverCardContent>
-                  </HoverCard>
-              </div>
-              )}
-            </div>
-            <div className="w-full h-full row-start-3 flex items-center ">
-              <div className="w-[75%] h-[50%] rounded-full  flex items-center justify-center bg-[#FFA961] bg-opacity-[50%] text-opacity-[50%] hover:bg-opacity-[100%] ease-in-out duration-300">
-
-             <HoverCard>
+                <HoverCard>
                   <HoverCardTrigger>
-                    <button onClick={() => sendblock(data.id)}>B</button>
+                    <button onClick={() => sendFriend(data.id)}>{fr === 'Unfriend' ? '-' : '+'}</button>
                   </HoverCardTrigger>
                   <HoverCardContent className="w-[180px] h-[40px] flex items-center justify-center">
-                    {block}
+                    {fr}
                   </HoverCardContent>
                 </HoverCard>
               </div>
-              </div>
+            )}
+          </div>
+          <div className="w-full h-full row-start-3 flex items-center ">
+            <div className="w-[75%] h-[50%] rounded-full  flex items-center justify-center bg-[#FFA961] bg-opacity-[50%] text-opacity-[50%] hover:bg-opacity-[100%] ease-in-out duration-300">
+
+              <HoverCard>
+                <HoverCardTrigger>
+                  <button onClick={() => sendblock(data.id)}>B</button>
+                </HoverCardTrigger>
+                <HoverCardContent className="w-[180px] h-[40px] flex items-center justify-center">
+                  {block}
+                </HoverCardContent>
+              </HoverCard>
+            </div>
           </div>
         </div>
-        <Toaster />
       </div>
+      <Toaster />
+    </div>
   );
 };
 

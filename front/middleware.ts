@@ -16,17 +16,17 @@ export async function middleware(request: NextRequest) {
 
         return NextResponse.next();
       } catch (error) {
-        console.log(error);
-        return NextResponse.redirect('http://localhost:3000/Login');
+        //(error);
+        return NextResponse.redirect(process.env.FRONTEND_URL +  'Login');
       }
   }
 
   if (request.nextUrl.pathname === '/Login') {
     try {
       await jwtVerify(token!, new TextEncoder().encode(process.env.JWT_SECRET));
-      return NextResponse.redirect('http://localhost:3000/');
+      return NextResponse.redirect(process.env.FRONTEND_URL + '');
     } catch (error) {
-        console.log(error);
+        //(error);
         return NextResponse.next();
     }
   }
@@ -34,9 +34,9 @@ export async function middleware(request: NextRequest) {
   // if (request.nextUrl.pathname === '/Login') {
   //   try {
   //     await jwtVerify(token!, new TextEncoder().encode(process.env.JWT_SECRET));
-  //     return NextResponse.redirect('http://localhost:3000/');
+  //     return NextResponse.redirect('process.env.FRONTEND_URL +  '');
   //   } catch (error) {
-  //       console.log(error);
+  //       //(error);
   //       return NextResponse.next();
   //   }
   // }

@@ -1,4 +1,4 @@
-import { MyContextProvider } from "@/components/game/tools/MyContextProvider";
+import { SocketCtxProvider } from "@/components/game/tools/SocketCtxProvider";
 import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
@@ -14,6 +14,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  
   return (
     <html lang="en">
       <head>
@@ -22,7 +23,9 @@ export default function RootLayout({
           rel="stylesheet"
         ></link>
       </head>
+      <SocketCtxProvider>
           <body className={inter.className}>{children}</body>
+      </SocketCtxProvider>
     </html>
   );
 }

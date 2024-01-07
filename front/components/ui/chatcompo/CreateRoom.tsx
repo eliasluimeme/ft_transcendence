@@ -1,5 +1,5 @@
 import React from "react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Popover,
   PopoverContent,
@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/popover";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 
 const CreateRoom = () => {
   const router = useRouter();
@@ -28,7 +28,7 @@ const CreateRoom = () => {
   //////////////send data////////////////////////////////
   const send_data = async () => {
     try {
-      const response = await axios.post("http://localhost:3001/chat/create", {
+      const response = await axios.post(process.env.BACK_END_URL + "chat/create", {
         roomName: roomName,
         roomType: roomType,
         pw: passwordName,
@@ -36,21 +36,19 @@ const CreateRoom = () => {
         withCredentials: true,
       });
       if (response.status === 201) {
-        console.log("success");
+        //("success");
         toast.success("Room Created Successfuly");
       } else {
-        console.log("Failed to fetch group data");
+        //("Failed to fetch group data");
       }
     } catch (error: any) {
       if (error.response) {
         toast.error(error.response.data.message || 'An error occurred');
       }
-      console.error("An error occurred while fetching group data:", error);
+      //ror("An error occurred while fetching group data:", error);
     }
   };
-  // useEffect(() => {
-  //   takefreind();
-  // }, []);
+
   /////////////////////////////////
 
   return (
@@ -92,7 +90,6 @@ const CreateRoom = () => {
           Save
         </button>
       </div>
-      {/* <Toaster /> */}
     </div>
   );
 };

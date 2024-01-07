@@ -32,3 +32,19 @@ TO DO LIST:
     -Savage: Win 10 games with clean score.
     -Dominator: Win 10 consecutive games without a loss.
     -Master: win 50 clean games in row.
+
+
+    [Remind myself for back]
+    -rebuild gamegateway for online addon ()
+    -rebuild ready handler (Done)
+    -achievs
+
+    [Remind myself for front]
+    -add context  (Done)
+    -add board route  (Done)
+    -optimise canvas with single trigger in setInterval
+    -dont forget flags for useEffect onces protection
+    
+    
+    -goback eventHandler change emit body type
+    -rslts compos

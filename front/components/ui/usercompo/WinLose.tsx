@@ -5,23 +5,6 @@ function WinLose(props: { wl: string; opo: string; className: string }) {
 
   return (
     <div className={`${textColorClass} ${props.className} p-4 text-[13px]`}>
-      {/* {props.wl ? (
-        <div className="border flex space-x-1">
-          <p>
-            Congratulations! You emerged victorious in a thrilling ping pong
-            match against
-          </p>
-          <p className="text-white">{props.opo}</p>
-        </div>
-      ) : (
-        <div className="border flex space-x-1">
-          <p>
-            Every game is a chance to learn, grow, and come back stronger. You
-            lost against
-          </p>
-          <p className="text-white">{props.opo}</p>
-        </div>
-      )} */}
       <div className="border flex space-x-1">
           <p>
             Congratulations! You emerged victorious in a thrilling ping pong

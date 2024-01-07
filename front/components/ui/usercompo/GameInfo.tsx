@@ -16,13 +16,6 @@ type Achievement = {
   achieved: boolean;
 };
 const GetAchivment = (indice: string) => {
-  // console.log("indice achivements : ====> ", indice);
-  // const [achievements, setAchievements] = useState<Achievement[]>([
-  //   { description: "", achieved: true },
-  //   { description: "", achieved: false },
-  //   { description: "", achieved: true },
-  //   { description: "", achieved: true },
-  // ]);
   const achievementsInitialState: Achievement[] = [
     { description: "", achieved: true },
     { description: "", achieved: false },
@@ -32,13 +25,11 @@ const GetAchivment = (indice: string) => {
   const [achievements, setAchievements] = useState<Achievement[]>(
     achievementsInitialState
   );
-  // Fetch data using useEffect only once when the component mounts
   useEffect(() => {
     const fetchData = async () => {
-      console.log("Fetching data...");
       try {
         const response = await axios.get(
-          "http://localhost:3001/users/achievement",
+          process.env.BACK_END_URL + "users/achievement",
           {
             withCredentials: true,
             params: {
@@ -67,10 +58,10 @@ const GetAchivment = (indice: string) => {
           ];
           setAchievements(newAchievements);
         } else {
-          console.log("failed to fetch data");
+          //("failed to fetch data");
         }
       } catch (error) {
-        console.error("An error occurred while fetching user data:", error);
+        //ror("An error occurred while fetching user data:", error);
       }
     };
 
@@ -159,7 +150,7 @@ const GetMatchHistory = (indice: string): MatchHistory[] => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/users/matchs", {
+      const response = await axios.get(process.env.BACK_END_URL + "users/matchs", {
         withCredentials: true,
         params: {
           user: indice,
@@ -179,25 +170,21 @@ const GetMatchHistory = (indice: string): MatchHistory[] => {
 
         setMatchHistory(newMatchHistory);
       } else {
-        console.log("Failed to fetch data");
+        //("Failed to fetch data");
       }
     } catch (error) {
-      console.error("An error occurred while fetching user data:", error);
+      //ror("An error occurred while fetching user data:", error);
     }
   };
 
   useEffect(() => {
     fetchData();
   }, []);
-  console.log(matchHistory);
-
   return matchHistory;
 };
 
 const GameInfo = (id: any) => {
-  // console.log("l9laoui")
   const indice: string = id.id;
-  // console.log("test allah allah",indice);
   const achievements = GetAchivment(indice);
   const matchHistory = GetMatchHistory(indice);
   return (
@@ -216,9 +203,8 @@ const GameInfo = (id: any) => {
             {matchHistory.map((historyItem, index) => (
               <WinLose
                 key={index}
-                className={`w-full h-full row-start-${
-                  index + 1
-                } col-start-2 col-span-9 `}
+                className={`w-full h-full row-start-${index + 1
+                  } col-start-2 col-span-9 `}
                 opo1={historyItem.opo1}
                 opo2={historyItem.opo2}
                 result={historyItem.result}

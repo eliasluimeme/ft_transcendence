@@ -14,7 +14,7 @@ const FillSet: React.FC = () => {
   const router = useRouter();
   const fetchData = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/settings", {
+      const response = await axios.get(process.env.BACK_END_URL + "settings", {
         withCredentials: true,
       });
       if (response.status === 200) {
@@ -25,10 +25,10 @@ const FillSet: React.FC = () => {
           number: response.data.number,
         });
       } else {
-        console.log("failed to fetchdata");
+        //("failed to fetchdata");
       }
     } catch (error) {
-      console.error("An error occurred while fetching user data:", error);
+      //ror("An error occurred while fetching user data:", error);
     }
   };
 
@@ -43,17 +43,17 @@ const FillSet: React.FC = () => {
       [name]: value,
     }));
   };
-  function checkEmpty(name : string , fullName : string) : Boolean{
-    if(name.length === 0 || fullName.length === 0)
+  function checkEmpty(name: string, fullName: string): Boolean {
+    if (name.length === 0 || fullName.length === 0)
       return true
     return false;
   }
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-    if(!checkEmpty(inputValues.fullName, inputValues.userName)) {
-      const response = await axios.post(
-        "http://localhost:3001/settings/update",
+      if (!checkEmpty(inputValues.fullName, inputValues.userName)) {
+        const response = await axios.post(
+          process.env.BACK_END_URL + "settings/update",
           inputValues,
           {
             withCredentials: true,
@@ -61,27 +61,27 @@ const FillSet: React.FC = () => {
               "Content-Type": "application/json",
             },
           }
-          );
-          if (response.status === 201) {
-            console.log("Data sent successfully!");
-            toast.success('Data sent successfully!');
-          } else if (response.status === 403) {
-            toast.error(response.data.message || 'An error occurred');
-          }
+        );
+        if (response.status === 201) {
+          //("Data sent successfully!");
+          toast.success('Data sent successfully!');
+        } else if (response.status === 403) {
+          toast.error(response.data.message || 'An error occurred');
         }
-        
-      } catch (error: any) {
-        if (error.response && error.response.status === 403) {
-          toast.error(error.response.data.message || 'An error occurred');
-        }
-      console.error("An error occurred while sending data:", error);
+      }
+
+    } catch (error: any) {
+      if (error.response && error.response.status === 403) {
+        toast.error(error.response.data.message || 'An error occurred');
+      }
+      //ror("An error occurred while sending data:", error);
     }
   };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-[#1E2124] text-gray-300">
       <div className="w-96 p-6 bg-[#36393E] shadow-lg rounded-lg">
-        <form onSubmit={handleSubmit}>
+        <form >
           <div className="mb-6">
             <label
               htmlFor="inline-full-name"

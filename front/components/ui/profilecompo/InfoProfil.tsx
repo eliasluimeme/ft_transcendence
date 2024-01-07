@@ -1,11 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card";
 import Link from "next/link";
 import axios from "axios";
 
@@ -17,7 +12,7 @@ type Data = {
   rank: string;
 };
 
-const getInitialData = (): Data => {
+const GetInitialData = (): Data => {
   const [profileInfo, setProfileInfo] = useState<Data>({
     image: "",
     statu: "",
@@ -27,7 +22,7 @@ const getInitialData = (): Data => {
   });
   const fetchData = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/profile", {
+      const response = await axios.get(process.env.BACK_END_URL + "profile", {
         withCredentials: true,
       });
       if (response.status === 200) {
@@ -39,10 +34,10 @@ const getInitialData = (): Data => {
           rank: response.data.rank,
         });
       } else {
-        console.log("failed to fetchdata");
+        //("failed to fetchdata");
       }
     } catch (error) {
-      console.error("An error occurred while fetching user data:", error);
+      //ror("An error occurred while fetching user data:", error);
     }
   };
   useEffect(() => {
@@ -83,8 +78,7 @@ const Informations: React.FC<{ data: Data }> = ({ data }) => {
 };
 
 const InfoProfil = () => {
-  const data = getInitialData();
-  const [friend, sendFriend] = useState(false);
+  const data = GetInitialData();
 
   return (
     <div className="w-full h-full grid grid-cols-12">

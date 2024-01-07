@@ -22,7 +22,7 @@ const JoinRoom = () => {
 
   const join = async () => {
     try {
-      const response = await axios.post("http://localhost:3001/chat/join", {
+      const response = await axios.post(process.env.BACK_END_URL + "chat/join", {
         roomName: roomName,
         pw: passwordName,
       }, {
@@ -33,13 +33,13 @@ const JoinRoom = () => {
         router.push('/chat/chatconv?id=' + response.data.id);
         toast.success("Room Joined Successfuly");
       } else {
-        console.log("Failed to fetch group data");
+        //("Failed to fetch group data");
       }
     } catch (error: any) {
       if (error.response) {
         toast.error(error.response.data.message || 'An error occurred');
       }
-      console.error("An error occurred while fetching group data:", error);
+      //ror("An error occurred while fetching group data:", error);
     }
   };
 

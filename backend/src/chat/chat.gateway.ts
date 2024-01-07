@@ -16,7 +16,7 @@ import { idMessageDto } from './dto/id.dto';
 @Injectable()
 @WebSocketGateway({
   cors: {
-    origin: 'http://localhost:3000',
+    origin: process.env.FRONTEND_URL,
     credentials: true,
   },
   namespace: 'chat',
@@ -56,7 +56,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
             return user;
         } else return user;
     } catch (error) {
-        console.error('Error finding user: ', error);
+        //ror('Error finding user: ', error);
     }
 }
 
@@ -65,6 +65,7 @@ async join_chat_rooms(socket: Socket, user_id: number) {
     all_user_rooms.forEach((room) => {
       socket.join(room.chatroom.id + "_room")
     });
+    //("All Rooms joined ",socket.rooms)
   }
 
 async handleConnection(client: Socket) {
@@ -82,11 +83,11 @@ async handleConnection(client: Socket) {
       return this.disconnect(client);
 
     this.userToClient.set(user.id, client.id);
-    console.log(client.id, 'successfully connected ');
+    //(client.id, 'successfully connected ');
     client.data.user = verifiedToken
     await this.join_chat_rooms(client, user.id)
     } catch (error) {
-        console.log('erroooor: ', error);
+        //('erroooor: ', error);
       return this.disconnect(client);
     }
   }
@@ -94,7 +95,7 @@ async handleConnection(client: Socket) {
   handleDisconnect(client: Socket) {
     delete this.userToClient[client.id];
     this.disconnect(client);
-    console.log('disconnected', client.id);
+    //('disconnected', client.id);
   }
 
   private disconnect(client: Socket) {
@@ -127,6 +128,7 @@ async handleConnection(client: Socket) {
       createdAt : new Date(),
       roomId: data.roomId,
     }
+      //("my room  : ", data.roomId  + "_room");
       this.server.to(data.roomId  + "_room").emit('reciecved', pyload);
       await this.chatService.addMessage(data.senderId, newId, data.messageContent);
   }

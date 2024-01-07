@@ -1,8 +1,6 @@
 "use client";
 import React from "react";
 import { useState } from "react";
-import Image from "next/image";
-import { useEffect } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 
@@ -25,7 +23,7 @@ const Page = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:3001/auth/2fa/login",
+        process.env.BACK_END_URL + "auth/2fa/login",
         code,
         {
           withCredentials: true,
@@ -36,14 +34,13 @@ const Page = () => {
       );
 
       if (response.status === 201) {
-        // console.log(code);
         router.push("/");
-        console.log("Data sent successfully!");
+        //("Data sent successfully!");
       } else {
-        console.error("Failed to send data.");
+        //ror("Failed to send data.");
       }
     } catch (error) {
-      console.error("An error occurred while sending data:", error);
+      //ror("An error occurred while sending data:", error);
     }
   };
 
@@ -61,7 +58,6 @@ const Page = () => {
           <input
             type="text"
             name="number"
-            // value={}
             onChange={handleInputChange}
             className="text-black w-full py-2 px-3 border border-gray-300 rounded-lg focus:outline-none focus:border-gray-900"
           />

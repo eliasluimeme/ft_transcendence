@@ -19,3 +19,7 @@
   ::-webkit-scrollbar-track {
     background: transparent;
   }
+
+  .debug{
+    border: 1px solid red;
+  }
